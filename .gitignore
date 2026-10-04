@@ -18,3 +18,19 @@ desktop.ini
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Prisma
+src/generated/
+prisma/*.db
+prisma/*.db-journal
+!.env.production.example
+
+# Uploaded files (covers, rulebooks)
+storage/

@@ -1,0 +1,186 @@
+/*
+ * Theme palettes. Each theme sets the same design tokens; components only use tokens.
+ * Applied with <html data-theme="...">. "system" follows the OS light/dark preference.
+ * Board-game themes are fan palettes inspired by each game's mood (no official artwork).
+ */
+
+:root,
+[data-theme="light"],
+[data-theme="system"] {
+  color-scheme: light;
+  --bg: #f7f1e3;
+  --surface: #fffaf0;
+  --surface-2: #f1e6cf;
+  --ink: #2b2118;
+  --muted: #6b5d4f;
+  --line: #e2d3b5;
+  --accent: #d9480f;
+  --accent-ink: #ffffff;
+  --accent-2: #2f6b4f;
+  --danger: #c92a2a;
+  --success: #2b8a3e;
+  --shadow: 0 1px 0 rgb(80 50 20 / 0.06), 0 8px 24px -12px rgb(80 50 20 / 0.25);
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='98' viewBox='0 0 56 98'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0 32V66' fill='none' stroke='%23d9480f' stroke-opacity='.06' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #17140f;
+  --surface: #221d17;
+  --surface-2: #2c261f;
+  --ink: #f3ead9;
+  --muted: #b4a68f;
+  --line: #3a3228;
+  --accent: #f08c00;
+  --accent-ink: #1a1209;
+  --accent-2: #63c49a;
+  --danger: #ff6b6b;
+  --success: #69db7c;
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.3), 0 10px 30px -12px rgb(0 0 0 / 0.7);
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='98' viewBox='0 0 56 98'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0 32V66' fill='none' stroke='%23f08c00' stroke-opacity='.05' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="system"] {
+    color-scheme: dark;
+    --bg: #17140f;
+    --surface: #221d17;
+    --surface-2: #2c261f;
+    --ink: #f3ead9;
+    --muted: #b4a68f;
+    --line: #3a3228;
+    --accent: #f08c00;
+    --accent-ink: #1a1209;
+    --accent-2: #63c49a;
+    --danger: #ff6b6b;
+    --success: #69db7c;
+    --shadow: 0 1px 0 rgb(0 0 0 / 0.3), 0 10px 30px -12px rgb(0 0 0 / 0.7);
+    --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='98' viewBox='0 0 56 98'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0 32V66' fill='none' stroke='%23f08c00' stroke-opacity='.05' stroke-width='2'/%3E%3C/svg%3E");
+  }
+}
+
+/* Catan — sand, brick and forest, hex tiles */
+[data-theme="catan"] {
+  color-scheme: light;
+  --bg: #f4e3c1;
+  --surface: #fff6e0;
+  --surface-2: #ecd3a1;
+  --ink: #3b2412;
+  --muted: #7a5a3a;
+  --line: #dcbf8a;
+  --accent: #c1440e;
+  --accent-ink: #ffffff;
+  --accent-2: #2f6b2f;
+  --danger: #a61e1e;
+  --success: #2f6b2f;
+  --shadow: 0 1px 0 rgb(90 50 10 / 0.08), 0 10px 26px -12px rgb(90 50 10 / 0.35);
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='98' viewBox='0 0 56 98'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0 32V66' fill='none' stroke='%23c1440e' stroke-opacity='.12' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+/* Anachrony — exosuit cyan on a dark future grid */
+[data-theme="anachrony"] {
+  color-scheme: dark;
+  --bg: #0b131b;
+  --surface: #122030;
+  --surface-2: #18293a;
+  --ink: #e3f1f5;
+  --muted: #8aa3b3;
+  --line: #23394d;
+  --accent: #3fd0c9;
+  --accent-ink: #04201f;
+  --accent-2: #f2a93b;
+  --danger: #ff6b6b;
+  --success: #63e6be;
+  --shadow: 0 0 0 1px rgb(63 208 201 / 0.05), 0 12px 30px -12px rgb(0 0 0 / 0.8);
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath d='M0 20h40M20 0v40' stroke='%233fd0c9' stroke-opacity='.06'/%3E%3Ccircle cx='20' cy='20' r='2' fill='%233fd0c9' fill-opacity='.14'/%3E%3C/svg%3E");
+}
+
+/* Merchants Cove — night harbour, lantern gold and ship timber */
+[data-theme="merchants-cove"] {
+  color-scheme: dark;
+  --bg: #0f1c26;
+  --surface: #1a2a35;
+  --surface-2: #233846;
+  --ink: #f4e9d3;
+  --muted: #b2a58c;
+  --line: #33495a;
+  --accent: #e0b04a;
+  --accent-ink: #2a1c05;
+  --accent-2: #c0532d;
+  --danger: #ff8787;
+  --success: #8ce99a;
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.3), 0 12px 30px -12px rgb(0 0 0 / 0.75);
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='24'%3E%3Cpath d='M0 12 Q 20 2 40 12 T 80 12' fill='none' stroke='%23e0b04a' stroke-opacity='.08' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+/* Wingspan — pastel field guide, eggs and feathers */
+[data-theme="wingspan"] {
+  color-scheme: light;
+  --bg: #f3efe2;
+  --surface: #fbf9f1;
+  --surface-2: #e7efe9;
+  --ink: #2c3a33;
+  --muted: #6a7a70;
+  --line: #d4dccf;
+  --accent: #c26a3d;
+  --accent-ink: #ffffff;
+  --accent-2: #4f8a78;
+  --danger: #b03a2e;
+  --success: #4f8a78;
+  --shadow: 0 1px 0 rgb(40 60 50 / 0.06), 0 10px 26px -12px rgb(40 60 50 / 0.25);
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='34' height='34'%3E%3Cellipse cx='17' cy='17' rx='3' ry='4' fill='%234f8a78' fill-opacity='.12'/%3E%3C/svg%3E");
+}
+
+/* Azul — cobalt tiles with amber glaze */
+[data-theme="azul"] {
+  color-scheme: light;
+  --bg: #eef3fa;
+  --surface: #ffffff;
+  --surface-2: #dfe8f5;
+  --ink: #0f2747;
+  --muted: #5a6f8c;
+  --line: #c8d6ea;
+  --accent: #1d4e89;
+  --accent-ink: #ffffff;
+  --accent-2: #e8a33d;
+  --danger: #c0392b;
+  --success: #2f9e44;
+  --shadow: 0 1px 0 rgb(15 39 71 / 0.06), 0 10px 26px -12px rgb(15 39 71 / 0.3);
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect x='4' y='4' width='40' height='40' rx='5' fill='none' stroke='%231d4e89' stroke-opacity='.08' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+/* Terraforming — rust plains and oxygen blue */
+[data-theme="terraforming"] {
+  color-scheme: dark;
+  --bg: #1a0d09;
+  --surface: #2a1510;
+  --surface-2: #361c14;
+  --ink: #f7e4d6;
+  --muted: #c49a83;
+  --line: #4d281c;
+  --accent: #f2742b;
+  --accent-ink: #230c02;
+  --accent-2: #6cc3d5;
+  --danger: #ff8787;
+  --success: #8ce99a;
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.35), 0 12px 30px -12px rgb(0 0 0 / 0.8);
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='98' viewBox='0 0 56 98'%3E%3Cpath d='M28 66L0 50V16L28 0l28 16v34L28 66zm0 32V66' fill='none' stroke='%23f2742b' stroke-opacity='.07' stroke-width='2'/%3E%3C/svg%3E");
+}
+
+/* Carcassonne — meadow tiles, roads and city walls */
+[data-theme="carcassonne"] {
+  color-scheme: light;
+  --bg: #eef0dc;
+  --surface: #fbfbf1;
+  --surface-2: #e2e8c8;
+  --ink: #2e3320;
+  --muted: #6a7050;
+  --line: #cfd6af;
+  --accent: #a33b2c;
+  --accent-ink: #ffffff;
+  --accent-2: #6f8f3a;
+  --danger: #a61e1e;
+  --success: #5c7f2a;
+  --shadow: 0 1px 0 rgb(50 60 20 / 0.06), 0 10px 26px -12px rgb(50 60 20 / 0.28);
+  --pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='none' stroke='%236f8f3a' stroke-opacity='.1'/%3E%3Cpath d='M30 0v60' stroke='%23a33b2c' stroke-opacity='.06' stroke-width='3' stroke-dasharray='6 6'/%3E%3C/svg%3E");
+}

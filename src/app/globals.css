@@ -1,0 +1,202 @@
+@import "tailwindcss";
+@import "./themes.css";
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-2: var(--accent-2);
+  --color-danger: var(--danger);
+  --color-success: var(--success);
+  --font-display: var(--font-display), ui-serif, Georgia, serif;
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --shadow-card: var(--shadow);
+}
+
+html {
+  background-color: var(--bg);
+  background-image: var(--pattern);
+  transition: background-color 0.4s ease;
+}
+
+body {
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+  transition:
+    background-color 0.4s ease,
+    color 0.4s ease;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-line/70 bg-surface/85 shadow-card backdrop-blur-xl;
+  }
+  .card-hover {
+    @apply border border-line/70 bg-surface/80 shadow-card backdrop-blur-xl transition duration-300
+      hover:-translate-y-1 hover:border-accent/60 hover:shadow-[0_20px_50px_-20px_var(--accent)];
+  }
+  .glass {
+    @apply border border-white/10 bg-surface/70 shadow-[0_8px_40px_-12px_rgb(0_0_0/0.35)] backdrop-blur-2xl;
+  }
+  .text-gradient {
+    @apply bg-gradient-to-r from-accent via-[color-mix(in_oklab,var(--accent)_50%,var(--accent-2))] to-accent-2 bg-clip-text text-transparent;
+  }
+  .card-pad {
+    @apply p-5 sm:p-6;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition
+      active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-gradient-to-br from-accent to-[color-mix(in_oklab,var(--accent)_75%,var(--accent-2))] text-accent-ink
+      shadow-[0_8px_24px_-10px_var(--accent)] hover:shadow-[0_10px_30px_-8px_var(--accent)] hover:brightness-110;
+  }
+  .btn-secondary {
+    @apply border border-line bg-surface-2 text-ink hover:border-accent;
+  }
+  .btn-ghost {
+    @apply text-ink hover:bg-surface-2;
+  }
+  .btn-danger {
+    @apply bg-danger text-white hover:brightness-110;
+  }
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+  .input,
+  .select,
+  .textarea {
+    @apply w-full rounded-xl border border-line bg-bg px-3 py-2 text-sm text-ink placeholder:text-muted
+      outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/25;
+  }
+  .textarea {
+    @apply min-h-24;
+  }
+  .label {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-muted;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-line bg-surface-2 px-2.5 py-0.5 text-xs font-medium text-ink;
+  }
+  .chip-accent {
+    @apply border-transparent bg-accent text-accent-ink;
+  }
+  .page-title {
+    @apply font-display text-3xl font-bold tracking-tight sm:text-4xl;
+  }
+  .section-title {
+    @apply font-display text-xl font-semibold;
+  }
+  .link {
+    @apply font-medium text-accent underline-offset-4 hover:underline;
+  }
+}
+
+/* Wooden-token look used by meeples and dice */
+.wood {
+  filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.18)) drop-shadow(0 6px 8px rgb(0 0 0 / 0.18));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── 2030 layer: aurora background, grain, page entrance ── */
+.aurora {
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(80px) saturate(140%);
+  opacity: 0.55;
+}
+.aurora span {
+  position: absolute;
+  border-radius: 9999px;
+  mix-blend-mode: normal;
+  animation: aurora-drift 26s ease-in-out infinite alternate;
+}
+.aurora span:nth-child(1) {
+  width: 45vw; height: 45vw; left: 5%; top: 0%;
+  background: color-mix(in oklab, var(--accent) 55%, transparent);
+}
+.aurora span:nth-child(2) {
+  width: 38vw; height: 38vw; right: 0%; top: 25%;
+  background: color-mix(in oklab, var(--accent-2) 50%, transparent);
+  animation-duration: 32s; animation-delay: -8s;
+}
+.aurora span:nth-child(3) {
+  width: 30vw; height: 30vw; left: 35%; bottom: 0%;
+  background: color-mix(in oklab, var(--accent) 30%, var(--accent-2) 30%);
+  animation-duration: 38s; animation-delay: -14s;
+}
+@keyframes aurora-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(6vw, -4vh, 0) scale(1.15); }
+  100% { transform: translate3d(-4vw, 5vh, 0) scale(0.95); }
+}
+.grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.shimmer {
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.25) 50%, transparent 70%);
+  background-size: 250% 100%;
+  animation: shimmer 2.8s linear infinite;
+}
+@keyframes shimmer {
+  to { background-position: -150% 0; }
+}
+/* App shell: collapsible sidebar on large screens */
+.app-sidebar {
+  width: 272px;
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+html[data-sidebar="collapsed"] .app-sidebar {
+  width: 84px;
+}
+@media (min-width: 1024px) {
+  .app-shell {
+    padding-left: 272px;
+    transition: padding-left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  html[data-sidebar="collapsed"] .app-shell {
+    padding-left: 84px;
+  }
+}
+html[data-sidebar="collapsed"] .sidebar-label {
+  display: none;
+}
+/* Markdown answers from the AI assistant */
+.prose-chat > * + * { margin-top: 0.6em; }
+.prose-chat h1, .prose-chat h2, .prose-chat h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.05em; }
+.prose-chat ul { list-style: disc; padding-left: 1.25em; }
+.prose-chat ol { list-style: decimal; padding-left: 1.25em; }
+.prose-chat li + li { margin-top: 0.25em; }
+.prose-chat strong { color: var(--ink); font-weight: 700; }
+.prose-chat code { background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 0.35em; font-size: 0.9em; }
+.prose-chat table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+.prose-chat th, .prose-chat td { border: 1px solid var(--line); padding: 0.3em 0.5em; text-align: left; }
+.prose-chat blockquote { border-left: 3px solid var(--accent); padding-left: 0.75em; color: var(--muted); }
