@@ -34,3 +34,6 @@ prisma/*.db-journal
 
 # Uploaded files (covers, rulebooks)
 storage/
+
+# server backups made by scripts/update.sh
+backups/

@@ -81,7 +81,15 @@
     "emailConfirmed": "Your email address is confirmed.",
     "passwordChanged": "Your password was changed.",
     "resendVerify": "Send the confirmation email again",
-    "verifySent": "Sent: check your inbox (and spam folder)."
+    "verifySent": "Sent: check your inbox (and spam folder).",
+    "confirmEmail": {
+      "title": "Confirm your address",
+      "lead": "One last click to confirm your email address and join the table.",
+      "button": "Confirm my address",
+      "already": "Your email address is already confirmed. You can sign in.",
+      "invalid": "This link is no longer valid (expired or replaced by a newer one). Sign in: you'll be able to ask for a new confirmation email.",
+      "signIn": "Go to sign in"
+    }
   },
   "meeple": {
     "yours": "Your meeple",

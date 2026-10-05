@@ -81,7 +81,15 @@
     "emailConfirmed": "Ton adresse courriel est confirmée.",
     "passwordChanged": "Ton mot de passe a été changé.",
     "resendVerify": "Renvoyer le courriel de confirmation",
-    "verifySent": "C'est envoyé : regarde ta boîte de réception (et les indésirables)."
+    "verifySent": "C'est envoyé : regarde ta boîte de réception (et les indésirables).",
+    "confirmEmail": {
+      "title": "Confirme ton adresse",
+      "lead": "Un dernier clic pour confirmer ton adresse courriel et entrer à la table.",
+      "button": "Confirmer mon adresse",
+      "already": "Ton adresse courriel est déjà confirmée. Tu peux te connecter.",
+      "invalid": "Ce lien n'est plus valide (expiré ou remplacé par un plus récent). Connecte-toi : tu pourras demander un nouveau courriel de confirmation.",
+      "signIn": "Aller à la connexion"
+    }
   },
   "meeple": {
     "yours": "Votre meeple",

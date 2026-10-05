@@ -32,3 +32,10 @@ export async function consumeEmailToken(token: string, kind: TokenKind) {
   const done = await db.emailToken.updateMany({ where: { id: row.id, usedAt: null }, data: { usedAt: new Date() } });
   return done.count ? row.userId : null;
 }
+
+/** Whoever a link was made for, even when it's used up or expired (to say "already confirmed"). */
+export async function emailTokenOwner(token: string, kind: TokenKind) {
+  if (!token) return null;
+  const row = await db.emailToken.findUnique({ where: { tokenHash: hash(token) }, select: { kind: true, userId: true } });
+  return row?.kind === kind ? row.userId : null;
+}

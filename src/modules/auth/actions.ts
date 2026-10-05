@@ -13,7 +13,7 @@ import { HEX_COLOR, str, type ActionState } from "@/lib/forms";
 import { LOCALE_COOKIE, LOCALES, THEME_COOKIE, type Locale } from "@/lib/constants";
 import { createPersonalLibrary } from "@/modules/kallax/service";
 import { mailConfigured } from "@/lib/mail";
-import { consumeEmailToken } from "@/lib/auth/emailTokens";
+import { consumeEmailToken, emailTokenOwner } from "@/lib/auth/emailTokens";
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/modules/notifications/emails";
 
 /** Email confirmation applies when admins want it and email is set up. */
@@ -214,4 +214,24 @@ export async function resetPasswordWithTokenAction(token: string, _prev: ActionS
   await createSession(userId);
   await rememberPreferences(user.locale, user.theme);
   redirect("/home?reset=1");
+}
+
+/**
+ * The "Confirmer mon adresse" button of the page the email links to. Opening the link only
+ * shows that page: antispam filters that open every link to scan it can't use the token up.
+ */
+export async function confirmEmailAction(token: string) {
+  const userId = await consumeEmailToken(token, "verify");
+  if (!userId) {
+    // already used: fine if the address is confirmed (a second click, another device…)
+    const owner = await emailTokenOwner(token, "verify");
+    const done = owner ? await db.user.findUnique({ where: { id: owner }, select: { emailVerifiedAt: true } }) : null;
+    redirect(done?.emailVerifiedAt ? "/?verified=1" : "/?verify=invalid");
+  }
+  const user = await db.user.update({ where: { id: userId }, data: { emailVerifiedAt: new Date() } });
+  await audit(userId, "user.verifyEmail", user.username);
+  // Still waiting for a team member's approval: confirmed, but not signed in yet.
+  if (user.status !== "ACTIVE") redirect("/?pending=1&verified=1");
+  await createSession(userId);
+  redirect("/home?verified=1");
 }
