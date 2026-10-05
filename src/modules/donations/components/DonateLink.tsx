@@ -1,49 +1,22 @@
 import { getTranslations } from "next-intl/server";
-import { HeartHandshake } from "lucide-react";
 import { getModule } from "@/lib/modules";
+import { DonateDialog, DonateTrigger } from "./DonatePopup";
 
-// Deliberately discreet: a small heart in the header and a one-line footer link.
-// Hidden when the module is off or no donation URL is configured.
+// Deliberately discreet: a small link in the top bar and a one-line footer link, both opening
+// the "Soutenir le projet" popup. Hidden when the module is off.
 
-export async function DonateLink({ placement }: { placement: "header" | "footer" | "top" }) {
+export async function DonateLink({ placement }: { placement: "footer" | "top" }) {
   const mod = await getModule("donations");
-  const url = String(mod.settings.url ?? "");
-  if (!mod.enabled || !url) return null;
-  if ((placement === "header" || placement === "top") && !mod.settings.showInHeader) return null;
-  if (placement === "footer" && !mod.settings.showInFooter) return null;
+  if (!mod.enabled) return null;
+  if (placement === "top" && mod.settings.showInHeader === false) return null;
+  if (placement === "footer" && mod.settings.showInFooter === false) return null;
   const t = await getTranslations("donations");
+  return <DonateTrigger placement={placement} label={placement === "top" ? t("support") : t("footer")} />;
+}
 
-  if (placement === "top") {
-    return (
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="hidden items-center gap-1.5 rounded-xl border border-line/70 px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-accent hover:text-accent sm:inline-flex"
-      >
-        <HeartHandshake className="size-4" aria-hidden />
-        {t("support")}
-      </a>
-    );
-  }
-  if (placement === "header") {
-    return (
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        title={t("support")}
-        className="btn btn-ghost btn-sm text-muted hover:text-accent"
-      >
-        <HeartHandshake className="size-4" aria-hidden />
-        <span className="sr-only">{t("support")}</span>
-      </a>
-    );
-  }
-  return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 hover:text-accent">
-      <HeartHandshake className="size-3.5" aria-hidden />
-      {t("footer")}
-    </a>
-  );
+/** The popup itself, mounted once in the member layout (null when the module is off). */
+export async function DonatePopupHost() {
+  const mod = await getModule("donations");
+  if (!mod.enabled) return null;
+  return <DonateDialog url={String(mod.settings.url ?? "")} transferEmail={String(mod.settings.transferEmail ?? "").trim()} />;
 }

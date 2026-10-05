@@ -147,11 +147,25 @@
     "orderSaved": "Ordre enregistré!",
     "menuOrder": "Ordre du menu",
     "menuOrderLead": "Choisis l'ordre des éléments de ton menu. Glisse-les par la poignée ou utilise les flèches.",
-    "suggestions": "Boîte à suggestions"
+    "suggestions": "Boîte à suggestions",
+    "animationsOn": "Animations activées (cliquer pour les couper)",
+    "animationsOff": "Animations désactivées (cliquer pour les remettre)",
+    "picker": "Coup de dé"
   },
   "donations": {
     "support": "Soutenir le projet",
-    "footer": "Vous aimez le site? Offrez-nous un café"
+    "footer": "Vous aimez le site? Offrez-nous un café",
+    "popup": {
+      "title": "Soutenir le projet",
+      "b1": "Le site est gratuit, sans pub, fait par des passionnés.",
+      "b2": "L'hébergement, l'entretien et les recherches IA (Claude) sont présentement payés de notre poche.",
+      "b3": "Chaque don, petit ou grand, aide à garder le site en marche.",
+      "thanks": "Merci de faire rouler la table! 🎲",
+      "give": "Faire un don",
+      "later": "Plus tard",
+      "transfer": "Fais un virement Interac à :",
+      "copy": "Copier l'adresse"
+    }
   },
   "location": {
     "useMine": "Utiliser ma position",
@@ -193,10 +207,11 @@
       "discover": "Rien ne correspond. Pourquoi ne pas en organiser une?"
     },
     "kinds": {
-      "HOME_GAME": "Partie à la maison",
       "GAME_NIGHT": "Soirée de jeux",
+      "BOARD_GAME_EVENT": "Événement de jeux de société",
       "TOURNAMENT": "Tournoi",
-      "CONVENTION": "Convention"
+      "CONVENTION": "Convention",
+      "HOME_GAME": "Soirée de jeux"
     },
     "visibility": {
       "PUBLIC": "Publique",
@@ -226,7 +241,7 @@
       "locationVenue": "Café, boutique, salle communautaire…",
       "city": "Ville",
       "address": "Adresse",
-      "addressPrivate": "Pour une partie à la maison, l'adresse n'est montrée qu'aux joueurs confirmés.",
+      "addressPrivate": "Pour une soirée chez quelqu'un, l'adresse n'est montrée qu'aux joueurs confirmés.",
       "visibility": "Qui peut la voir",
       "maxPlayers": "Places (vous inclus)",
       "maxPlayersHint": "Sans limite",
@@ -237,7 +252,6 @@
       "title": "Donnez un titre à votre partie (120 caractères max.).",
       "date": "Choisissez une date et une heure de début.",
       "endBeforeStart": "La fin doit être après le début.",
-      "homeGamesDisabled": "Les parties à la maison sont désactivées pour le moment.",
       "maxPlayers": "Le nombre de places doit être entre 2 et {cap}."
     },
     "noLocation": "Lieu à confirmer",
@@ -300,7 +314,10 @@
       "manualHint": "Entre toi-même les infos de ton jeu. Seul le nom est obligatoire; s'il n'est pas encore dans la Ludothèque, il y sera ajouté.",
       "how": "Comment veux-tu ajouter ton jeu?",
       "expansionOf": "C'est une extension de… (facultatif)",
-      "notExpansion": "Non, c'est un jeu à part entière"
+      "notExpansion": "Non, c'est un jeu à part entière",
+      "timesPlayed": "Nombre de fois joué",
+      "timesPlayedHint": "Les parties notées dans Parties jouées s'ajoutent toutes seules.",
+      "timesPlayedLogged": "{count, plural, one {Dont # partie notée dans Parties jouées (elle compte toute seule).} other {Dont # parties notées dans Parties jouées (elles comptent toutes seules).}}"
     },
     "status": {
       "OWNED": "Possédé",
@@ -482,7 +499,9 @@
       "of2": "extension de",
       "attached": "{count, plural, =0 {Rien n'a été rattaché.} one {# extension rattachée à son jeu.} other {# extensions rattachées à leur jeu.}}",
       "close": "Fermer"
-    }
+    },
+    "playedTimes": "{count, plural, one {Joué # fois} other {Joué # fois}}",
+    "neverPlayed": "Jamais joué"
   },
   "plays": {
     "title": "Suivi des parties",
@@ -525,7 +544,8 @@
       "location": "Où",
       "notes": "Notes",
       "submit": "Noter cette partie",
-      "save": "Enregistrer les changements"
+      "save": "Enregistrer les changements",
+      "expansions": "Extensions utilisées"
     },
     "errors": {
       "game": "À quel jeu avez-vous joué?",
@@ -538,7 +558,29 @@
     "edit": "Modifier cette partie",
     "editTitle": "Modifier la partie",
     "editLead": "Corrige le jeu, la date, les scores ou les joueurs. Les amis déjà confirmés restent confirmés.",
-    "deleteConfirm": "Supprimer cette partie pour tout le monde?"
+    "deleteConfirm": "Supprimer cette partie pour tout le monde?",
+    "timer": {
+      "start": "Commencer la partie",
+      "hint": "Le chrono démarre. Tu peux fermer la page : la partie reste en cours, reviens entrer les points à la fin.",
+      "running": "Partie en cours… tout est gardé automatiquement.",
+      "paused": "En pause",
+      "pause": "Pause",
+      "resume": "Reprendre"
+    },
+    "draft": {
+      "restored": "Partie en cours : tout est comme tu l'avais laissé.",
+      "cancel": "Annuler",
+      "confirmTitle": "Annuler cette partie?",
+      "confirmText": "Tout ce qui a été entré sera supprimé : le jeu, les joueurs, les points et le chrono. On ne pourra pas le récupérer.",
+      "no": "Non, continuer",
+      "yes": "Oui, supprimer",
+      "banner": "Partie en cours",
+      "noGame": "Jeu pas encore choisi",
+      "paused": "en pause",
+      "resume": "Reprendre",
+      "play": "Jouer",
+      "playHint": "Garder la partie en cours et quitter la page : reviens entrer les points à la fin."
+    }
   },
   "friends": {
     "title": "Amis",
@@ -670,6 +712,11 @@
         "bazaarMessage": "Un nouveau message au bazar",
         "suggestionUpdate": "L'équipe répond à ma suggestion"
       }
+    },
+    "guide": {
+      "title": "Guide du site",
+      "lead": "Le petit tour du site présenté à ta première connexion.",
+      "replay": "Revoir le guide"
     }
   },
   "home": {
@@ -893,11 +940,11 @@
         "ai": "Assistant des règles : répond aux questions sur un jeu à partir de son livret téléversé.",
         "bazaar": "Les membres vendent ou échangent des jeux, avec photos et messages privés.",
         "facebook": "Une page avec des onglets vers vos groupes Facebook.",
-        "suggestions": "Boîte à suggestions : les membres proposent des idées et votent. Les doublons deviennent des votes."
+        "suggestions": "Boîte à suggestions : les membres proposent des idées et votent. Les doublons deviennent des votes.",
+        "picker": "Coup de dé : choisir un jeu de sa Kallax avec des filtres, tirer au sort dans une liste, désigner le premier joueur."
       },
       "settings": {
         "events": {
-          "allowHomeGames": "Permettre les parties à la maison",
           "allowPublicEvents": "Permettre les événements publics",
           "defaultRadiusKm": "Rayon « près de moi » par défaut (km)",
           "maxPlayersCap": "Nombre maximal de places par événement"
@@ -919,6 +966,7 @@
         },
         "donations": {
           "url": "URL de la page de dons",
+          "transferEmail": "Courriel pour les virements Interac",
           "showInHeader": "Afficher le cœur dans l'en-tête",
           "showInFooter": "Afficher le lien dans le pied de page"
         },
@@ -1544,7 +1592,18 @@
     },
     "withRulebooks": "Réponses tirées {count, plural, one {du livret du jeu} other {des # livrets du jeu}}",
     "readingRulebooks": "L'IA lit :",
-    "addRulebook": "+ Ajouter un livret"
+    "addRulebook": "+ Ajouter un livret",
+    "notice": {
+      "title": "IA des règles : comment ça marche",
+      "b1": "L'IA Claude est payée par l'admin du site, avec une limite d'utilisation.",
+      "b2": "Quand il ne reste plus de jetons, on bascule sur une IA gratuite, un peu moins performante.",
+      "b3": "Envie de plus? Contacte l'admin pour te faire allouer des jetons privés (à tes frais).",
+      "b3own": "Envie de plus? Contacte l'admin pour te faire allouer des jetons privés (à tes frais), ou branche ton propre compte Claude :",
+      "ownLink": "Paramètres → Mes crédits Claude",
+      "b4": "Les dons sont les bienvenus : ils paient les jetons de tout le monde!",
+      "donate": "Faire un don",
+      "ok": "Compris!"
+    }
   },
   "facebook": {
     "title": "Groupes Facebook",
@@ -1735,6 +1794,252 @@
       "suggestionUpdate": {
         "title": "Ta suggestion a une réponse",
         "body": "L'équipe a mis à jour ta suggestion « {title} »."
+      }
+    }
+  },
+  "guide": {
+    "progress": "Étape {n} sur {total}",
+    "skip": "Passer le guide",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "finish": "C'est parti!",
+    "showNext": "Me remontrer ce guide à la prochaine connexion",
+    "steps": {
+      "welcome": {
+        "title": "Bienvenue à la table, {name}!",
+        "b1": "Un tour rapide du site : moins d'une minute.",
+        "b2": "Suis le pion : il te montre l'essentiel.",
+        "b3": "Tu peux passer le guide à tout moment (✕)."
+      },
+      "menu": {
+        "title": "Le menu",
+        "b1": "Tous les modules du site sont ici.",
+        "b2": "« Réorganiser le menu » : mets-les dans l'ordre qui te plaît.",
+        "b3": "Sur téléphone, le menu est en bas de l'écran."
+      },
+      "home": {
+        "title": "Accueil",
+        "b1": "Ce qui t'attend : demandes d'amis, parties à confirmer…",
+        "b2": "Tes prochaines parties et celles près de chez toi.",
+        "b3": "Des raccourcis pour annoncer ou noter une partie."
+      },
+      "events": {
+        "title": "Parties",
+        "b1": "Annonce une soirée de jeux, un événement, un tournoi ou une convention.",
+        "b2": "Trouve des tables près de chez toi.",
+        "b3": "L'adresse d'une soirée chez quelqu'un reste privée.",
+        "b4": "Vue liste ou calendrier."
+      },
+      "kallax": {
+        "title": "Ma Kallax",
+        "b1": "Tes jeux, visibles par toi seulement (et ton foyer si tu la partages).",
+        "b2": "Ajoute un jeu à la main, par photo ou par liste : l'IA complète les infos.",
+        "b3": "Les extensions se rangent avec leur jeu."
+      },
+      "plays": {
+        "title": "Parties jouées",
+        "b1": "Note qui a joué, les scores et qui a gagné.",
+        "b2": "Commence la partie : le chrono tourne, reviens entrer les points à la fin.",
+        "b3": "Tous les joueurs confirmés peuvent corriger la partie.",
+        "b4": "Tes statistiques se remplissent toutes seules."
+      },
+      "picker": {
+        "title": "Coup de dé",
+        "b1": "Quel jeu jouer? Le dé pige dans ta Kallax.",
+        "b2": "Filtres : joueurs, durée, niveau, party game, type de jeu…",
+        "b3": "Tirage au sort dans ta propre liste.",
+        "b4": "Et il désigne le premier joueur!"
+      },
+      "ai": {
+        "title": "IA des règles",
+        "b1": "Pose ta question sur un jeu de ta Kallax.",
+        "b2": "Elle lit le livret PDF et cite les pages.",
+        "b3": "La FAQ répond d'abord, gratuitement.",
+        "b4": "Usage limité, payé par l'admin; ensuite une IA gratuite prend le relais."
+      },
+      "more": {
+        "title": "Et aussi…",
+        "b1": "Ludothèque : tous les jeux des membres, avec leur note.",
+        "b2": "Bazar : vends ou échange tes jeux.",
+        "b3": "Amis : ajoute tes partenaires de jeu.",
+        "b4": "Groupes Facebook : les communautés de la région."
+      },
+      "search": {
+        "title": "La recherche",
+        "b1": "Trouve un jeu, un membre ou une partie.",
+        "b2": "Raccourci : Ctrl + K."
+      },
+      "prefs": {
+        "title": "À ta façon",
+        "b1": "Langue : français ou anglais.",
+        "b2": "✨ Animations : active-les ou coupe-les.",
+        "b3": "Thèmes inspirés de jeux (Catan, Anachrony…)."
+      },
+      "account": {
+        "title": "Ton compte",
+        "b1": "Profil, paramètres et notifications par courriel.",
+        "b2": "Revoir ce guide : Paramètres → Guide du site."
+      },
+      "suggestions": {
+        "title": "Une idée?",
+        "b1": "La boîte à suggestions est toujours ouverte.",
+        "b2": "Vote pour les idées des autres membres."
+      },
+      "donate": {
+        "title": "Soutenir le projet",
+        "b1": "Ce lien ouvre une courte explication sur les dons.",
+        "b2": "Le site et l'IA des règles sont payés par l'équipe.",
+        "b3": "Un don, même petit, aide à garder le site en marche."
+      },
+      "end": {
+        "title": "Prêt à jouer!",
+        "b1": "Commence par ajouter tes jeux dans Ma Kallax.",
+        "b2": "Puis trouve ta prochaine partie. Bon jeu!"
+      }
+    }
+  },
+  "picker": {
+    "title": "Coup de dé",
+    "lead": "On ne sait pas à quoi jouer, ni qui commence? Laisse le dé décider.",
+    "tabs": {
+      "game": "Quel jeu jouer?",
+      "list": "Tirage au sort",
+      "first": "Premier joueur"
+    },
+    "game": {
+      "filters": "Filtres",
+      "clear": "Tout effacer",
+      "any": "Peu importe",
+      "players": "Nombre de joueurs",
+      "since": "Pas joué depuis",
+      "sinceMonths": "{n, plural, one {# mois} other {# mois}}",
+      "never": "Jamais joué",
+      "minRating": "Note minimum",
+      "ratingAtLeast": "{n}/10 et plus",
+      "ratingHint": "Ta note, sinon la moyenne des membres.",
+      "idle": "Choisis tes filtres, puis lance le dé : il pige un jeu dans ta Kallax.",
+      "roll": "Lancer le dé",
+      "again": "Relancer",
+      "logPlay": "On le joue! Noter la partie",
+      "count": "{n, plural, one {# jeu possible} other {# jeux possibles}}",
+      "none": "Aucun jeu ne correspond : enlève un filtre.",
+      "empty": "Ta Kallax est vide : ajoute des jeux pour que le dé puisse choisir.",
+      "neverPlayed": "Jamais joué",
+      "playedToday": "Joué aujourd'hui",
+      "playedDays": "Joué il y a {n, plural, one {# jour} other {# jours}}",
+      "playedMonths": "Joué il y a {n} mois",
+      "party": "Party game",
+      "partyChoice": {
+        "any": "Peu importe",
+        "yes": "Oui",
+        "no": "Non"
+      },
+      "length": "Durée",
+      "lengths": {
+        "QUICK": "30 min ou moins",
+        "SHORT": "30 à 60 min",
+        "MEDIUM": "1 à 2 h",
+        "LONG": "Plus de 2 h"
+      },
+      "level": "Niveau",
+      "levels": {
+        "LIGHT": "Léger",
+        "MEDIUM": "Intermédiaire",
+        "HEAVY": "Expert"
+      },
+      "types": "Type de jeu",
+      "typesHint": "Un jeu qui a au moins un des types choisis.",
+      "age": "Le plus jeune a",
+      "ageYears": "{n} ans",
+      "mineOnly": "Seulement mes jeux (pas ceux de la Kallax partagée)",
+      "withExpansions": "Seulement les jeux avec des extensions",
+      "favorLessPlayed": "Favoriser les jeux moins joués",
+      "unknownHint": "Un jeu sans l'info demandée (durée, niveau, âge…) est mis de côté par ce filtre. L'IA complète les infos des jeux petit à petit.",
+      "playersN": "{n, plural, one {# joueur} other {# joueurs}}",
+      "fewerPlayers": "Un joueur de moins",
+      "morePlayers": "Un joueur de plus",
+      "options": "Options",
+      "arrange": "Réorganiser",
+      "arrangeDone": "Terminé",
+      "arrangeHint": "Placer les filtres dans l'ordre voulu",
+      "arrangeHelp": "Glisse les filtres par la poignée, ou utilise les flèches.",
+      "arrangeReset": "Remettre l'ordre de départ",
+      "moveUp": "Monter",
+      "moveDown": "Descendre"
+    },
+    "list": {
+      "choices": "Les choix",
+      "placeholder": "Ajoute un choix (ou plusieurs, séparés par des virgules)",
+      "add": "Ajouter",
+      "fromKallax": "Ajouter un jeu de ma Kallax",
+      "remove": "Retirer {name}",
+      "emptyHint": "Des jeux, des restos, des équipes… n'importe quoi!",
+      "removeWinner": "Retirer le gagnant de la liste après le tirage",
+      "clear": "Vider la liste",
+      "idle": "Ajoute au moins deux choix, puis lance le tirage.",
+      "roll": "Tirer au sort",
+      "again": "Tirer encore",
+      "winner": "Le sort en est jeté!",
+      "needTwo": "Il faut au moins deux choix."
+    },
+    "first": {
+      "players": "Autour de la table",
+      "placeholder": "Nom d'un joueur",
+      "add": "Ajouter",
+      "addFriend": "Ajouter un ami",
+      "remove": "Retirer {name}",
+      "idle": "Ajoute les joueurs, puis lance le dé pour savoir qui commence.",
+      "roll": "Qui commence?",
+      "again": "Relancer",
+      "starts": "{name} commence!",
+      "needTwo": "Il faut au moins deux joueurs.",
+      "orderHint": "Tu auras aussi un ordre de jeu au hasard."
+    },
+    "types": {
+      "PARTY": "Party game",
+      "FAMILY": "Familial",
+      "STRATEGY": "Stratégie",
+      "COOP": "Coopératif",
+      "DUEL": "Duel (2 joueurs)",
+      "SOLO": "Jouable en solo",
+      "KIDS": "Enfants",
+      "TEAMS": "En équipes",
+      "DEDUCTION": "Déduction / bluff",
+      "WORDS": "Mots / quiz",
+      "CARDS": "Cartes",
+      "DECK": "Deck-building / draft",
+      "TILES": "Pose de tuiles",
+      "WORKERS": "Placement d'ouvriers",
+      "DICE": "Dés",
+      "ENGINE": "Moteur / combos",
+      "ECONOMY": "Gestion / économie",
+      "AREA": "Territoire / conflit",
+      "ADVENTURE": "Aventure / thématique",
+      "ABSTRACT": "Abstrait",
+      "PUZZLE": "Puzzle / logique",
+      "DEXTERITY": "Adresse / rapidité"
+    },
+    "presets": {
+      "choose": "Filtres préconçus",
+      "builtIn": "Préconçus",
+      "mine": "Mes filtres",
+      "noneSaved": "Aucun pour l'instant : choisis des filtres, puis « Enregistrer ».",
+      "delete": "Supprimer {name}",
+      "save": "Enregistrer",
+      "saveHint": "Enregistrer ces filtres sous un nom",
+      "namePlaceholder": "Nom (ex. : Soirée chez Marie)",
+      "saveConfirm": "Enregistrer",
+      "cancel": "Annuler",
+      "names": {
+        "party": "Soirée party",
+        "quick": "Petit jeu rapide",
+        "family": "En famille",
+        "duo": "À deux",
+        "solo": "En solo",
+        "coop": "Coopératif",
+        "expert": "Gros jeu expert",
+        "forgotten": "Oublié sur la tablette",
+        "never": "Jamais joué"
       }
     }
   }

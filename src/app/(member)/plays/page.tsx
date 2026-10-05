@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { getPendingPlays, getPlays, getPlayStats } from "@/modules/plays/service";
 import { respondPlayAction } from "@/modules/plays/actions";
 import { PlayCard } from "@/modules/plays/components/PlayCard";
+import { PlayInProgress } from "@/modules/plays/components/PlayInProgress";
 
 export async function generateMetadata() {
   return { title: (await getTranslations("nav"))("plays") };
@@ -40,6 +41,7 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
       {sp.logged && (
         <FadeIn className="rounded-xl bg-success/10 px-4 py-3 text-sm font-semibold text-success">{t("logged")}</FadeIn>
       )}
+      <PlayInProgress userId={user.id} />
 
       <Stagger className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {tiles.map((tile) => (

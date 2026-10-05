@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ArrowRight, Bell, CalendarPlus, Dices, LibraryBig, Sparkles, UserPlus } from "lucide-react";
 import { requireUser } from "@/lib/auth/guards";
+import { PlayInProgress } from "@/modules/plays/components/PlayInProgress";
 import { getModuleStates } from "@/lib/modules";
 import { db } from "@/lib/db";
 import { FadeIn, Stagger, StaggerItem } from "@/components/Motion";
@@ -74,6 +75,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           </div>
         </div>
       </FadeIn>
+
+      {/* a play started and not saved yet */}
+      {modules.plays.enabled && <PlayInProgress userId={user.id} />}
 
       {todo.length > 0 && (
         <FadeIn delay={0.1} className="card border-accent/50 p-4">

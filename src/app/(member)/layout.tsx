@@ -10,13 +10,16 @@ import { AppSidebar, MobileNav } from "@/components/shell/MemberNav";
 import { UserMenu } from "@/components/shell/UserMenu";
 import { CommandPalette } from "@/components/shell/CommandPalette";
 import { LocaleSwitch, ThemePicker } from "@/components/PreferenceControls";
-import { DonateLink } from "@/modules/donations/components/DonateLink";
+import { DonateLink, DonatePopupHost } from "@/modules/donations/components/DonateLink";
+import { AnimationToggle } from "@/components/AnimationToggle";
+import { SiteGuide } from "@/modules/guide/components/SiteGuide";
 import { SuggestionDialog } from "@/modules/suggestions/components/SuggestionDialog";
 import { RulebookOverlay } from "@/modules/games/components/RulebookOverlay";
 
 export default async function MemberLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
   const [items, settings, suggestions] = await Promise.all([getMenuItems(user.navOrder), getSiteSettings(), getModule("suggestions")]);
+  const donations = await getModule("donations");
 
   return (
     <div className="grain min-h-dvh">
@@ -35,21 +38,26 @@ export default async function MemberLayout({ children }: { children: React.React
             <Meeple color={user.meepleColor} size={28} />
             <span className="hidden font-display text-base font-black sm:inline">{settings.siteName}</span>
           </Link>
-          <div className="hidden w-full max-w-sm lg:block">
+          <div className="hidden w-full max-w-sm lg:block" data-guide="search">
             <CommandPalette />
           </div>
           <div className="ml-auto flex items-center gap-1">
-            <div className="lg:hidden">
+            <div className="lg:hidden" data-guide="search">
               <CommandPalette compact />
             </div>
             <DonateLink placement="top" />
-            <LocaleSwitch />
-            <ThemePicker current={user.theme} enabled={settings.enabledThemes} images={settings.themeImages} />
+            <div className="flex items-center gap-1" data-guide="prefs">
+              <LocaleSwitch />
+              <AnimationToggle />
+              <ThemePicker current={user.theme} enabled={settings.enabledThemes} images={settings.themeImages} />
+            </div>
+            <div data-guide="account">
             <UserMenu
               user={{ username: user.username, displayName: user.displayName, meepleColor: user.meepleColor }}
               canModerate={hasRole(user.role, "MODERATOR")}
               canAdmin={isStaff(user)}
             />
+            </div>
           </div>
         </header>
 
@@ -76,6 +84,9 @@ export default async function MemberLayout({ children }: { children: React.React
 
       <MobileNav items={items} />
       <RulebookOverlay />
+      {/* welcome tour: first sign-in, or the next one when the member asked */}
+      <SiteGuide autoStart={!user.guideSeenAt || user.guidePending} name={user.displayName} menu={items.map((i) => i.href)} donate={donations.enabled && donations.settings.showInHeader !== false} />
+      <DonatePopupHost />
       {suggestions.enabled && <SuggestionDialog showList={Boolean(suggestions.settings.showToMembers)} />}
     </div>
   );

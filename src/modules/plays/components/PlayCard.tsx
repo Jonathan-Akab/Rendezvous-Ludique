@@ -4,7 +4,7 @@ import { Clock, Crown, MapPin, Pencil, Trash2 } from "lucide-react";
 import { ConfirmButton } from "@/components/forms";
 import { Meeple } from "@/components/Meeple";
 import { deletePlayAction } from "../actions";
-import type { PlayWithDetails } from "../service";
+import { isPlayEditor, type PlayWithDetails } from "../service";
 
 export async function PlayCard({ play, viewerId, children }: { play: PlayWithDetails; viewerId: string; children?: React.ReactNode }) {
   const [t, format] = await Promise.all([getTranslations("plays"), getFormatter()]);
@@ -14,6 +14,7 @@ export async function PlayCard({ play, viewerId, children }: { play: PlayWithDet
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="font-display text-lg font-bold">{play.game.name}</h3>
+          {play.expansions.length > 0 && <p className="text-xs font-semibold text-accent">+ {play.expansions.map((x) => x.game.name).join(", ")}</p>}
           <p className="flex flex-wrap items-center gap-x-3 text-xs text-muted">
             <span>{format.dateTime(play.playedAt, { dateStyle: "medium" })}</span>
             {play.durationMin && (
@@ -28,16 +29,18 @@ export async function PlayCard({ play, viewerId, children }: { play: PlayWithDet
             )}
           </p>
         </div>
-        {play.createdById === viewerId && (
+        {isPlayEditor(play, viewerId) && (
           <div className="flex items-center gap-1">
             <Link href={`/plays/${play.id}/edit`} className="p-1 text-muted hover:text-accent" title={t("edit")}>
               <Pencil className="size-4" />
             </Link>
-            <form action={deletePlayAction.bind(null, play.id)}>
-              <ConfirmButton message={t("deleteConfirm")} className="p-1 text-muted hover:text-danger" title={t("delete")}>
-                <Trash2 className="size-4" />
-              </ConfirmButton>
-            </form>
+            {play.createdById === viewerId && (
+              <form action={deletePlayAction.bind(null, play.id)}>
+                <ConfirmButton message={t("deleteConfirm")} className="p-1 text-muted hover:text-danger" title={t("delete")}>
+                  <Trash2 className="size-4" />
+                </ConfirmButton>
+              </form>
+            )}
           </div>
         )}
       </div>

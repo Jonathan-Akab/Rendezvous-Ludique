@@ -18,6 +18,7 @@ import { deleteChatAction } from "@/modules/ai/actions";
 import { faqCounts, faqEnabled } from "@/modules/ai/faq";
 import { ownKeysAllowed } from "@/modules/ai/ownKey";
 import { getSiteSettings } from "@/lib/settings";
+import { AiNotice } from "@/modules/ai/components/AiNotice";
 import { RulebookLink } from "@/modules/games/components/RulebookOverlay";
 
 export async function generateMetadata() {
@@ -36,6 +37,7 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<S
     getFormatter(),
     getModule("games"),
   ]);
+  const donationsMod = await getModule("donations");
 
   const [chats, status, myGames] = await Promise.all([
     db.aiChat.findMany({ where: { userId: user.id }, include: { game: { select: { name: true } } }, orderBy: { updatedAt: "desc" }, take: 40 }),
@@ -116,6 +118,7 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<S
 
   return (
     <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
+      <AiNotice ownAllowed={providerInfo.ownAllowed} donate={donationsMod.enabled} />
       <aside className="space-y-3 lg:sticky lg:top-6 lg:self-start">
         <Link href="/ai" className="btn btn-primary w-full">
           <MessageSquarePlus className="size-4" /> {t("newChat")}

@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion } from "motion/react";
-import { House, PartyPopper, Swords, Tent } from "lucide-react";
+import { Dices, PartyPopper, Swords, Tent } from "lucide-react";
 import { FormMessage, SubmitButton } from "@/components/forms";
 import { LocationFields } from "@/components/LocationFields";
 import type { ActionState } from "@/lib/forms";
@@ -27,8 +27,8 @@ export type EventFormValues = {
 };
 
 const KINDS = [
-  { key: "HOME_GAME", icon: House },
   { key: "GAME_NIGHT", icon: PartyPopper },
+  { key: "BOARD_GAME_EVENT", icon: Dices },
   { key: "TOURNAMENT", icon: Swords },
   { key: "CONVENTION", icon: Tent },
 ] as const;
@@ -36,7 +36,6 @@ const KINDS = [
 export function EventForm({
   action,
   values = {},
-  allowHomeGames,
   allowPublic,
   submitLabel,
   returnTo,
@@ -44,7 +43,6 @@ export function EventForm({
 }: {
   action: (prev: ActionState, fd: FormData) => Promise<ActionState>;
   values?: EventFormValues;
-  allowHomeGames: boolean;
   allowPublic: boolean;
   submitLabel: string;
   returnTo?: "admin";
@@ -53,7 +51,7 @@ export function EventForm({
 }) {
   const t = useTranslations("events");
   const [state, formAction] = useActionState(action, undefined);
-  const [kind, setKind] = useState(values.kind ?? (allowHomeGames ? "HOME_GAME" : "GAME_NIGHT"));
+  const [kind, setKind] = useState(values.kind && values.kind !== "HOME_GAME" ? values.kind : "GAME_NIGHT");
 
   return (
     <form action={formAction} className="space-y-6">
@@ -62,7 +60,7 @@ export function EventForm({
         <legend className="label">{t("form.kind")}</legend>
         <input type="hidden" name="kind" value={kind} />
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          {KINDS.filter((k) => allowHomeGames || k.key !== "HOME_GAME").map((k) => (
+          {KINDS.map((k) => (
             <button
               type="button"
               key={k.key}
@@ -123,7 +121,7 @@ export function EventForm({
             <label className="label" htmlFor="locationName">
               {t("form.locationName")}
             </label>
-            <input id="locationName" name="locationName" className="input" defaultValue={values.locationName ?? ""} placeholder={kind === "HOME_GAME" ? t("form.locationHome") : t("form.locationVenue")} />
+            <input id="locationName" name="locationName" className="input" defaultValue={values.locationName ?? ""} placeholder={kind === "GAME_NIGHT" ? t("form.locationHome") : t("form.locationVenue")} />
           </div>
           <div>
             <label className="label" htmlFor="city">
@@ -137,7 +135,7 @@ export function EventForm({
             {t("form.address")}
           </label>
           <input id="address" name="address" className="input" defaultValue={values.address ?? ""} />
-          {kind === "HOME_GAME" && <p className="mt-1 text-xs text-muted">{t("form.addressPrivate")}</p>}
+          {kind === "GAME_NIGHT" && <p className="mt-1 text-xs text-muted">{t("form.addressPrivate")}</p>}
         </div>
         <LocationFields latitude={values.latitude} longitude={values.longitude} />
       </div>
@@ -162,7 +160,7 @@ export function EventForm({
       </div>
 
       <label className="flex items-start gap-3 text-sm">
-        <input type="checkbox" name="requiresApproval" defaultChecked={values.requiresApproval ?? kind === "HOME_GAME"} className="mt-1 size-4 accent-[var(--accent)]" />
+        <input type="checkbox" name="requiresApproval" defaultChecked={values.requiresApproval ?? kind === "GAME_NIGHT"} className="mt-1 size-4 accent-[var(--accent)]" />
         <span>
           <span className="font-semibold">{t("form.requiresApproval")}</span>
           <span className="block text-muted">{t("form.requiresApprovalHint")}</span>

@@ -152,7 +152,13 @@ export function AddGameForm({
                       </select>
                     </div>
                   </div>
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <label className="label" htmlFor="kg-plays">
+                        {t("form.timesPlayed")}
+                      </label>
+                      <input id="kg-plays" name="timesPlayed" type="number" min={0} max={100000} inputMode="numeric" className="input" placeholder="0" />
+                    </div>
                     <div>
                       <label className="label" htmlFor="kg-parent">
                         {t("form.expansionOf")}

@@ -9,7 +9,7 @@ export type UserStatus = (typeof USER_STATUSES)[number];
 export const VISIBILITIES = ["PUBLIC", "MEMBERS", "FRIENDS", "PRIVATE"] as const;
 export type Visibility = (typeof VISIBILITIES)[number];
 
-export const EVENT_KINDS = ["HOME_GAME", "GAME_NIGHT", "TOURNAMENT", "CONVENTION"] as const;
+export const EVENT_KINDS = ["GAME_NIGHT", "BOARD_GAME_EVENT", "TOURNAMENT", "CONVENTION"] as const;
 export type EventKind = (typeof EVENT_KINDS)[number];
 
 export const EVENT_VISIBILITIES = ["PUBLIC", "MEMBERS", "FRIENDS"] as const;

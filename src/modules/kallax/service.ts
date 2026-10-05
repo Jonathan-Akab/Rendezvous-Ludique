@@ -61,6 +61,45 @@ export async function getMyKallaxGames(userId: string): Promise<MyGame[]> {
 }
 
 /**
+ * Plays logged on the site for games of a Kallax: confirmed plays of any member sharing it,
+ * by Ludothèque game id. The counter shown on a game adds its `extraPlays` (plays typed in by hand).
+ */
+export async function getLoggedPlayCounts(libraryId: string, gameIds: string[]) {
+  if (!gameIds.length) return new Map<string, number>();
+  const members = await db.libraryMember.findMany({ where: { libraryId, status: "ACCEPTED" }, select: { userId: true } });
+  const rows = await db.play.groupBy({
+    by: ["gameId"],
+    where: { gameId: { in: gameIds }, participants: { some: { userId: { in: members.map((m) => m.userId) }, status: "CONFIRMED" } } },
+    _count: { _all: true },
+  });
+  return new Map(rows.map((r) => [r.gameId, r._count._all]));
+}
+
+/** "Played N times" typed by the member: what isn't logged on the site is kept as extra plays. */
+export function extraPlaysFor(total: number | null, logged: number) {
+  if (total == null || !Number.isFinite(total)) return null;
+  return Math.max(0, Math.min(100_000, Math.round(total)) - logged);
+}
+
+export type MyExpansions = Record<string, { gameId: string; name: string }[]>;
+
+/** Expansions in the member's Kallax, grouped by the Ludothèque id of their base game. */
+export async function getMyExpansions(userId: string): Promise<MyExpansions> {
+  const rows = await db.kallaxGame.findMany({
+    where: { library: { members: { some: { userId, status: "ACCEPTED" } } }, parentId: { not: null } },
+    select: { gameId: true, name: true, parent: { select: { gameId: true } } },
+    orderBy: { name: "asc" },
+  });
+  const out: MyExpansions = {};
+  for (const r of rows) {
+    if (!r.parent) continue;
+    const list = (out[r.parent.gameId] ??= []);
+    if (!list.some((x) => x.gameId === r.gameId)) list.push({ gameId: r.gameId, name: r.name });
+  }
+  return out;
+}
+
+/**
  * Adds a game to a Kallax: makes sure the Ludothèque knows the game (creating it only if
  * it doesn't exist), then stores the Kallax's own record. Returns null if it's already there.
  */

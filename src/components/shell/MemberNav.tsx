@@ -24,6 +24,7 @@ function NavEntry({ item, onOpen, ...props }: { item: NavItem; onOpen?: () => vo
         type="button"
         className={className}
         title={title}
+        data-guide={(props as Record<string, unknown>)["data-guide"] as string | undefined}
         onClick={() => {
           onOpen?.();
           openSuggestionBox();
@@ -97,13 +98,14 @@ export function AppSidebar({ items, siteName, meepleColor }: { items: NavItem[];
           <MenuOrderEditor items={order} onChange={setOrder} compact />
         </div>
       ) : (
-        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto" aria-label="Main">
+        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto" aria-label="Main" data-guide="menu">
           {order.map((item) => {
             const active = isActive(pathname, item.href);
             return (
               <NavEntry
                 key={item.href}
                 item={item}
+                data-guide={`nav-${item.href.slice(1)}`}
                 title={item.label}
                 aria-current={active ? "page" : undefined}
                 className={`group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition ${

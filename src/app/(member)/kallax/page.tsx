@@ -10,7 +10,7 @@ import { FadeIn } from "@/components/Motion";
 import { MeepleAvatar } from "@/components/Meeple";
 import { EmptyState } from "@/components/EmptyState";
 import { ConfirmButton } from "@/components/forms";
-import { getMyLibraries, kallaxCoverUrl } from "@/modules/kallax/service";
+import { getMyLibraries, kallaxCoverUrl, getLoggedPlayCounts } from "@/modules/kallax/service";
 import { getAiStatus } from "@/modules/ai/policy";
 import { providerChoices } from "@/modules/ai/providerInfo";
 import { enrichAvailable } from "@/modules/games/enrich";
@@ -89,7 +89,7 @@ export default async function KallaxPage({ searchParams }: { searchParams: Promi
     orderBy: { name: "asc" },
   });
   const gameIds = rows.map((r) => r.gameId);
-  const [stats, mine] = await Promise.all([getRatingStats(gameIds), getMyRatings(user.id, gameIds)]);
+  const [stats, mine, logged] = await Promise.all([getRatingStats(gameIds), getMyRatings(user.id, gameIds), library ? getLoggedPlayCounts(library.id, gameIds) : new Map<string, number>()]);
   const games = rows.map((r) => ({
     id: r.id,
     status: r.status,
@@ -100,6 +100,7 @@ export default async function KallaxPage({ searchParams }: { searchParams: Promi
     rating: stats.get(r.gameId) ?? { avg: null, count: 0 },
     myRating: mine.get(r.gameId) ?? null,
     expansions: r.expansions.map((e) => e.name),
+    plays: (logged.get(r.gameId) ?? 0) + r.extraPlays,
   }));
   const view = sp.view === "list" ? "list" : "shelf";
 

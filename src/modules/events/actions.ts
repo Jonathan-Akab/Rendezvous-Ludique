@@ -29,13 +29,12 @@ async function readEventForm(fd: FormData, mod: Awaited<ReturnType<typeof guard>
   const title = str(fd, "title");
   const startsAt = fromLocalInput(str(fd, "startsAt"), timeZone);
   const endsAt = str(fd, "endsAt") ? fromLocalInput(str(fd, "endsAt"), timeZone) : null;
-  const kind = oneOf(str(fd, "kind"), EVENT_KINDS, "HOME_GAME");
+  const kind = oneOf(str(fd, "kind"), EVENT_KINDS, "GAME_NIGHT");
   let visibility = oneOf(str(fd, "visibility"), EVENT_VISIBILITIES, "MEMBERS");
 
   if (!title || title.length > 120) return { error: t("title") };
   if (!startsAt) return { error: t("date") };
   if (endsAt && endsAt < startsAt) return { error: t("endBeforeStart") };
-  if (kind === "HOME_GAME" && !mod.settings.allowHomeGames) return { error: t("homeGamesDisabled") };
   if (visibility === "PUBLIC" && !mod.settings.allowPublicEvents) visibility = "MEMBERS";
 
   const cap = Number(mod.settings.maxPlayersCap) || 100;

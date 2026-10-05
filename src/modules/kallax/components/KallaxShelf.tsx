@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Clock, Users, Puzzle } from "lucide-react";
+import { Clock, Dices, Users, Puzzle } from "lucide-react";
 import { Meeple } from "@/components/Meeple";
 import { GameCover } from "@/modules/games/components/GameCover";
 import { MeepleRating } from "@/modules/games/components/MeepleRating";
@@ -25,6 +25,8 @@ export type ShelfGame = {
   myRating?: number | null;
   /** names of the expansions attached to this game */
   expansions?: string[];
+  /** times played: logged on the site + typed in by hand */
+  plays?: number;
 };
 
 const STATUS_STYLE: Record<string, string> = {
@@ -80,6 +82,11 @@ export async function KallaxShelf({
                   </span>
                 )}
                 {g.game.year && <span>{g.game.year}</span>}
+                {g.plays != null && (
+                  <span className="inline-flex items-center gap-1 font-semibold text-ink">
+                    <Dices className="size-3" /> {g.plays ? t("playedTimes", { count: g.plays }) : t("neverPlayed")}
+                  </span>
+                )}
                 {g.status !== "OWNED" && <span className="chip">{t(`status.${g.status}`)}</span>}
                 {g.expansions && g.expansions.length > 0 && (
                   <span className="chip border-transparent bg-[#1c5fbf]/15 text-[#3b82f6]" title={g.expansions.join(", ")}>
@@ -124,6 +131,11 @@ export async function KallaxShelf({
               {g.expansions && g.expansions.length > 0 && (
                 <span className="chip gap-0.5 bg-[#1c5fbf]/85 px-1.5 text-[10px] text-white backdrop-blur" title={g.expansions.join(", ")}>
                   <Puzzle className="size-3" /> +{g.expansions.length}
+                </span>
+              )}
+              {g.plays != null && g.plays > 0 && (
+                <span className="chip gap-0.5 bg-surface/90 px-1.5 text-[10px] font-bold backdrop-blur" title={t("playedTimes", { count: g.plays })}>
+                  <Dices className="size-3 text-accent" /> ×{g.plays}
                 </span>
               )}
             </div>

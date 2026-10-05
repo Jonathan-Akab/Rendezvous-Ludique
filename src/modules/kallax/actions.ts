@@ -11,7 +11,7 @@ import { deleteStored, UploadError } from "@/lib/storage";
 import { oneOf, optInt, optStr, str, type ActionState } from "@/lib/forms";
 import { LIBRARY_GAME_STATUSES } from "@/lib/constants";
 import { readGameFields, storeCoverFromForm } from "@/modules/games/mutations";
-import { addToKallax, attachExpansion, detachExpansion, findBaseInLibrary, isLibraryMember } from "./service";
+import { addToKallax, attachExpansion, detachExpansion, extraPlaysFor, findBaseInLibrary, getLoggedPlayCounts, isLibraryMember } from "./service";
 import { enrichAvailable, lookUpFacts } from "@/modules/games/enrich";
 import { fillEmptyGameFields } from "@/modules/games/service";
 import { notify } from "@/modules/notifications/emails";
@@ -76,6 +76,13 @@ export async function addGameAction(_prev: ActionState, fd: FormData): Promise<A
   if (!result) return { error: t("name") };
   if (!result.created) return { error: t("duplicate", { name: result.kallaxGame.name }) };
 
+  // "played N times" typed in when adding (plays logged on the site count by themselves)
+  const timesPlayed = optInt(fd, "timesPlayed");
+  if (timesPlayed != null) {
+    const logged = (await getLoggedPlayCounts(libraryId, [result.game.id])).get(result.game.id) ?? 0;
+    await db.kallaxGame.update({ where: { id: result.kallaxGame.id }, data: { extraPlays: extraPlaysFor(timesPlayed, logged) ?? 0 } });
+  }
+
   const rating = optInt(fd, "rating");
   if (rating && rating >= 1 && rating <= 10) {
     await db.gameRating.upsert({
@@ -117,9 +124,12 @@ export async function updateKallaxGameAction(id: string, _prev: ActionState, fd:
     await deleteStored(kg.coverFileId);
     coverFileId = null;
   }
+  const timesPlayed = optInt(fd, "timesPlayed");
+  const extraPlays = timesPlayed == null ? null : extraPlaysFor(timesPlayed, (await getLoggedPlayCounts(kg.libraryId, [kg.gameId])).get(kg.gameId) ?? 0);
   await db.kallaxGame.update({
     where: { id },
     data: {
+      ...(extraPlays != null ? { extraPlays } : {}),
       ...info,
       imageUrl: info.imageUrl ?? (fd.get("removeImageUrl") === "on" ? null : kg.imageUrl),
       coverFileId,

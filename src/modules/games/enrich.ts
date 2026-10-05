@@ -51,7 +51,7 @@ export type Facts = z.infer<typeof factsSchema>["games"][number];
 /** Asks the free AI what it knows about several games at once (one call). */
 export async function lookUpFacts(names: string[], language: string): Promise<Map<string, Facts>> {
   const prompt = `You are a board game encyclopedia. For each board game below, give the facts you are SURE about for its best-known edition. Use null for anything you are not sure about — never guess. If you don't know the game, set "known": false.
-Write "description" (2 short sentences: theme and what players do) and "categories" (comma-separated, e.g. "worker placement, economic") in ${language === "en" ? "English" : "French"}. "weight" is the complexity from 1 (light) to 5 (heavy).
+Write "description" (2 short sentences: theme and what players do) and "categories" (comma-separated; start with the kind of game — party game, family, strategy, cooperative, two-player, children — then the mechanics, e.g. "strategy, worker placement, economic") in ${language === "en" ? "English" : "French"}. "weight" is the complexity from 1 (light) to 5 (heavy).
 If the item is an EXPANSION (it needs another game to be played), set "isExpansion": true and "baseGame" to the title of the game it extends. A standalone game, a new edition or a deluxe/big box version of a game is NOT an expansion.
 
 Games:

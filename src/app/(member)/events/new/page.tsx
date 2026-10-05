@@ -22,7 +22,6 @@ export default async function NewEventPage() {
       <div className="card card-pad">
         <EventForm
           action={createEventAction}
-          allowHomeGames={Boolean(mod.settings.allowHomeGames)}
           allowPublic={Boolean(mod.settings.allowPublicEvents)}
           values={{ city: user.city, latitude: user.latitude, longitude: user.longitude }}
           submitLabel={t("publish")}

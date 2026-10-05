@@ -29,7 +29,6 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
       <div className="card card-pad">
         <EventForm
           action={updateEventAction.bind(null, event.id)}
-          allowHomeGames={Boolean(mod.settings.allowHomeGames) || event.kind === "HOME_GAME"}
           allowPublic={Boolean(mod.settings.allowPublicEvents)}
           submitLabel={t("save")}
           myGames={[

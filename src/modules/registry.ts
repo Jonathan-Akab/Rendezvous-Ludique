@@ -25,7 +25,7 @@ export type ModuleManifest = {
   settings: SettingField[];
 };
 
-export type ModuleKey = "events" | "games" | "kallax" | "plays" | "friends" | "ai" | "bazaar" | "facebook" | "profiles" | "donations" | "suggestions";
+export type ModuleKey = "events" | "games" | "kallax" | "plays" | "friends" | "ai" | "bazaar" | "facebook" | "profiles" | "donations" | "suggestions" | "picker";
 
 export const MODULES: ModuleManifest[] = [
   {
@@ -33,7 +33,6 @@ export const MODULES: ModuleManifest[] = [
     icon: "CalendarDays",
     href: "/events",
     settings: [
-      { key: "allowHomeGames", type: "boolean", default: true },
       { key: "allowPublicEvents", type: "boolean", default: true },
       { key: "defaultRadiusKm", type: "number", default: 50, min: 1, max: 1000 },
       { key: "maxPlayersCap", type: "number", default: 100, min: 2, max: 10000 },
@@ -134,10 +133,18 @@ export const MODULES: ModuleManifest[] = [
     settings: [{ key: "allowPublicProfiles", type: "boolean", default: true }],
   },
   {
+    // "Coup de dé": which game to play, a draw from a list, the first player
+    key: "picker",
+    icon: "Dices",
+    href: "/picker",
+    settings: [],
+  },
+  {
     key: "donations",
     icon: "Heart",
     settings: [
       { key: "url", type: "url", default: "" },
+      { key: "transferEmail", type: "string", default: "jonathan-boisvert@outlook.com" },
       { key: "showInHeader", type: "boolean", default: true },
       { key: "showInFooter", type: "boolean", default: true },
     ],
@@ -145,7 +152,7 @@ export const MODULES: ModuleManifest[] = [
 ];
 
 /** Default menu order on a fresh install (admins can change it in Admin → Modules). */
-export const DEFAULT_MENU_ORDER: ModuleKey[] = ["events", "plays", "kallax", "ai", "friends", "games", "bazaar", "facebook", "suggestions", "profiles", "donations"];
+export const DEFAULT_MENU_ORDER: ModuleKey[] = ["events", "plays", "kallax", "picker", "ai", "friends", "games", "bazaar", "facebook", "suggestions", "profiles", "donations"];
 
 export function getManifest(key: ModuleKey) {
   const m = MODULES.find((mod) => mod.key === key);

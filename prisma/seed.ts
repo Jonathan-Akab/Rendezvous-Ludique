@@ -198,7 +198,7 @@ async function main() {
       hostId: marie.id,
       title: "Soirée Anachrony",
       description: "Partie complète avec l'extension Fractures. Débutants bienvenus, j'explique les règles!",
-      kind: "HOME_GAME",
+      kind: "GAME_NIGHT",
       startsAt: at(3, 19),
       locationName: "Chez Marie et Julien",
       address: "123, rue Fictive",
@@ -247,7 +247,7 @@ async function main() {
     data: {
       hostId: lea.id,
       title: "Wingspan et thé",
-      kind: "HOME_GAME",
+      kind: "GAME_NIGHT",
       startsAt: at(8, 14),
       city: "Québec",
       latitude: 46.81,

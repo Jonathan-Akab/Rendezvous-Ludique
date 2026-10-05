@@ -15,6 +15,7 @@ import { removeOwnKeyAction } from "@/modules/ai/actions";
 import { mailConfigured } from "@/lib/mail";
 import { NOTIFY_TYPES, parseNotifyPrefs } from "@/modules/notifications/emails";
 import { NotifyPrefsForm } from "@/modules/notifications/components/NotifyPrefsForm";
+import { ReplayGuideButton } from "@/modules/guide/components/SiteGuide";
 
 export async function generateMetadata() {
   return { title: (await getTranslations("nav"))("settings") };
@@ -42,6 +43,13 @@ export default async function SettingsPage() {
           <p className="text-sm text-muted">{tn("menuOrderLead")}</p>
         </div>
         <MenuOrderSettings items={menu} />
+      </div>
+      <div className="card card-pad flex flex-wrap items-center gap-4">
+        <div className="min-w-56 flex-1">
+          <h2 className="section-title">{t("guide.title")}</h2>
+          <p className="text-sm text-muted">{t("guide.lead")}</p>
+        </div>
+        <ReplayGuideButton label={t("guide.replay")} />
       </div>
       {/* Email notifications (opt-in) */}
       <div id="notifications" className="card card-pad scroll-mt-24 space-y-4">

@@ -5,7 +5,8 @@ import { getSiteSettings } from "@/lib/settings";
 import { toDateInput } from "@/lib/time";
 import { FadeIn } from "@/components/Motion";
 import { getFriends } from "@/modules/friends/service";
-import { getMyKallaxGames } from "@/modules/kallax/service";
+import { getMyExpansions, getMyKallaxGames } from "@/modules/kallax/service";
+import { getPlayDraft } from "@/modules/plays/service";
 import { PlayForm } from "@/modules/plays/components/PlayForm";
 
 export async function generateMetadata() {
@@ -14,7 +15,7 @@ export async function generateMetadata() {
 
 export default async function NewPlayPage({ searchParams }: { searchParams: Promise<{ game?: string }> }) {
   const [user, mod, { timeZone }, t, { game }] = await Promise.all([requireUser(), requireModule("plays"), getSiteSettings(), getTranslations("plays"), searchParams]);
-  const [friends, games] = await Promise.all([getFriends(user.id), getMyKallaxGames(user.id)]);
+  const [friends, games, expansions, draft] = await Promise.all([getFriends(user.id), getMyKallaxGames(user.id), getMyExpansions(user.id), getPlayDraft(user.id)]);
 
   return (
     <FadeIn className="mx-auto max-w-3xl space-y-6">
@@ -31,6 +32,8 @@ export default async function NewPlayPage({ searchParams }: { searchParams: Prom
           allowGuests={Boolean(mod.settings.allowGuests)}
           requireConfirmation={Boolean(mod.settings.requireConfirmation)}
           defaultGame={game}
+          expansions={expansions}
+          draft={draft ? { data: draft.data, clock: draft.clock } : null}
         />
       </div>
     </FadeIn>

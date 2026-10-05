@@ -17,7 +17,7 @@ import { RatingInput } from "@/modules/games/components/RatingInput";
 import { FindImage } from "@/modules/games/components/ImageSuggestions";
 import { getMyRatings, getRatingStats } from "@/modules/games/service";
 import { deleteRulebookAction, uploadRulebookAction } from "@/modules/games/actions";
-import { isLibraryMember, kallaxCoverUrl } from "@/modules/kallax/service";
+import { getLoggedPlayCounts, isLibraryMember, kallaxCoverUrl } from "@/modules/kallax/service";
 import { addKallaxExpansionAction, removeKallaxGameAndBackAction, setKallaxParentAction, updateKallaxGameAction } from "@/modules/kallax/actions";
 import { RulebookLink } from "@/modules/games/components/RulebookOverlay";
 
@@ -41,13 +41,17 @@ export default async function KallaxGamePage({ params }: { params: Promise<{ id:
   // Private to the members who share this Kallax.
   if (!kg || !(await isLibraryMember(kg.libraryId, user.id))) notFound();
 
-  const [t, tg, format, stats, mine] = await Promise.all([
+  const [t, tg, format, stats, mine, loggedPlays] = await Promise.all([
     getTranslations("kallax"),
     getTranslations("games"),
     getFormatter(),
     getRatingStats([kg.gameId]),
     getMyRatings(user.id, [kg.gameId]),
+    getLoggedPlayCounts(kg.libraryId, [kg.gameId]),
   ]);
+  // times played: plays logged on the site + the ones typed in by hand
+  const logged = loggedPlays.get(kg.gameId) ?? 0;
+  const timesPlayed = logged + kg.extraPlays;
   const rating = stats.get(kg.gameId) ?? { avg: null, count: 0 };
   const cover = kallaxCoverUrl(kg);
   const shared = kg.library.members.length > 1;
@@ -77,6 +81,9 @@ export default async function KallaxGamePage({ params }: { params: Promise<{ id:
             <div>
               <div className="flex flex-wrap gap-1.5">
                 {kg.status !== "OWNED" && <span className="chip">{t(`status.${kg.status}`)}</span>}
+                <span className="chip">
+                  <Dices className="size-3 text-accent" /> {timesPlayed ? t("playedTimes", { count: timesPlayed }) : t("neverPlayed")}
+                </span>
                 {shared && kg.owner && (
                   <span className="chip">
                     <Meeple color={kg.owner.meepleColor} size={14} /> {kg.owner.displayName}
@@ -295,6 +302,13 @@ export default async function KallaxGamePage({ params }: { params: Promise<{ id:
                   </select>
                 </div>
               )}
+            </div>
+            <div>
+              <label className="label" htmlFor="kg-plays">
+                {t("form.timesPlayed")}
+              </label>
+              <input id="kg-plays" name="timesPlayed" type="number" min={logged} max={100000} inputMode="numeric" defaultValue={timesPlayed} className="input w-32" />
+              <p className="mt-1 text-xs text-muted">{logged ? t("form.timesPlayedLogged", { count: logged }) : t("form.timesPlayedHint")}</p>
             </div>
             <div>
               <label className="label" htmlFor="kg-notes">

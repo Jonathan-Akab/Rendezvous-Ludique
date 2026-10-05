@@ -5,8 +5,9 @@ import { MeepleAvatar } from "@/components/Meeple";
 import { seatsTaken, type EventWithDetails } from "../service";
 
 export const KIND_COLORS: Record<string, string> = {
-  HOME_GAME: "#2f6b4f",
   GAME_NIGHT: "#d9480f",
+  BOARD_GAME_EVENT: "#2f6b4f",
+  HOME_GAME: "#d9480f", // former kind, now a game night
   TOURNAMENT: "#6741d9",
   CONVENTION: "#1c5fbf",
 };

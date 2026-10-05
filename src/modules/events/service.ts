@@ -91,8 +91,8 @@ export function seatsTaken(e: EventWithDetails) {
   return 1 + e.attendees.filter((a) => a.status === "GOING" && a.userId !== e.hostId).length;
 }
 
-/** Home-game addresses are only shown to the host and confirmed players. */
+/** Game-night addresses (often someone's home) are only shown to the host and confirmed players. */
 export function canSeeAddress(e: EventWithDetails, viewerId: string) {
-  if (e.kind !== "HOME_GAME") return true;
+  if (e.kind !== "GAME_NIGHT" && e.kind !== "HOME_GAME") return true;
   return e.hostId === viewerId || e.attendees.some((a) => a.userId === viewerId && a.status === "GOING");
 }

@@ -32,7 +32,6 @@ export default async function AdminEditEventPage({ params }: { params: Promise<{
         <EventForm
           action={updateEventAction.bind(null, event.id)}
           returnTo="admin"
-          allowHomeGames
           allowPublic
           submitLabel={t("save")}
           myGames={[

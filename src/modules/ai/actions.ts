@@ -106,3 +106,10 @@ export async function removeOwnKeyAction() {
   revalidatePath("/settings");
   revalidatePath("/ai");
 }
+
+/** One more visit to the rules AI page; true when the "how the AI is paid for" notice is due (1st visit, then every 30th). */
+export async function aiNoticeTickAction() {
+  const user = await requireUser();
+  const { aiNoticeViews } = await db.user.update({ where: { id: user.id }, data: { aiNoticeViews: { increment: 1 } }, select: { aiNoticeViews: true } });
+  return aiNoticeViews % 30 === 1;
+}

@@ -53,6 +53,7 @@ export async function loginAction(_prev: ActionState, fd: FormData): Promise<Act
   if (user.status !== "ACTIVE") return { error: t("suspended") };
   if (!user.emailVerifiedAt && (await confirmationRequired())) return { error: t("unverified"), data: { resend: identifier } };
 
+  if (user.guideShowNext) await db.user.update({ where: { id: user.id }, data: { guidePending: true } });
   await createSession(user.id);
   await rememberPreferences(user.locale, user.theme);
   redirect(safeNext(str(fd, "next")));

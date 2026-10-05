@@ -2,10 +2,10 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BoardGameTransition, transitionFor } from "@/components/transitions/BoardGameTransition";
+import { BoardGameTransition } from "@/components/transitions/BoardGameTransition";
 
-// Re-mounted on every navigation. Moving to another module plays that module's
-// board-game transition (tiles, board, mat, cards, die); moving inside a module just fades.
+// Re-mounted on every navigation. Moving to another module plays a board-game transition
+// picked at random (tiles, cards or die); moving inside a module just fades.
 let lastModule: string | null = null;
 
 export default function MemberTemplate({ children }: { children: React.ReactNode }) {
@@ -17,7 +17,7 @@ export default function MemberTemplate({ children }: { children: React.ReactNode
     lastModule = mod;
   }, [mod]);
   return (
-    <BoardGameTransition kind={transitionFor(pathname)} play={play}>
+    <BoardGameTransition play={play}>
       {children}
     </BoardGameTransition>
   );

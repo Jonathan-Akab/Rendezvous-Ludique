@@ -12,7 +12,9 @@ import { getSiteSettings } from "@/lib/settings";
 import { fromLocalInput } from "@/lib/time";
 import { audit } from "@/lib/audit";
 import { optInt, optStr, str, type ActionState } from "@/lib/forms";
-import { getMyKallaxGames } from "@/modules/kallax/service";
+import { getMyExpansions, getMyKallaxGames } from "@/modules/kallax/service";
+import { isPlayEditor } from "./service";
+import { draftDataSchema } from "./draft";
 import { getFriendIds } from "@/modules/friends/service";
 import { notify } from "@/modules/notifications/emails";
 
@@ -31,6 +33,11 @@ const seatSchema = z.array(
     isWinner: z.boolean().optional(),
   }),
 );
+
+/** Expansions ticked in the form, kept only if they belong to the played game. */
+function readExpansions(fd: FormData, allowed: Set<string>) {
+  return [...new Set(fd.getAll("expansionIds").map(String))].filter((id) => allowed.has(id));
+}
 
 export async function logPlayAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const { user, mod } = await guard();
@@ -56,6 +63,7 @@ export async function logPlayAction(_prev: ActionState, fd: FormData): Promise<A
   if (others.some((s) => s.userId && !friendIds.has(s.userId))) return { error: t("notFriend") };
   if (!mod.settings.allowGuests && others.some((s) => !s.userId)) return { error: t("guestsDisabled") };
   const needsOk = Boolean(mod.settings.requireConfirmation);
+  const expansionIds = readExpansions(fd, new Set(((await getMyExpansions(user.id))[gameId] ?? []).map((x) => x.gameId)));
 
   const play = await db.play.create({
     data: {
@@ -66,6 +74,7 @@ export async function logPlayAction(_prev: ActionState, fd: FormData): Promise<A
       location: optStr(fd, "location"),
       notes: optStr(fd, "notes"),
       eventId: optStr(fd, "eventId"),
+      expansions: { create: expansionIds.map((id) => ({ gameId: id })) },
       participants: {
         create: [
           { userId: user.id, score: self.score ?? null, isWinner: Boolean(self.isWinner), status: "CONFIRMED" },
@@ -87,7 +96,10 @@ export async function logPlayAction(_prev: ActionState, fd: FormData): Promise<A
     const game = await db.game.findUnique({ where: { id: gameId }, select: { name: true } });
     for (const s of others) if (s.userId) void notify(s.userId, "playToConfirm", { name: user.displayName, game: game?.name ?? "" }, "/plays");
   }
+  // the play in progress is now a real play
+  await db.playDraft.deleteMany({ where: { userId: user.id } });
   revalidatePath("/plays");
+  revalidatePath("/home");
   redirect(`/plays?logged=${play.id}`);
 }
 
@@ -102,15 +114,15 @@ export async function respondPlayAction(participantId: string, accept: boolean) 
 }
 
 /**
- * Edit a logged play (its creator or an admin). Players already on the play keep their
+ * Edit a logged play (its creator, a player who confirmed it, or an admin). Players already on the play keep their
  * confirmation; newly added friends are asked to confirm, like when logging.
  */
 export async function updatePlayAction(playId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
   const { user, mod } = await guard();
   const t = await getTranslations("plays.errors");
   const { timeZone } = await getSiteSettings();
-  const play = await db.play.findUnique({ where: { id: playId }, include: { participants: true } });
-  if (!play || (play.createdById !== user.id && !can(user, "plays"))) return { error: t("forbidden") };
+  const play = await db.play.findUnique({ where: { id: playId }, include: { participants: true, expansions: true } });
+  if (!play || (!isPlayEditor(play, user.id) && !can(user, "plays"))) return { error: t("forbidden") };
 
   const gameId = str(fd, "gameId");
   if (!gameId || (gameId !== play.gameId && !(await getMyKallaxGames(play.createdById)).some((g) => g.gameId === gameId))) return { error: t("game") };
@@ -130,9 +142,15 @@ export async function updatePlayAction(playId: string, _prev: ActionState, fd: F
   if (!mod.settings.allowGuests && seats.some((s) => !s.userId && s.guestName?.trim())) return { error: t("guestsDisabled") };
   const needsOk = Boolean(mod.settings.requireConfirmation);
 
+  // the creator's expansions of that game, plus the ones already on the play
+  const allowed = new Set(((await getMyExpansions(play.createdById))[gameId] ?? []).map((x) => x.gameId));
+  if (gameId === play.gameId) for (const x of play.expansions) allowed.add(x.gameId);
+  const expansionIds = readExpansions(fd, allowed);
+
   await db.play.update({
     where: { id: playId },
     data: {
+      expansions: { deleteMany: {}, create: expansionIds.map((id) => ({ gameId: id })) },
       gameId,
       playedAt,
       durationMin: optInt(fd, "durationMin"),
@@ -161,7 +179,7 @@ export async function updatePlayAction(playId: string, _prev: ActionState, fd: F
       data: { playId, guestName: s.guestName!.trim(), score: s.score ?? null, isWinner: Boolean(s.isWinner), status: "CONFIRMED" },
     });
   }
-  if (play.createdById !== user.id) await audit(user.id, "play.update", playId);
+  if (play.createdById !== user.id && !isPlayEditor(play, user.id)) await audit(user.id, "play.update", playId);
   revalidatePath("/plays");
   redirect("/plays");
 }
@@ -175,4 +193,24 @@ export async function deletePlayAction(playId: string) {
   await db.play.delete({ where: { id: playId } });
   if (play.createdById !== user.id) await audit(user.id, "play.delete", playId);
   revalidatePath("/plays");
+}
+
+/** Keeps the play in progress on the server (called as the member types, and by the clock buttons). */
+export async function savePlayDraftAction(data: unknown, clock: { startedAt: number | null; savedMs: number }) {
+  const { user } = await guard();
+  const parsed = draftDataSchema.safeParse(data);
+  if (!parsed.success) return { ok: false };
+  const startedAt = typeof clock?.startedAt === "number" && Number.isFinite(clock.startedAt) ? new Date(clock.startedAt) : null;
+  const savedMs = Math.max(0, Math.min(7 * 24 * 3600_000, Math.round(Number(clock?.savedMs) || 0)));
+  const fields = { data: JSON.stringify(parsed.data), startedAt, savedMs };
+  await db.playDraft.upsert({ where: { userId: user.id }, create: { userId: user.id, ...fields }, update: fields });
+  return { ok: true };
+}
+
+/** "Annuler": the play in progress is thrown away. */
+export async function discardPlayDraftAction() {
+  const { user } = await guard();
+  await db.playDraft.deleteMany({ where: { userId: user.id } });
+  revalidatePath("/plays");
+  revalidatePath("/home");
 }
