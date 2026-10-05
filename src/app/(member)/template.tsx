@@ -1,16 +1,24 @@
 "use client";
 
-import { motion } from "motion/react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { BoardGameTransition, transitionFor } from "@/components/transitions/BoardGameTransition";
 
-// Re-mounted on every navigation: gives each page a soft entrance.
+// Re-mounted on every navigation. Moving to another module plays that module's
+// board-game transition (tiles, board, mat, cards, die); moving inside a module just fades.
+let lastModule: string | null = null;
+
 export default function MemberTemplate({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const mod = pathname.split("/")[1] ?? "";
+  // decided once per page; remembered after rendering (safe when React renders twice in dev)
+  const [play] = useState(() => mod !== lastModule);
+  useEffect(() => {
+    lastModule = mod;
+  }, [mod]);
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-    >
+    <BoardGameTransition kind={transitionFor(pathname)} play={play}>
       {children}
-    </motion.div>
+    </BoardGameTransition>
   );
 }
