@@ -10,7 +10,10 @@ RUN npm ci
 
 FROM deps AS build
 COPY . .
-ENV NEXT_TELEMETRY_DISABLED=1
+# The build loads the pages, which pick the Prisma driver from DATABASE_URL: a placeholder
+# PostgreSQL address (nothing connects to it during the build; the real one is set at run time).
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    DATABASE_URL=postgresql://build:build@localhost:5432/build
 RUN node scripts/use-postgres.mjs \
   && npx prisma generate \
   && npm run build
