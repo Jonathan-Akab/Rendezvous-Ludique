@@ -7,6 +7,8 @@ import {
   Dices,
   Gauge,
   LibraryBig,
+  Lightbulb,
+  MessageCircleQuestion,
   Palette,
   Puzzle,
   ScrollText,
@@ -16,10 +18,11 @@ import {
   Swords,
   Users2,
   Users,
+  UserCheck,
   type LucideIcon,
 } from "lucide-react";
 
-const ICONS: Record<string, LucideIcon> = { Gauge, Users, CalendarDays, Swords, LibraryBig, Dices, Puzzle, Palette, Settings2, ScrollText, Sparkles, Store, Users2 };
+const ICONS: Record<string, LucideIcon> = { Gauge, Users, CalendarDays, Swords, LibraryBig, Dices, Puzzle, Palette, Settings2, ScrollText, Sparkles, Store, Users2, Lightbulb, MessageCircleQuestion, UserCheck };
 
 export type AdminNavItem = { href: string; label: string; icon: string; group: string };
 
@@ -27,7 +30,8 @@ export function AdminNav({ items, groups }: { items: AdminNavItem[]; groups: Rec
   const pathname = usePathname();
   return (
     <nav className="space-y-5" aria-label="Admin">
-      {Object.entries(groups).map(([key, label]) => (
+      {/* groups with no section this person may use are hidden */}
+      {Object.entries(groups).filter(([key]) => items.some((i) => i.group === key)).map(([key, label]) => (
         <div key={key}>
           <p className="mb-1 px-3 text-[11px] font-bold uppercase tracking-widest text-[var(--console-muted)]">{label}</p>
           <ul className="space-y-0.5">

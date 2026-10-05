@@ -35,6 +35,14 @@ services:
       UPLOAD_DIR: /app/storage
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       FREE_AI_API_KEY: ${FREE_AI_API_KEY:-}
+      APP_SECRET: ${APP_SECRET:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      APP_URL: ${APP_URL:-}
+      BGG_API_TOKEN: ${BGG_API_TOKEN:-}
     volumes:
       - uploads:/app/storage
     ports:

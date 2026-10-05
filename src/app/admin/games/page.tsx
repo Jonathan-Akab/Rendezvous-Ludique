@@ -1,4 +1,7 @@
 import { getTranslations } from "next-intl/server";
+import { requirePermission } from "@/lib/auth/guards";
+import { enrichAvailable, INCOMPLETE_GAME_WHERE } from "@/modules/games/enrich";
+import { LudoEnrich } from "@/modules/games/components/LudoEnrich";
 import { db } from "@/lib/db";
 import { ilike } from "@/lib/search";
 import { ActionForm } from "@/components/ActionForm";
@@ -14,28 +17,32 @@ export async function generateMetadata() {
 }
 
 export default async function AdminGamesPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  await requirePermission("games");
   const [sp, t] = await Promise.all([searchParams, getTranslations("admin.games")]);
   const [games, all] = await Promise.all([
     db.game.findMany({
       where: sp.q ? { name: ilike(sp.q) } : {},
-      include: { _count: { select: { libraryGames: true, plays: true, eventGames: true } } },
+      include: { _count: { select: { kallaxGames: true, plays: true, eventGames: true } } },
       orderBy: { name: "asc" },
       take: 200,
     }),
     db.game.findMany({ select: { id: true, name: true }, orderBy: { name: "asc" } }),
   ]);
+  // Entries with an empty detail or no picture (the free AI can complete them).
+  const incomplete = (await db.game.findMany({ where: INCOMPLETE_GAME_WHERE, select: { id: true }, orderBy: { name: "asc" }, take: 500 })).map((g) => g.id);
+  const aiOn = await enrichAvailable();
 
   return (
     <div className="space-y-6">
       <AdminHeader title={t("title")} lead={t("lead", { count: all.length })} />
-      <details className="card card-pad">
-        <summary className="cursor-pointer font-semibold">{t("add")}</summary>
-        <div className="mt-4">
-          <ActionForm action={saveGameAction.bind(null, null)} submitLabel={t("create")}>
-            <GameFields />
-          </ActionForm>
-        </div>
-      </details>
+
+      {aiOn && (
+        <section className="card card-pad space-y-2">
+          <p className="text-sm text-muted">{t("aiLead", { count: incomplete.length })}</p>
+          <LudoEnrich ids={incomplete} label={t("aiAll", { count: incomplete.length })} />
+        </section>
+      )}
+
       <SearchBar placeholder={t("search")} defaultValue={sp.q} />
       <div className="space-y-2">
         {games.map((g) => (
@@ -45,11 +52,27 @@ export default async function AdminGamesPage({ searchParams }: { searchParams: P
               <span className="flex-1 font-semibold">
                 {g.name} {g.year && <span className="text-xs font-normal text-muted">({g.year})</span>}
               </span>
-              <span className="text-xs text-muted">{t("usage", { copies: g._count.libraryGames, plays: g._count.plays, events: g._count.eventGames })}</span>
+              <span className="text-xs text-muted">{t("usage", { copies: g._count.kallaxGames, plays: g._count.plays, events: g._count.eventGames })}</span>
             </summary>
             <div className="space-y-4 border-t border-line p-4">
+              {aiOn && <LudoEnrich ids={[g.id]} label={t("aiOne")} compact />}
               <ActionForm action={saveGameAction.bind(null, g.id)} submitLabel={t("save")}>
                 <GameFields values={g} />
+                <div>
+                  <label className="label" htmlFor={`base-${g.id}`}>
+                    {t("expansionOf")}
+                  </label>
+                  <select id={`base-${g.id}`} name="baseGameId" defaultValue={g.baseGameId ?? ""} className="select">
+                    <option value="">{t("standalone")}</option>
+                    {all
+                      .filter((o) => o.id !== g.id)
+                      .map((o) => (
+                        <option key={o.id} value={o.id}>
+                          {o.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
               </ActionForm>
               <div className="flex flex-wrap items-end gap-3 border-t border-line pt-4">
                 <form action={mergeGameAction.bind(null, g.id)} className="flex flex-wrap items-end gap-2">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth/guards";
 import { getTranslations } from "next-intl/server";
 import { Gift, Settings2, Sparkles } from "lucide-react";
 import { db } from "@/lib/db";
@@ -19,6 +20,7 @@ export async function generateMetadata() {
 const usd = (n: number) => `${n.toFixed(2)} $`;
 
 export default async function AdminAiPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  await requirePermission("ai");
   const [{ q }, mod, t] = await Promise.all([searchParams, getModule("ai"), getTranslations("admin.ai")]);
   const s = mod.settings;
   const since = await monthStart();

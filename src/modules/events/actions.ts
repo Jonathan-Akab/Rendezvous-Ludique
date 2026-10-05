@@ -5,14 +5,16 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { hasRole, requireUser } from "@/lib/auth/guards";
+import { can } from "@/lib/auth/permissions";
 import { getModule } from "@/lib/modules";
 import { getSiteSettings } from "@/lib/settings";
 import { fromLocalInput } from "@/lib/time";
 import { audit } from "@/lib/audit";
 import { bool, oneOf, optFloat, optInt, optStr, str, type ActionState } from "@/lib/forms";
 import { EVENT_KINDS, EVENT_VISIBILITIES, type AttendeeStatus } from "@/lib/constants";
-import { findOrCreateGame } from "@/modules/kallax/service";
+import { getMyKallaxGames } from "@/modules/kallax/service";
 import { getEventForViewer, seatsTaken } from "./service";
+import { notify } from "@/modules/notifications/emails";
 
 async function guard() {
   const user = await requireUser();
@@ -56,23 +58,17 @@ async function readEventForm(fd: FormData, mod: Awaited<ReturnType<typeof guard>
       maxPlayers,
       requiresApproval: bool(fd, "requiresApproval"),
     },
-    games: str(fd, "games")
-      .split(",")
-      .map((g) => g.trim())
-      .filter(Boolean)
-      .slice(0, 12),
+    gameIds: fd.getAll("gameIds").map(String).filter(Boolean).slice(0, 12),
   };
 }
 
-async function setEventGames(eventId: string, names: string[], userId: string) {
+/** Games on the menu: chosen from the host's Kallax (games already on the event stay allowed). */
+async function setEventGames(eventId: string, gameIds: string[], hostId: string) {
+  const current = (await db.eventGame.findMany({ where: { eventId }, select: { gameId: true } })).map((g) => g.gameId);
+  const allowed = new Set([...current, ...(await getMyKallaxGames(hostId)).map((g) => g.gameId)]);
   await db.eventGame.deleteMany({ where: { eventId } });
-  for (const name of names) {
-    const game = await findOrCreateGame(name, userId);
-    await db.eventGame.upsert({
-      where: { eventId_gameId: { eventId, gameId: game.id } },
-      create: { eventId, gameId: game.id },
-      update: {},
-    });
+  for (const gameId of new Set(gameIds.filter((id) => allowed.has(id)))) {
+    await db.eventGame.create({ data: { eventId, gameId } });
   }
 }
 
@@ -81,7 +77,7 @@ export async function createEventAction(_prev: ActionState, fd: FormData): Promi
   const parsed = await readEventForm(fd, mod);
   if ("error" in parsed) return { error: parsed.error };
   const event = await db.event.create({ data: { ...parsed.data, hostId: user.id } });
-  await setEventGames(event.id, parsed.games, user.id);
+  await setEventGames(event.id, parsed.gameIds, user.id);
   revalidatePath("/events");
   redirect(`/events/${event.id}?created=1`);
 }
@@ -90,7 +86,7 @@ async function canManage(eventId: string) {
   const user = await requireUser();
   const event = await db.event.findUnique({ where: { id: eventId } });
   if (!event) return null;
-  const isAdmin = hasRole(user.role, "ADMIN");
+  const isAdmin = can(user, "events");
   if (event.hostId !== user.id && !isAdmin) return null;
   return { user, event, viaAdmin: event.hostId !== user.id };
 }
@@ -102,12 +98,12 @@ export async function updateEventAction(eventId: string, _prev: ActionState, fd:
   const parsed = await readEventForm(fd, mod);
   if ("error" in parsed) return { error: parsed.error };
   await db.event.update({ where: { id: eventId }, data: parsed.data });
-  await setEventGames(eventId, parsed.games, ctx.user.id);
+  await setEventGames(eventId, parsed.gameIds, ctx.event.hostId);
   if (ctx.viaAdmin) await audit(ctx.user.id, "event.update", eventId);
   revalidatePath(`/events/${eventId}`);
   revalidatePath("/admin/events");
   // Admins editing from the console go back to the console.
-  redirect(str(fd, "returnTo") === "admin" && hasRole(ctx.user.role, "ADMIN") ? "/admin/events" : `/events/${eventId}`);
+  redirect(str(fd, "returnTo") === "admin" && can(ctx.user, "events") ? "/admin/events" : `/events/${eventId}`);
 }
 
 export async function setEventStatusAction(eventId: string, status: "SCHEDULED" | "CANCELLED") {
@@ -115,6 +111,10 @@ export async function setEventStatusAction(eventId: string, status: "SCHEDULED" 
   if (!ctx) return;
   await db.event.update({ where: { id: eventId }, data: { status } });
   if (ctx.viaAdmin) await audit(ctx.user.id, `event.${status.toLowerCase()}`, eventId);
+  if (status === "CANCELLED" && ctx.event.status !== "CANCELLED") {
+    const going = await db.eventAttendee.findMany({ where: { eventId, status: { in: ["GOING", "MAYBE"] } }, select: { userId: true } });
+    for (const a of going) void notify(a.userId, "eventCancelled", { event: ctx.event.title }, `/events/${eventId}`);
+  }
   revalidatePath(`/events/${eventId}`);
 }
 
@@ -147,6 +147,9 @@ export async function rsvpAction(eventId: string, wanted: "GOING" | "MAYBE" | "L
       create: { eventId, userId: user.id, status },
       update: { status },
     });
+    if (status === "REQUESTED" && current?.status !== "REQUESTED") {
+      void notify(event.hostId, "eventJoinRequest", { name: user.displayName, event: event.title }, `/events/${eventId}`);
+    }
   }
   revalidatePath(`/events/${eventId}`);
   revalidatePath("/home");
@@ -158,6 +161,7 @@ export async function respondJoinRequestAction(attendeeId: string, accept: boole
   const a = await db.eventAttendee.findUnique({ where: { id: attendeeId }, include: { event: true } });
   if (!a || a.event.hostId !== user.id) return;
   await db.eventAttendee.update({ where: { id: attendeeId }, data: { status: accept ? "GOING" : "DECLINED" } });
+  if (accept) void notify(a.userId, "eventJoinAccepted", { event: a.event.title }, `/events/${a.eventId}`);
   revalidatePath(`/events/${a.eventId}`);
   revalidatePath("/home");
 }

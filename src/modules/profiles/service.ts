@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { getModule } from "@/lib/modules";
 import { areFriends } from "@/modules/friends/service";
 import { confirmedPlaysWhere, PLAY_INCLUDE } from "@/modules/plays/service";
+import { kallaxCoverUrl } from "@/modules/kallax/service";
 
 /**
  * Who may see a profile. viewerId is null for visitors who aren't signed in (public link).
@@ -47,9 +48,9 @@ export async function getProfileData(username: string) {
 
   const [kallax, plays, playCount, hosted, friendCount] = await Promise.all([
     user.showLibrary
-      ? db.libraryGame.findMany({
-          where: { status: { in: ["OWNED", "FOR_TRADE"] }, library: { members: { some: { userId: user.id, status: "ACCEPTED" } } } },
-          include: { game: true, owner: { select: { displayName: true, meepleColor: true } } },
+      ? db.kallaxGame.findMany({
+          where: { status: { in: ["OWNED", "FOR_TRADE"] }, parentId: null, library: { members: { some: { userId: user.id, status: "ACCEPTED" } } } },
+          include: { game: { select: { coverFileId: true, imageUrl: true } }, owner: { select: { displayName: true, meepleColor: true } } },
           orderBy: { addedAt: "desc" },
         })
       : Promise.resolve([]),
@@ -63,7 +64,17 @@ export async function getProfileData(username: string) {
 
   // A game shared by two co-owners' libraries shows once.
   const seen = new Set<string>();
-  const games = kallax.filter((g) => (seen.has(g.gameId) ? false : (seen.add(g.gameId), true)));
+  // Shown only because the member chose to share their Kallax on their profile.
+  const games = kallax
+    .filter((g) => (seen.has(g.gameId) ? false : (seen.add(g.gameId), true)))
+    .map((g) => ({
+      id: g.id,
+      status: g.status,
+      notes: null,
+      owner: g.owner,
+      cover: kallaxCoverUrl(g),
+      game: { id: g.gameId, name: g.name, minPlayers: g.minPlayers, maxPlayers: g.maxPlayers, playTimeMin: g.playTimeMin, year: g.year },
+    }));
 
   return { user, games, plays, stats: { plays: playCount, games: games.length, hosted, friends: friendCount } };
 }

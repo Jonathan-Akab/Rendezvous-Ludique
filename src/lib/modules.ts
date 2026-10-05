@@ -2,7 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { MODULES, defaultSettings, getManifest, type ModuleKey } from "@/modules/registry";
+import { DEFAULT_MENU_ORDER, MODULES, defaultSettings, getManifest, type ModuleKey } from "@/modules/registry";
 
 export type ModuleState = {
   key: ModuleKey;
@@ -27,7 +27,8 @@ export const getModuleStates = cache(async (): Promise<Record<ModuleKey, ModuleS
     out[m.key] = {
       key: m.key,
       enabled: m.core ? true : (row?.enabled ?? true),
-      sortOrder: row?.sortOrder || (index + 1) * 10,
+      // Modules without a saved position (e.g. newly added ones) go after the ordered ones.
+      sortOrder: row?.sortOrder || 1000 + (DEFAULT_MENU_ORDER.indexOf(m.key) + 1 || index + 1) * 10,
       settings: { ...defaultSettings(m.key), ...(stored as ModuleState["settings"]) },
     };
   }
@@ -75,6 +76,19 @@ export async function moveModule(key: ModuleKey, direction: -1 | 1) {
     await db.moduleConfig.upsert({
       where: { key: m.key },
       create: { key: m.key, sortOrder: (index + 1) * 10 },
+      update: { sortOrder: (index + 1) * 10 },
+    });
+  }
+}
+/** Sets the default menu order; modules not listed keep their relative order after the listed ones. */
+export async function setModuleOrder(keys: ModuleKey[]) {
+  const current = await getOrderedModules();
+  const listed = keys.filter((k, i) => keys.indexOf(k) === i && current.some((m) => m.key === k));
+  const ordered = [...listed, ...current.map((m) => m.key).filter((k) => !listed.includes(k))];
+  for (const [index, key] of ordered.entries()) {
+    await db.moduleConfig.upsert({
+      where: { key },
+      create: { key, sortOrder: (index + 1) * 10 },
       update: { sortOrder: (index + 1) * 10 },
     });
   }

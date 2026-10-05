@@ -2,13 +2,17 @@ import Link from "next/link";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { getModuleStates } from "@/lib/modules";
+import { requireStaff } from "@/lib/auth/guards";
+import { permissionsOf, type Permission } from "@/lib/auth/permissions";
 import { MODULES } from "@/modules/registry";
 import { MeepleAvatar } from "@/components/Meeple";
 import { Stagger, StaggerItem } from "@/components/Motion";
 import { AdminHeader } from "@/modules/admin/components/AdminUi";
 
 export default async function AdminDashboard() {
-  const [t, tm, format, modules] = await Promise.all([getTranslations("admin.dashboard"), getTranslations("nav"), getFormatter(), getModuleStates()]);
+  const [me, t, tm, format, modules] = await Promise.all([requireStaff(), getTranslations("admin.dashboard"), getTranslations("nav"), getFormatter(), getModuleStates()]);
+  // Each card only for staff who have that section's right.
+  const allowed = permissionsOf(me);
   const now = new Date();
   const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
@@ -25,13 +29,13 @@ export default async function AdminDashboard() {
   ]);
 
   const stats = [
-    { label: t("members"), value: members, sub: t("newThisWeek", { count: newMembers }), href: "/admin/members" },
-    { label: t("upcomingEvents"), value: upcoming, href: "/admin/events" },
-    { label: t("games"), value: games, href: "/admin/games" },
-    { label: t("libraries"), value: libraries, href: "/admin/libraries" },
-    { label: t("plays"), value: plays, href: "/admin/plays" },
-    { label: t("suspended"), value: suspended, href: "/admin/members?status=SUSPENDED" },
-  ];
+    { label: t("members"), value: members, sub: t("newThisWeek", { count: newMembers }), href: "/admin/members", perm: "members" },
+    { label: t("upcomingEvents"), value: upcoming, href: "/admin/events", perm: "events" },
+    { label: t("games"), value: games, href: "/admin/games", perm: "games" },
+    { label: t("libraries"), value: libraries, href: "/admin/libraries", perm: "libraries" },
+    { label: t("plays"), value: plays, href: "/admin/plays", perm: "plays" },
+    { label: t("suspended"), value: suspended, href: "/admin/members?status=SUSPENDED", perm: "members" },
+  ].filter((s) => allowed.has(s.perm as Permission));
 
   return (
     <div className="space-y-8">
@@ -49,6 +53,7 @@ export default async function AdminDashboard() {
       </Stagger>
 
       <div className="grid gap-6 lg:grid-cols-3">
+        {allowed.has("modules") && (
         <section className="card card-pad">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="section-title text-base">{t("modules")}</h2>
@@ -67,7 +72,9 @@ export default async function AdminDashboard() {
             ))}
           </ul>
         </section>
+        )}
 
+        {allowed.has("members") && (
         <section className="card card-pad">
           <h2 className="section-title mb-3 text-base">{t("newMembers")}</h2>
           <ul className="space-y-2">
@@ -82,7 +89,9 @@ export default async function AdminDashboard() {
             ))}
           </ul>
         </section>
+        )}
 
+        {allowed.has("audit") && (
         <section className="card card-pad">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="section-title text-base">{t("activity")}</h2>
@@ -105,6 +114,7 @@ export default async function AdminDashboard() {
             </ul>
           )}
         </section>
+        )}
       </div>
     </div>
   );

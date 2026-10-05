@@ -7,6 +7,7 @@ import { Crown, UserPlus, X } from "lucide-react";
 import { FormMessage, SubmitButton } from "@/components/forms";
 import { Meeple } from "@/components/Meeple";
 import { logPlayAction } from "../actions";
+import { MyGameSelect, type MyGameOption } from "@/modules/kallax/components/MyGameSelect";
 import type { ActionState } from "@/lib/forms";
 
 type Friend = { id: string; displayName: string; meepleColor: string };
@@ -16,7 +17,7 @@ export type Seat = { key: string; userId?: string; guestName?: string; name: str
 export type PlayEdit = {
   action: (prev: ActionState, fd: FormData) => Promise<ActionState>;
   ownerId: string;
-  game: string;
+  gameId: string;
   playedAt: string;
   durationMin: number | null;
   location: string | null;
@@ -27,7 +28,7 @@ export type PlayEdit = {
 export function PlayForm({
   me,
   friends,
-  gameNames,
+  games,
   today,
   allowGuests,
   requireConfirmation,
@@ -36,10 +37,11 @@ export function PlayForm({
 }: {
   me: Friend;
   friends: Friend[];
-  gameNames: string[];
+  games: MyGameOption[];
   today: string;
   allowGuests: boolean;
   requireConfirmation: boolean;
+  /** game id pre-selected (e.g. "log a play" from a Kallax game) */
   defaultGame?: string;
   edit?: PlayEdit;
 }) {
@@ -76,18 +78,11 @@ export function PlayForm({
   return (
     <form action={action} className="space-y-6">
       <input type="hidden" name="participants" value={payload} />
-      <div className="grid gap-4 sm:grid-cols-[2fr_1fr_1fr]">
-        <div>
-          <label className="label" htmlFor="game">
-            {t("form.game")}
-          </label>
-          <input id="game" name="game" list="play-games" className="input" required autoComplete="off" defaultValue={edit?.game ?? defaultGame} />
-          <datalist id="play-games">
-            {gameNames.map((n) => (
-              <option key={n} value={n} />
-            ))}
-          </datalist>
-        </div>
+      <div>
+        <span className="label">{t("form.game")}</span>
+        <MyGameSelect games={games} defaultValue={edit?.gameId ?? defaultGame} required />
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className="label" htmlFor="playedAt">
             {t("form.date")}

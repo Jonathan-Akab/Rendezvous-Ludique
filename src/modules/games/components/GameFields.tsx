@@ -65,7 +65,7 @@ export function GameFields({
       {num("minPlayers", t("minPlayers"), { min: 1, max: 100 })}
       {num("maxPlayers", t("maxPlayers"), { min: 1, max: 100 })}
       {num("playTimeMin", t("playTime"), { min: 1, max: 6000 })}
-      {!compact && num("minAge", t("minAge"), { min: 1, max: 99 })}
+      {num("minAge", t("minAge"), { min: 1, max: 99 })}
       {!compact && num("weight", t("weight"), { min: 1, max: 5, step: 0.1 })}
       {text("designer", t("designer"), compact ? "col-span-2" : "")}
       {text("publisher", t("publisher"), compact ? "col-span-2" : "")}

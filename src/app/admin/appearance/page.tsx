@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { requirePermission } from "@/lib/auth/guards";
 import { getSiteSettings } from "@/lib/settings";
 import { THEMES } from "@/lib/constants";
 import { ActionForm } from "@/components/ActionForm";
@@ -13,6 +14,7 @@ export async function generateMetadata() {
 const ALWAYS_ON = ["system", "light", "dark"];
 
 export default async function AdminAppearancePage() {
+  await requirePermission("appearance");
   const [settings, t, tt] = await Promise.all([getSiteSettings(), getTranslations("admin.appearance"), getTranslations("themes")]);
   return (
     <div className="space-y-6">

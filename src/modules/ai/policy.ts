@@ -5,14 +5,16 @@ import { getSiteSettings } from "@/lib/settings";
 import { fromLocalInput, toDateInput } from "@/lib/time";
 import { aiConfigured } from "./service";
 import { freeConfigured } from "./free";
+import { ownKeysAllowed } from "./ownKey";
 
 // Who may use which AI provider, and how much Claude spending is left.
 //
 // Claude is the default for everyone, within two monthly budgets set by admins:
 // one for the whole site and one per member (overridable per member). Admins can
-// also restrict a member to the free provider or turn the AI off for them.
+// also restrict a member to the free provider or turn the AI off for them. Members may
+// also use their own Anthropic key ("own"): their money, so no site budget or daily limit.
 
-export type Provider = "claude" | "free";
+export type Provider = "claude" | "free" | "own";
 export type Access = "DEFAULT" | "FREE_ONLY" | "NONE";
 
 export async function monthStart() {
@@ -20,13 +22,17 @@ export async function monthStart() {
   return fromLocalInput(`${toDateInput(new Date(), timeZone).slice(0, 7)}-01T00:00`, timeZone)!;
 }
 
+/** The site's Claude spending this month: rules answers plus other AI calls (Kallax photos). */
 export async function claudeSpend(userId?: string) {
   const since = await monthStart();
-  const agg = await db.aiMessage.aggregate({
-    _sum: { costUsd: true },
-    where: { provider: "claude", createdAt: { gte: since }, ...(userId ? { chat: { userId } } : {}) },
-  });
-  return agg._sum.costUsd ?? 0;
+  const [chat, other] = await Promise.all([
+    db.aiMessage.aggregate({
+      _sum: { costUsd: true },
+      where: { provider: "claude", createdAt: { gte: since }, ...(userId ? { chat: { userId } } : {}) },
+    }),
+    db.aiUsage.aggregate({ _sum: { costUsd: true }, where: { provider: "claude", createdAt: { gte: since }, ...(userId ? { userId } : {}) } }),
+  ]);
+  return (chat._sum.costUsd ?? 0) + (other._sum.costUsd ?? 0);
 }
 
 export async function getMemberAiSetting(userId: string) {
@@ -37,6 +43,9 @@ export async function getMemberAiSetting(userId: string) {
       monthlyBudgetUsd: null,
       dailyLimit: null,
       preferredProvider: "claude",
+      ownKeyEncrypted: null,
+      ownKeyHint: null,
+      ownModel: null,
     }
   );
 }
@@ -46,6 +55,7 @@ export type AiStatus = {
   preferred: Provider;
   claude: { available: boolean; reason?: "disabled" | "notConfigured" | "siteBudget" | "memberBudget" | "restricted"; spent: number; budget: number };
   free: { available: boolean; name: string };
+  own: { available: boolean; hint: string | null; model: string | null };
   dailyLimit: number;
   usedToday: number;
 };
@@ -59,9 +69,12 @@ export async function getAiStatus(userId: string, mod?: ModuleState): Promise<Ai
   const [siteSpent, memberSpent, usedToday] = await Promise.all([
     claudeSpend(),
     claudeSpend(userId),
-    db.aiMessage.count({ where: { role: "user", chat: { userId }, createdAt: { gte: new Date(Date.now() - 86_400_000) } } }),
+    // AI answers only: answers from the FAQ are free and don't count.
+    db.aiMessage.count({ where: { role: "assistant", provider: { in: ["claude", "free"] }, chat: { userId }, createdAt: { gte: new Date(Date.now() - 86_400_000) } } }),
   ]);
   const memberBudget = setting.monthlyBudgetUsd ?? Number(s.memberMonthlyBudgetUsd);
+
+  const ownAvailable = access !== "NONE" && ownKeysAllowed(m) && Boolean(setting.ownKeyEncrypted);
 
   let reason: AiStatus["claude"]["reason"];
   if (access !== "DEFAULT") reason = "restricted";
@@ -72,9 +85,10 @@ export async function getAiStatus(userId: string, mod?: ModuleState): Promise<Ai
 
   return {
     access,
-    preferred: setting.preferredProvider === "free" ? "free" : "claude",
+    preferred: setting.preferredProvider === "free" ? "free" : setting.preferredProvider === "own" && ownAvailable ? "own" : "claude",
     claude: { available: !reason, reason, spent: memberSpent, budget: memberBudget },
     free: { available: access !== "NONE" && Boolean(s.freeEnabled) && freeConfigured(String(s.freeBaseUrl)), name: String(s.freeProviderName) },
+    own: { available: ownAvailable, hint: setting.ownKeyHint, model: setting.ownModel },
     dailyLimit: setting.dailyLimit ?? Number(s.dailyQuestionLimit),
     usedToday,
   };
@@ -88,6 +102,8 @@ export function resolveProvider(status: AiStatus, requested: Provider, autoFallb
   | { provider: Provider; switched: boolean }
   | { error: string } {
   if (status.access === "NONE") return { error: "blocked" };
+  // The member's own credits: no site budget, no daily limit.
+  if (requested === "own") return status.own.available ? { provider: "own", switched: false } : { error: "ownUnavailable" };
   if (status.usedToday >= status.dailyLimit) return { error: "limit" };
   if (requested === "claude" && status.claude.available) return { provider: "claude", switched: false };
   if (status.free.available && (requested === "free" || autoFallback || status.access === "FREE_ONLY")) {

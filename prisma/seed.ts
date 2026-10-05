@@ -1,4 +1,4 @@
-// Seeds the first admin account and (optionally) demo data.
+// Seeds the first admin account and (optionally) fictional demo data.
 // Run with `npm run db:seed`. Safe to re-run: existing rows are left alone.
 
 import "dotenv/config";
@@ -19,6 +19,14 @@ function createClient() {
 
 const db = createClient();
 const day = 24 * 60 * 60 * 1000;
+
+const normalizeName = (name: string) =>
+  name
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 
 async function ensureUser(data: {
   email: string;
@@ -44,9 +52,63 @@ async function ensureUser(data: {
   return user;
 }
 
+type GameData = { name: string; year: number; minPlayers: number; maxPlayers: number; playTimeMin: number; minAge: number; designer: string; publisher: string };
+
+// Demo games (factual public info: name, year, player count, length, designer, publisher).
+const GAMES: Record<string, GameData> = {
+  Catan: { name: "Catan", year: 1995, minPlayers: 3, maxPlayers: 4, playTimeMin: 90, minAge: 10, designer: "Klaus Teuber", publisher: "Kosmos" },
+  Anachrony: { name: "Anachrony", year: 2017, minPlayers: 1, maxPlayers: 4, playTimeMin: 120, minAge: 14, designer: "Richard Amann, Viktor Péter, Dávid Turczi", publisher: "Mindclash Games" },
+  "Merchants Cove": { name: "Merchants Cove", year: 2021, minPlayers: 1, maxPlayers: 4, playTimeMin: 90, minAge: 12, designer: "Carl Van Ostrand, Drew Wynne", publisher: "Final Frontier Games" },
+  Wingspan: { name: "Wingspan", year: 2019, minPlayers: 1, maxPlayers: 5, playTimeMin: 70, minAge: 10, designer: "Elizabeth Hargrave", publisher: "Stonemaier Games" },
+  Azul: { name: "Azul", year: 2017, minPlayers: 2, maxPlayers: 4, playTimeMin: 45, minAge: 8, designer: "Michael Kiesling", publisher: "Plan B Games" },
+  "Terraforming Mars": { name: "Terraforming Mars", year: 2016, minPlayers: 1, maxPlayers: 5, playTimeMin: 120, minAge: 12, designer: "Jacob Fryxelius", publisher: "FryxGames" },
+  Carcassonne: { name: "Carcassonne", year: 2000, minPlayers: 2, maxPlayers: 5, playTimeMin: 40, minAge: 7, designer: "Klaus-Jürgen Wrede", publisher: "Hans im Glück" },
+  "Brass: Birmingham": { name: "Brass: Birmingham", year: 2018, minPlayers: 2, maxPlayers: 4, playTimeMin: 120, minAge: 14, designer: "Gavan Brown, Matt Tolman, Martin Wallace", publisher: "Roxley" },
+  "Spirit Island": { name: "Spirit Island", year: 2017, minPlayers: 1, maxPlayers: 4, playTimeMin: 120, minAge: 13, designer: "R. Eric Reuss", publisher: "Greater Than Games" },
+  Cascadia: { name: "Cascadia", year: 2021, minPlayers: 1, maxPlayers: 4, playTimeMin: 45, minAge: 10, designer: "Randy Flynn", publisher: "Flatout Games" },
+  Codenames: { name: "Codenames", year: 2015, minPlayers: 2, maxPlayers: 8, playTimeMin: 15, minAge: 14, designer: "Vlaada Chvátil", publisher: "Czech Games Edition" },
+  Root: { name: "Root", year: 2018, minPlayers: 2, maxPlayers: 4, playTimeMin: 90, minAge: 10, designer: "Cole Wehrle", publisher: "Leder Games" },
+  "Ark Nova": { name: "Ark Nova", year: 2021, minPlayers: 1, maxPlayers: 4, playTimeMin: 150, minAge: 14, designer: "Mathias Wigge", publisher: "Feuerland Spiele" },
+  "7 Wonders": { name: "7 Wonders", year: 2010, minPlayers: 3, maxPlayers: 7, playTimeMin: 30, minAge: 10, designer: "Antoine Bauza", publisher: "Repos Production" },
+  Agricola: { name: "Agricola", year: 2007, minPlayers: 1, maxPlayers: 4, playTimeMin: 120, minAge: 12, designer: "Uwe Rosenberg", publisher: "Lookout Games" },
+};
+
+/** Same rule as the app: the Ludothèque entry is created only if it doesn't exist. */
+async function ensureGame(info: GameData, userId: string) {
+  const normalizedName = normalizeName(info.name);
+  return (await db.game.findUnique({ where: { normalizedName } })) ?? db.game.create({ data: { ...info, normalizedName, createdById: userId } });
+}
+
+async function addToKallax(libraryId: string, gameKey: string, userId: string, opts: { status?: string; notes?: string; name?: string } = {}) {
+  const info = GAMES[gameKey];
+  const game = await ensureGame(info, userId);
+  const exists = await db.kallaxGame.findUnique({ where: { libraryId_gameId: { libraryId, gameId: game.id } } });
+  if (exists) return { game, kallaxGame: exists };
+  const { name, year, minPlayers, maxPlayers, playTimeMin, minAge, designer, publisher } = info;
+  const kallaxGame = await db.kallaxGame.create({
+    data: {
+      libraryId,
+      gameId: game.id,
+      addedById: userId,
+      ownerId: userId,
+      name: opts.name ?? name,
+      year,
+      minPlayers,
+      maxPlayers,
+      playTimeMin,
+      minAge,
+      designer,
+      publisher,
+      status: opts.status ?? "OWNED",
+      notes: opts.notes ?? null,
+    },
+  });
+  return { game, kallaxGame };
+}
+
 async function main() {
   // Module rows so admins see every module in the console from day one.
-  for (const key of ["events", "kallax", "plays", "friends", "profiles", "donations"]) {
+  for (const key of ["events", "games", "kallax", "plays", "friends", "ai", "bazaar", "facebook", "profiles", "donations"]) {
     await db.moduleConfig.upsert({ where: { key }, create: { key }, update: {} });
   }
 
@@ -67,90 +129,65 @@ async function main() {
 
   if (process.env.SEED_DEMO_DATA !== "true") return;
   if (await db.user.findUnique({ where: { username: "marie" } })) {
-    await demoExtras();
-    console.log("Demo data already present — refreshed ratings and game details.");
+    console.log("Demo data already present — skipping.");
     return;
   }
   const demoPassword = process.env.DEMO_PASSWORD;
   if (!demoPassword) throw new Error("Set DEMO_PASSWORD in .env to seed demo members.");
 
-  // ── Members (Montréal area) ──
-  const marie = await ensureUser({ email: "marie@demo.local", username: "marie", displayName: "Marie", password: demoPassword, meepleColor: "#6741d9", city: "Montréal", latitude: 45.52, longitude: -73.58, bio: "Worker placement forever. Anachrony is my happy place.", favoriteGames: "Anachrony, Brass: Birmingham, Wingspan" });
-  const julien = await ensureUser({ email: "julien@demo.local", username: "julien", displayName: "Julien", password: demoPassword, meepleColor: "#2b8a3e", city: "Montréal", latitude: 45.52, longitude: -73.58, bio: "Marie's partner in crime (and in kallax).", favoriteGames: "Catan, Carcassonne" });
-  const sophie = await ensureUser({ email: "sophie@demo.local", username: "sophie", displayName: "Sophie", password: demoPassword, meepleColor: "#f2b705", city: "Laval", latitude: 45.57, longitude: -73.69, favoriteGames: "Azul, Merchants Cove", locale: "fr" });
+  // ── Fictional members (Montréal area) ──
+  const marie = await ensureUser({ email: "marie@demo.local", username: "marie", displayName: "Marie", password: demoPassword, meepleColor: "#6741d9", city: "Montréal", latitude: 45.52, longitude: -73.58, bio: "Placement d'ouvriers pour toujours. Anachrony est mon jeu préféré.", favoriteGames: "Anachrony, Brass: Birmingham, Wingspan" });
+  const julien = await ensureUser({ email: "julien@demo.local", username: "julien", displayName: "Julien", password: demoPassword, meepleColor: "#2b8a3e", city: "Montréal", latitude: 45.52, longitude: -73.58, bio: "Je partage ma Kallax avec Marie.", favoriteGames: "Catan, Carcassonne" });
+  const sophie = await ensureUser({ email: "sophie@demo.local", username: "sophie", displayName: "Sophie", password: demoPassword, meepleColor: "#f2b705", city: "Laval", latitude: 45.57, longitude: -73.69, favoriteGames: "Azul, Merchants Cove" });
   const alex = await ensureUser({ email: "alex@demo.local", username: "alex", displayName: "Alex", password: demoPassword, meepleColor: "#1c5fbf", city: "Longueuil", latitude: 45.53, longitude: -73.52, favoriteGames: "Terraforming Mars, Spirit Island", locale: "en" });
   const lea = await ensureUser({ email: "lea@demo.local", username: "lea", displayName: "Léa", password: demoPassword, meepleColor: "#d6336c", city: "Québec", latitude: 46.81, longitude: -71.21, favoriteGames: "Wingspan, Cascadia" });
 
-  // ── Friendships ──
-  const friends: [string, string][] = [
+  for (const [a, b] of [
     [marie.id, julien.id],
     [marie.id, sophie.id],
     [marie.id, admin.id],
     [julien.id, alex.id],
     [sophie.id, alex.id],
     [admin.id, alex.id],
-  ];
-  for (const [a, b] of friends) await db.friendship.create({ data: { requesterId: a, addresseeId: b, status: "ACCEPTED", respondedAt: new Date() } });
+  ]) {
+    await db.friendship.create({ data: { requesterId: a, addresseeId: b, status: "ACCEPTED", respondedAt: new Date() } });
+  }
   await db.friendship.create({ data: { requesterId: lea.id, addresseeId: admin.id } }); // pending request for the admin
 
-  // ── Catalogue ──
-  const catalogue: [string, number, number, number, number][] = [
-    ["Catan", 1995, 3, 4, 90],
-    ["Anachrony", 2017, 1, 4, 120],
-    ["Merchants Cove", 2021, 1, 4, 90],
-    ["Wingspan", 2019, 1, 5, 70],
-    ["Azul", 2017, 2, 4, 45],
-    ["Terraforming Mars", 2016, 1, 5, 120],
-    ["Carcassonne", 2000, 2, 5, 40],
-    ["Brass: Birmingham", 2018, 2, 4, 120],
-    ["Spirit Island", 2017, 1, 4, 120],
-    ["Cascadia", 2021, 1, 4, 45],
-    ["Ticket to Ride", 2004, 2, 5, 60],
-    ["7 Wonders", 2010, 3, 7, 30],
-    ["Agricola", 2007, 1, 4, 120],
-    ["Ark Nova", 2021, 1, 4, 150],
-    ["Codenames", 2015, 2, 8, 15],
-    ["Root", 2018, 2, 4, 90],
-  ];
+  const kallaxOf = async (userId: string) => (await db.library.findFirstOrThrow({ where: { members: { some: { userId, role: "OWNER" } } } })).id;
+
+  // ── Kallax: Marie and Julien share one ──
+  const salon = await kallaxOf(marie.id);
+  await db.library.update({ where: { id: salon }, data: { name: "Kallax du salon" } });
+  await db.libraryMember.create({ data: { libraryId: salon, userId: julien.id, status: "ACCEPTED", invitedBy: marie.id } });
+  await db.library.delete({ where: { id: await kallaxOf(julien.id) } });
+
   const games: Record<string, string> = {};
-  for (const [name, year, minPlayers, maxPlayers, playTimeMin] of catalogue) {
-    const g = await db.game.create({ data: { name, year, minPlayers, maxPlayers, playTimeMin, createdById: admin.id } });
-    games[name] = g.id;
-  }
+  const shelf = async (libraryId: string, userId: string, items: [string, { status?: string; notes?: string; name?: string }?][]) => {
+    for (const [key, opts] of items) games[key] = (await addToKallax(libraryId, key, userId, opts)).game.id;
+  };
+  await shelf(salon, marie.id, [["Anachrony", { notes: "Avec l'extension Fractures du temps." }], ["Brass: Birmingham"], ["Wingspan"], ["Ark Nova", { status: "PREORDERED" }], ["Spirit Island", { status: "WISHLIST" }]]);
+  await shelf(salon, julien.id, [["Catan", { name: "Catan (5e édition)" }], ["Carcassonne"], ["Codenames"], ["Root", { status: "FOR_TRADE" }]]);
+  await shelf(await kallaxOf(sophie.id), sophie.id, [["Azul"], ["Merchants Cove"], ["Cascadia"]]);
+  await shelf(await kallaxOf(alex.id), alex.id, [["Terraforming Mars"], ["Spirit Island"], ["7 Wonders"]]);
+  await shelf(await kallaxOf(admin.id), admin.id, [["Catan"], ["Merchants Cove"], ["Anachrony"], ["Agricola"]]);
+  await shelf(await kallaxOf(lea.id), lea.id, [["Wingspan"], ["Azul"]]);
 
-  // ── Kallax: Marie & Julien share one ──
-  const marieLib = await db.library.findFirstOrThrow({ where: { members: { some: { userId: marie.id } } } });
-  await db.library.update({ where: { id: marieLib.id }, data: { name: "Kallax du salon" } });
-  await db.libraryMember.create({ data: { libraryId: marieLib.id, userId: julien.id, status: "ACCEPTED", invitedBy: marie.id } });
-  const julienOwn = await db.library.findFirstOrThrow({ where: { members: { some: { userId: julien.id, role: "OWNER" } } } });
-  await db.library.delete({ where: { id: julienOwn.id } });
-  const shelf: [string, string, string?][] = [
-    ["Anachrony", marie.id],
-    ["Brass: Birmingham", marie.id],
-    ["Wingspan", marie.id],
-    ["Ark Nova", marie.id, "PREORDERED"],
-    ["Catan", julien.id],
-    ["Carcassonne", julien.id],
-    ["Codenames", julien.id],
-    ["Root", julien.id, "FOR_TRADE"],
-    ["Spirit Island", marie.id, "WISHLIST"],
+  // Sophie invited the admin to share her Kallax (pending invitation)
+  await db.libraryMember.create({ data: { libraryId: await kallaxOf(sophie.id), userId: admin.id, status: "PENDING", invitedBy: sophie.id } });
+
+  // ── Members' ratings (each member rates games from their Kallax) ──
+  const ratings: [string, string, number][] = [
+    [marie.id, "Anachrony", 10], [marie.id, "Wingspan", 8], [marie.id, "Brass: Birmingham", 9],
+    [julien.id, "Catan", 9], [julien.id, "Anachrony", 8], [julien.id, "Carcassonne", 8],
+    [sophie.id, "Azul", 9], [sophie.id, "Merchants Cove", 8], [sophie.id, "Cascadia", 9],
+    [alex.id, "Terraforming Mars", 10], [alex.id, "Spirit Island", 9], [alex.id, "7 Wonders", 7],
+    [lea.id, "Wingspan", 10], [lea.id, "Azul", 8],
+    [admin.id, "Merchants Cove", 7], [admin.id, "Catan", 6],
   ];
-  for (const [name, ownerId, status] of shelf) {
-    await db.libraryGame.create({ data: { libraryId: marieLib.id, gameId: games[name], ownerId, status: status ?? "OWNED" } });
-  }
-  for (const [user, names] of [
-    [sophie, ["Azul", "Merchants Cove", "Cascadia", "Ticket to Ride"]],
-    [alex, ["Terraforming Mars", "Spirit Island", "7 Wonders"]],
-    [admin, ["Catan", "Merchants Cove", "Anachrony", "Agricola"]],
-  ] as const) {
-    const lib = await db.library.findFirstOrThrow({ where: { members: { some: { userId: user.id } } } });
-    for (const name of names) await db.libraryGame.create({ data: { libraryId: lib.id, gameId: games[name], ownerId: user.id } });
-  }
-  // Sophie invited the admin to share her kallax (pending invitation)
-  const sophieLib = await db.library.findFirstOrThrow({ where: { members: { some: { userId: sophie.id } } } });
-  await db.libraryMember.create({ data: { libraryId: sophieLib.id, userId: admin.id, status: "PENDING", invitedBy: sophie.id } });
+  for (const [userId, key, score] of ratings) await db.gameRating.create({ data: { userId, gameId: games[key], score } });
 
-  // ── Events ──
+  // ── Events (games on the menu come from the host's Kallax) ──
   const at = (days: number, hour: number) => {
     const d = new Date(Date.now() + days * day);
     d.setHours(hour, 0, 0, 0);
@@ -160,11 +197,11 @@ async function main() {
     data: {
       hostId: marie.id,
       title: "Soirée Anachrony",
-      description: "Full game with the Fractures expansion. Beginners welcome, I'll teach!",
+      description: "Partie complète avec l'extension Fractures. Débutants bienvenus, j'explique les règles!",
       kind: "HOME_GAME",
       startsAt: at(3, 19),
-      locationName: "Chez Marie & Julien",
-      address: "123 rue Saint-Denis",
+      locationName: "Chez Marie et Julien",
+      address: "123, rue Fictive",
       city: "Montréal",
       latitude: 45.52,
       longitude: -73.58,
@@ -178,24 +215,23 @@ async function main() {
     data: {
       hostId: sophie.id,
       title: "Café ludique du jeudi",
-      description: "Open table at the café: bring your favourite games or play ours.",
+      description: "Table ouverte au café : apportez vos jeux ou essayez les nôtres.",
       kind: "GAME_NIGHT",
       startsAt: at(5, 18),
-      locationName: "Café Le Meeple",
-      address: "45 boulevard Saint-Martin",
+      locationName: "Café Le Meeple (fictif)",
       city: "Laval",
       latitude: 45.57,
       longitude: -73.69,
       visibility: "PUBLIC",
       maxPlayers: 16,
-      games: { create: [{ gameId: games["Azul"] }, { gameId: games["Cascadia"] }, { gameId: games["Codenames"] }] },
+      games: { create: [{ gameId: games["Azul"] }, { gameId: games["Cascadia"] }] },
       attendees: { create: [{ userId: marie.id, status: "GOING" }, { userId: admin.id, status: "MAYBE" }] },
     },
   });
   await db.event.create({
     data: {
       hostId: alex.id,
-      title: "Terraforming Mars tournament",
+      title: "Tournoi Terraforming Mars",
       kind: "TOURNAMENT",
       startsAt: at(12, 13),
       endsAt: at(12, 20),
@@ -210,21 +246,20 @@ async function main() {
   await db.event.create({
     data: {
       hostId: lea.id,
-      title: "Wingspan & thé",
+      title: "Wingspan et thé",
       kind: "HOME_GAME",
       startsAt: at(8, 14),
       city: "Québec",
       latitude: 46.81,
       longitude: -71.21,
       maxPlayers: 5,
-      visibility: "MEMBERS",
       games: { create: [{ gameId: games["Wingspan"] }] },
     },
   });
 
   // ── Plays ──
   const play = async (
-    game: string,
+    key: string,
     daysAgo: number,
     by: string,
     seats: { userId?: string; guestName?: string; score?: number; isWinner?: boolean; status?: string }[],
@@ -232,53 +267,66 @@ async function main() {
   ) =>
     db.play.create({
       data: {
-        gameId: games[game],
+        gameId: games[key],
         createdById: by,
         playedAt: new Date(Date.now() - daysAgo * day),
         ...extra,
         participants: { create: seats.map((s) => ({ ...s, status: s.status ?? "CONFIRMED", isWinner: s.isWinner ?? false })) },
       },
     });
-
   await play("Anachrony", 20, marie.id, [{ userId: marie.id, score: 58, isWinner: true }, { userId: julien.id, score: 51 }, { userId: alex.id, score: 44 }], { durationMin: 150, location: "Chez Marie", eventId: e1.id });
   await play("Catan", 14, julien.id, [{ userId: julien.id, score: 10, isWinner: true }, { userId: marie.id, score: 8 }, { guestName: "Thomas", score: 6 }], { durationMin: 80 });
   await play("Azul", 9, sophie.id, [{ userId: sophie.id, score: 74, isWinner: true }, { userId: marie.id, score: 61 }], { durationMin: 40 });
   await play("Merchants Cove", 6, admin.id, [{ userId: admin.id, score: 42, isWinner: true }, { userId: alex.id, score: 38 }, { userId: marie.id, score: 35 }], { durationMin: 100 });
   // Plays waiting for the admin to confirm
   await play("Catan", 2, marie.id, [{ userId: marie.id, score: 9 }, { userId: admin.id, score: 10, isWinner: true, status: "PENDING" }, { userId: sophie.id, score: 7 }], { durationMin: 75 });
-  await play("Terraforming Mars", 1, alex.id, [{ userId: alex.id, score: 88, isWinner: true }, { userId: admin.id, score: 79, status: "PENDING" }], { durationMin: 140 });
 
-  await demoExtras();
-  console.log("Demo data created: 5 members, 16 games, 4 events, 6 plays, ratings.");
-}
+  // ── Bazar ──
+  await db.bazaarListing.create({
+    data: {
+      sellerId: julien.id,
+      gameId: games["Root"],
+      title: "Root — comme neuf",
+      description: "Joué deux fois, cartes protégées. Annonce fictive de démonstration.",
+      price: 45,
+      kind: "BOTH",
+      condition: "LIKE_NEW",
+      delivery: "PICKUP",
+      city: "Montréal",
+      latitude: 45.52,
+      longitude: -73.58,
+    },
+  });
 
-/** Game details and member ratings for the demo catalogue (safe to re-run). */
-async function demoExtras() {
-  const details: Record<string, { designer: string; publisher: string; categories: string; weight: number; minAge: number }> = {
-    Catan: { designer: "Klaus Teuber", publisher: "Kosmos", categories: "Trading, Dice rolling, Network building", weight: 2.3, minAge: 10 },
-    Anachrony: { designer: "Richard Amann, Viktor Péter, Dávid Turczi", publisher: "Mindclash Games", categories: "Worker placement, Time travel, Euro", weight: 4.0, minAge: 14 },
-    "Merchants Cove": { designer: "Carl Van Ostrand, Drew Wynne", publisher: "Final Frontier Games", categories: "Asymmetric, Economic, Euro", weight: 3.1, minAge: 12 },
-    Wingspan: { designer: "Elizabeth Hargrave", publisher: "Stonemaier Games", categories: "Engine building, Card drafting, Animals", weight: 2.5, minAge: 10 },
-    Azul: { designer: "Michael Kiesling", publisher: "Plan B Games", categories: "Tile placement, Pattern building, Abstract", weight: 1.8, minAge: 8 },
-    "Terraforming Mars": { designer: "Jacob Fryxelius", publisher: "FryxGames", categories: "Engine building, Space, Card drafting", weight: 3.2, minAge: 12 },
-    Carcassonne: { designer: "Klaus-Jürgen Wrede", publisher: "Hans im Glück", categories: "Tile placement, Area control", weight: 1.9, minAge: 7 },
-    "Brass: Birmingham": { designer: "Gavan Brown, Matt Tolman, Martin Wallace", publisher: "Roxley", categories: "Economic, Network building, Euro", weight: 3.9, minAge: 14 },
-  };
-  for (const [name, d] of Object.entries(details)) {
-    await db.game.updateMany({ where: { name, designer: null }, data: d });
-  }
-  const scores: [string, string, number][] = [
-    ["marie", "Anachrony", 10], ["marie", "Wingspan", 8], ["marie", "Catan", 6], ["marie", "Brass: Birmingham", 9],
-    ["julien", "Catan", 9], ["julien", "Anachrony", 8], ["julien", "Carcassonne", 8],
-    ["sophie", "Azul", 9], ["sophie", "Merchants Cove", 8], ["sophie", "Wingspan", 9],
-    ["alex", "Terraforming Mars", 10], ["alex", "Anachrony", 9], ["alex", "Merchants Cove", 7],
-    ["lea", "Wingspan", 10], ["lea", "Azul", 8],
-  ];
-  for (const [username, game, score] of scores) {
-    const [u, g] = await Promise.all([db.user.findUnique({ where: { username } }), db.game.findFirst({ where: { name: game } })]);
-    if (!u || !g) continue;
-    await db.gameRating.upsert({ where: { gameId_userId: { gameId: g.id, userId: u.id } }, create: { gameId: g.id, userId: u.id, score }, update: {} });
-  }
+  // ── Suggestion box ──
+  const suggestion = (title: string, details: string | null, authorId: string, voters: string[], status = "OPEN", adminNote: string | null = null) =>
+    db.suggestion.create({ data: { title, details, authorId, status, adminNote, votes: { create: [authorId, ...voters].map((userId) => ({ userId })) } } });
+  await suggestion("Un classement des joueurs par jeu", "Voir qui gagne le plus souvent à chaque jeu, à partir des parties notées.", marie.id, [alex.id, sophie.id]);
+  await suggestion("Rappel la veille d'une soirée de jeux", null, sophie.id, [julien.id], "PLANNED", "Bonne idée, c'est prévu!");
+  await suggestion("Exporter ma Kallax en fichier CSV", null, alex.id, []);
+
+  // ── Rules FAQ (normally built from the questions asked to the rules AI) ──
+  await db.ruleFaq.create({
+    data: {
+      gameId: games["Catan"],
+      question: "Combien de ressources reçoit-on au début de la partie?",
+      answer: "Après la mise en place, chaque joueur reçoit **une ressource** de chaque tuile adjacente à sa **deuxième** colonie.",
+      provider: "manual",
+      status: "VERIFIED",
+      askCount: 4,
+    },
+  });
+  await db.ruleFaq.create({
+    data: {
+      gameId: games["Azul"],
+      question: "Peut-on prendre des tuiles au centre et dans une fabrique au même tour?",
+      answer: "Non. À ton tour, tu prends **toutes les tuiles d'une même couleur** soit dans **une** fabrique, soit au centre de la table, jamais les deux.",
+      provider: "manual",
+      askCount: 2,
+    },
+  });
+
+  console.log("Fictional demo data created: 5 members, shared Kallax, Ludothèque, ratings, events, plays, a bazar listing, suggestions, rules FAQ.");
 }
 
 main()

@@ -25,7 +25,7 @@ export type ModuleManifest = {
   settings: SettingField[];
 };
 
-export type ModuleKey = "events" | "games" | "kallax" | "plays" | "friends" | "ai" | "bazaar" | "facebook" | "profiles" | "donations";
+export type ModuleKey = "events" | "games" | "kallax" | "plays" | "friends" | "ai" | "bazaar" | "facebook" | "profiles" | "donations" | "suggestions";
 
 export const MODULES: ModuleManifest[] = [
   {
@@ -48,6 +48,9 @@ export const MODULES: ModuleManifest[] = [
       { key: "communityEditing", type: "boolean", default: true },
       { key: "allowCoverUploads", type: "boolean", default: true },
       { key: "allowRulebookUploads", type: "boolean", default: true },
+      { key: "imageSearch", type: "select", default: "auto", options: ["auto", "bgg", "wikimedia", "none"] },
+      // the free AI completes games added to a Kallax (details + a verified box picture)
+      { key: "autoEnrich", type: "boolean", default: true },
     ],
   },
   {
@@ -87,15 +90,22 @@ export const MODULES: ModuleManifest[] = [
       { key: "memberMonthlyBudgetUsd", type: "number", default: 2, min: 0, max: 10000, decimal: true },
       { key: "dailyQuestionLimit", type: "number", default: 40, min: 1, max: 1000 },
       { key: "allowGeneralKnowledge", type: "boolean", default: true },
+      { key: "allowOwnKeys", type: "boolean", default: true },
       // Free option (less reliable): any OpenAI-compatible chat endpoint
       { key: "freeEnabled", type: "boolean", default: true },
       { key: "autoFallbackToFree", type: "boolean", default: true },
       { key: "freeProviderName", type: "string", default: "Google Gemini" },
       { key: "freeBaseUrl", type: "url", default: "https://generativelanguage.googleapis.com/v1beta/openai" },
-      { key: "freeModel", type: "string", default: "gemini-2.5-flash" },
+      { key: "freeModel", type: "string", default: "gemini-3.8-flash" },
+      // background tasks (completing games, photos): a lite model with a larger free quota
+      { key: "freeTaskModel", type: "string", default: "gemini-3.1-flash-lite" },
       { key: "freeMaxContextChars", type: "number", default: 80000, min: 4000, max: 2000000 },
+      // Rules FAQ, built from the questions members ask
+      { key: "faqEnabled", type: "boolean", default: true },
+      { key: "faqAutoPublish", type: "boolean", default: true },
     ],
-  },  {
+  },
+  {
     key: "bazaar",
     icon: "Store",
     href: "/bazaar",
@@ -110,6 +120,12 @@ export const MODULES: ModuleManifest[] = [
     icon: "Facebook",
     href: "/facebook",
     settings: [],
+  },
+  {
+    key: "suggestions",
+    icon: "Lightbulb",
+    href: "/suggestions",
+    settings: [{ key: "showToMembers", type: "boolean", default: true }],
   },
   {
     key: "profiles",
@@ -127,6 +143,9 @@ export const MODULES: ModuleManifest[] = [
     ],
   },
 ];
+
+/** Default menu order on a fresh install (admins can change it in Admin → Modules). */
+export const DEFAULT_MENU_ORDER: ModuleKey[] = ["events", "plays", "kallax", "ai", "friends", "games", "bazaar", "facebook", "suggestions", "profiles", "donations"];
 
 export function getManifest(key: ModuleKey) {
   const m = MODULES.find((mod) => mod.key === key);

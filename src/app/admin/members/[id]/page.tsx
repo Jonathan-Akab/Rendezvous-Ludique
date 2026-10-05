@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { db } from "@/lib/db";
-import { requireRole } from "@/lib/auth/guards";
+import { requirePermission } from "@/lib/auth/guards";
+import { isFullAdmin, PERMISSIONS, permissionsOf } from "@/lib/auth/permissions";
 import { ROLES, USER_STATUSES, VISIBILITIES } from "@/lib/constants";
 import { ActionForm } from "@/components/ActionForm";
 import { ConfirmButton } from "@/components/forms";
@@ -14,7 +15,7 @@ import { deleteMemberAction, resetPasswordAction, revokeSessionsAction, updateMe
 export default async function AdminMemberPage({ params }: { params: Promise<{ id: string }> }) {
   const [{ id }, me, t, tp, format] = await Promise.all([
     params,
-    requireRole("ADMIN"),
+    requirePermission("members"),
     getTranslations("admin.members"),
     getTranslations("profile.visibility"),
     getFormatter(),
@@ -28,6 +29,11 @@ export default async function AdminMemberPage({ params }: { params: Promise<{ id
   });
   if (!u) notFound();
   const isMe = u.id === me.id;
+  // Staff accounts, roles and rights: full admins only.
+  const full = isFullAdmin(me);
+  const locked = !full && u.role !== "MEMBER";
+  const granted = permissionsOf(u);
+  const tPerm = await getTranslations("admin.permissions");
 
   const field = (name: string, label: string, value: string | number | null, type = "text") => (
     <div>
@@ -55,6 +61,9 @@ export default async function AdminMemberPage({ params }: { params: Promise<{ id
       <div className="grid gap-6 xl:grid-cols-[2fr_1fr]">
         <section className="card card-pad">
           <h2 className="section-title mb-4">{t("account")}</h2>
+          {locked ? (
+            <p className="rounded-xl bg-surface-2/70 p-3 text-sm text-muted">{tPerm("staffLocked")}</p>
+          ) : (
           <ActionForm action={updateMemberAction.bind(null, u.id)} submitLabel={t("save")}>
             <div className="grid gap-4 sm:grid-cols-2">
               {field("displayName", t("displayName"), u.displayName)}
@@ -70,14 +79,14 @@ export default async function AdminMemberPage({ params }: { params: Promise<{ id
                 <label className="label" htmlFor="role">
                   {t("role")}
                 </label>
-                <select id="role" name="role" defaultValue={u.role} className="select" disabled={isMe}>
+                <select id="role" name="role" defaultValue={u.role} className="select" disabled={isMe || !full}>
                   {ROLES.map((r) => (
                     <option key={r} value={r}>
                       {t(`roles.${r}`)}
                     </option>
                   ))}
                 </select>
-                {isMe && <input type="hidden" name="role" value={u.role} />}
+                {(isMe || !full) && <input type="hidden" name="role" value={u.role} />}
               </div>
               <div>
                 <label className="label" htmlFor="status">
@@ -132,7 +141,30 @@ export default async function AdminMemberPage({ params }: { params: Promise<{ id
                 <input type="checkbox" name="showPlays" defaultChecked={u.showPlays} className="size-4 accent-[var(--accent)]" /> {t("showPlays")}
               </label>
             </div>
+            {full && (
+              <fieldset className="space-y-3 rounded-2xl border border-line p-4">
+                <legend className="px-1 text-sm font-semibold">{tPerm("title")}</legend>
+                <p className="text-xs text-muted">{tPerm("lead")}</p>
+                <label className="flex items-center gap-2 text-sm font-semibold">
+                  <input type="checkbox" name="fullAdmin" defaultChecked={isFullAdmin(u)} disabled={isMe} className="size-4 accent-[var(--accent)]" />
+                  {tPerm("fullAdmin")}
+                </label>
+                {isMe && <input type="hidden" name="fullAdmin" value="on" />}
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {PERMISSIONS.map((p) => (
+                    <label key={p} className="flex items-start gap-2 rounded-xl bg-surface-2/50 p-2 text-sm">
+                      <input type="checkbox" name="permissions" value={p} defaultChecked={!isFullAdmin(u) && granted.has(p)} className="mt-0.5 size-4 accent-[var(--accent)]" />
+                      <span>
+                        <span className="block font-semibold">{tPerm(`items.${p}.title`)}</span>
+                        <span className="block text-xs text-muted">{tPerm(`items.${p}.text`)}</span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
           </ActionForm>
+          )}
         </section>
 
         <div className="space-y-6">

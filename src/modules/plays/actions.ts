@@ -6,13 +6,15 @@ import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { hasRole, requireUser } from "@/lib/auth/guards";
+import { can } from "@/lib/auth/permissions";
 import { getModule } from "@/lib/modules";
 import { getSiteSettings } from "@/lib/settings";
 import { fromLocalInput } from "@/lib/time";
 import { audit } from "@/lib/audit";
 import { optInt, optStr, str, type ActionState } from "@/lib/forms";
-import { findOrCreateGame } from "@/modules/kallax/service";
+import { getMyKallaxGames } from "@/modules/kallax/service";
 import { getFriendIds } from "@/modules/friends/service";
+import { notify } from "@/modules/notifications/emails";
 
 async function guard() {
   const user = await requireUser();
@@ -35,8 +37,8 @@ export async function logPlayAction(_prev: ActionState, fd: FormData): Promise<A
   const t = await getTranslations("plays.errors");
   const { timeZone } = await getSiteSettings();
 
-  const gameName = str(fd, "game");
-  if (!gameName) return { error: t("game") };
+  const gameId = str(fd, "gameId");
+  if (!gameId || !(await getMyKallaxGames(user.id)).some((g) => g.gameId === gameId)) return { error: t("game") };
   const playedAt = fromLocalInput(`${str(fd, "playedAt")}T12:00`, timeZone);
   if (!playedAt) return { error: t("date") };
 
@@ -55,10 +57,9 @@ export async function logPlayAction(_prev: ActionState, fd: FormData): Promise<A
   if (!mod.settings.allowGuests && others.some((s) => !s.userId)) return { error: t("guestsDisabled") };
   const needsOk = Boolean(mod.settings.requireConfirmation);
 
-  const game = await findOrCreateGame(gameName, user.id);
   const play = await db.play.create({
     data: {
-      gameId: game.id,
+      gameId,
       createdById: user.id,
       playedAt,
       durationMin: optInt(fd, "durationMin"),
@@ -81,6 +82,11 @@ export async function logPlayAction(_prev: ActionState, fd: FormData): Promise<A
       },
     },
   });
+  // Friends with a play waiting for their OK
+  if (needsOk) {
+    const game = await db.game.findUnique({ where: { id: gameId }, select: { name: true } });
+    for (const s of others) if (s.userId) void notify(s.userId, "playToConfirm", { name: user.displayName, game: game?.name ?? "" }, "/plays");
+  }
   revalidatePath("/plays");
   redirect(`/plays?logged=${play.id}`);
 }
@@ -104,10 +110,10 @@ export async function updatePlayAction(playId: string, _prev: ActionState, fd: F
   const t = await getTranslations("plays.errors");
   const { timeZone } = await getSiteSettings();
   const play = await db.play.findUnique({ where: { id: playId }, include: { participants: true } });
-  if (!play || (play.createdById !== user.id && !hasRole(user.role, "ADMIN"))) return { error: t("forbidden") };
+  if (!play || (play.createdById !== user.id && !can(user, "plays"))) return { error: t("forbidden") };
 
-  const gameName = str(fd, "game");
-  if (!gameName) return { error: t("game") };
+  const gameId = str(fd, "gameId");
+  if (!gameId || (gameId !== play.gameId && !(await getMyKallaxGames(play.createdById)).some((g) => g.gameId === gameId))) return { error: t("game") };
   const playedAt = fromLocalInput(`${str(fd, "playedAt")}T12:00`, timeZone);
   if (!playedAt) return { error: t("date") };
 
@@ -124,11 +130,10 @@ export async function updatePlayAction(playId: string, _prev: ActionState, fd: F
   if (!mod.settings.allowGuests && seats.some((s) => !s.userId && s.guestName?.trim())) return { error: t("guestsDisabled") };
   const needsOk = Boolean(mod.settings.requireConfirmation);
 
-  const game = await findOrCreateGame(gameName, user.id);
   await db.play.update({
     where: { id: playId },
     data: {
-      gameId: game.id,
+      gameId,
       playedAt,
       durationMin: optInt(fd, "durationMin"),
       location: optStr(fd, "location"),
@@ -165,7 +170,7 @@ export async function deletePlayAction(playId: string) {
   const { user } = await guard();
   const play = await db.play.findUnique({ where: { id: playId } });
   if (!play) return;
-  const isAdmin = hasRole(user.role, "ADMIN");
+  const isAdmin = can(user, "plays");
   if (play.createdById !== user.id && !isAdmin) return;
   await db.play.delete({ where: { id: playId } });
   if (play.createdById !== user.id) await audit(user.id, "play.delete", playId);

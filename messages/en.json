@@ -5,7 +5,7 @@
     "f1Title": "Games & events",
     "f1Text": "Host a home game or find a game night nearby.",
     "f2Title": "My Kallax",
-    "f2Text": "Your game library, shared with your household.",
+    "f2Text": "Your personal game library, shared with your household if you like.",
     "f3Title": "Play tracker",
     "f3Text": "Log every play, scores and who won.",
     "f4Title": "Friends",
@@ -46,9 +46,42 @@
         "password": "Passwords need at least 8 characters.",
         "meepleColor": "Pick a meeple colour.",
         "locale": "Pick a language.",
-        "form": "Check the form and try again."
-      }
-    }
+        "form": "Check the form and try again.",
+        "signupNote": "Tell us in a few words how you heard about the group (at least 10 characters).",
+        "birthDate": "Enter a valid date of birth."
+      },
+      "pending": "Your sign-up is still waiting for the team's approval.",
+      "bot": "Your sign-up couldn't be sent. Take your time filling in the form and try again.",
+      "tooMany": "Too many sign-ups from this connection. Try again in an hour.",
+      "unverified": "First confirm your email address with the link you got when signing up.",
+      "tooYoung": "You must be {age} or older to sign up.",
+      "linkInvalid": "This link is no longer valid (expired or already used).",
+      "mailOff": "Email isn't set up on this site. Ask an admin to reset your password."
+    },
+    "becomeMember": "Become a member",
+    "signupNote": "How did you hear about the group?",
+    "signupNotePlaceholder": "E.g. I play at the Thursday game café with Marie.",
+    "approvalHint": "A team member approves each sign-up (against fake accounts). You can sign in as soon as it's done.",
+    "pendingSignup": "Thanks! Your sign-up was received. You can sign in as soon as a team member approves it.",
+    "birthDate": "Date of birth",
+    "ageHint": "You must be {age} or older to sign up. Your date of birth is only used to check this: it isn't stored.",
+    "forgot": "Forgot your password?",
+    "forgotTitle": "Forgot your password",
+    "forgotLead": "Enter your email or username: we'll send you a link to choose a new password.",
+    "forgotAgain": "Ask for a new link",
+    "sendResetLink": "Send me the link",
+    "sending": "Sending…",
+    "resetSent": "If an account matches, a link was just emailed to you. Check your spam folder too.",
+    "resetTitle": "New password",
+    "resetLead": "Choose your new password (at least 8 characters).",
+    "newPassword": "New password",
+    "savePassword": "Save and sign me in",
+    "backToSignIn": "Back to sign in",
+    "checkEmail": "Almost done! We emailed you: click the link to confirm your address and sign in.",
+    "emailConfirmed": "Your email address is confirmed.",
+    "passwordChanged": "Your password was changed.",
+    "resendVerify": "Send the confirmation email again",
+    "verifySent": "Sent: check your inbox (and spam folder)."
   },
   "meeple": {
     "yours": "Your meeple",
@@ -96,7 +129,7 @@
     "moderation": "Moderation",
     "adminConsole": "Admin console",
     "logout": "Sign out",
-    "games": "Games",
+    "games": "Ludothèque",
     "ai": "Rules AI",
     "more": "More",
     "expand": "Expand menu",
@@ -106,7 +139,15 @@
     "reorder": "Reorder menu",
     "reorderHint": "Drag the items into the order you like.",
     "reorderDone": "Done",
-    "reorderReset": "Back to default order"
+    "reorderReset": "Back to default order",
+    "dragHandle": "Drag to move",
+    "moveUp": "Move {item} up",
+    "moveDown": "Move {item} down",
+    "saveOrder": "Save this order",
+    "orderSaved": "Order saved!",
+    "menuOrder": "Menu order",
+    "menuOrderLead": "Choose the order of the items in your menu. Drag them by the handle or use the arrows.",
+    "suggestions": "Suggestion box"
   },
   "donations": {
     "support": "Support the project",
@@ -237,7 +278,7 @@
   },
   "kallax": {
     "title": "My Kallax",
-    "lead": "Your game library, cube by cube — shared with the people you live with.",
+    "lead": "Your games, cube by cube. Private: only you and the people you share it with see it.",
     "addGame": "Add a game",
     "form": {
       "name": "Game",
@@ -250,8 +291,16 @@
       "playTime": "Time (min)",
       "notes": "Notes",
       "submit": "Put it on the shelf",
-      "pickerHint": "Start typing: games already added by members appear with their info and meeple rating.",
-      "rating": "Your rating"
+      "pickerHint": "Start typing: games already in the Ludothèque show up with their info and meeple rating.",
+      "rating": "Your rating",
+      "modes": {
+        "manual": "Enter manually",
+        "search": "Search the Ludothèque"
+      },
+      "manualHint": "Enter your game's details yourself. Only the name is required; if the game isn't in the Ludothèque yet, it will be added.",
+      "how": "How do you want to add your game?",
+      "expansionOf": "It's an expansion of… (optional)",
+      "notExpansion": "No, it's a game of its own"
     },
     "status": {
       "OWNED": "Owned",
@@ -287,7 +336,8 @@
       "unknownMember": "No member with that username.",
       "full": "A kallax can be shared by {max} members at most.",
       "alreadyInvited": "That member already shares or was invited.",
-      "invited": "Invitation sent to {name}."
+      "invited": "Invitation sent to {name}.",
+      "saved": "Saved."
     },
     "libraries": "Libraries",
     "noLibrary": "You don't have a kallax yet",
@@ -310,7 +360,129 @@
       "shelf": "Shelf",
       "list": "List"
     },
-    "sell": "Sell or trade in the bazar"
+    "sell": "Sell or trade in the bazar",
+    "import": {
+      "button": "Import games",
+      "title": "Import games into my Kallax",
+      "lead": "Add many games at once: a photo of a box, a photo of your whole shelf, your BoardGameGeek collection or a simple list.",
+      "back": "Back to my Kallax",
+      "sources": {
+        "box": {
+          "title": "Photo of a box",
+          "text": "Snap the box, we read the title.",
+          "unavailable": "Needs an AI set up on the site (ask an admin)."
+        },
+        "shelf": {
+          "title": "Photo of my shelf",
+          "text": "Up to 4 photos of your shelves.",
+          "unavailable": "Needs an AI set up on the site (ask an admin)."
+        },
+        "list": {
+          "title": "A list",
+          "text": "Paste or type game names, one per line.",
+          "unavailable": ""
+        }
+      },
+      "takeBox": "Take or choose a photo of the box",
+      "takeShelf": "Take or choose up to 4 photos of your shelves",
+      "boxHint": "The front of the box with the title clearly visible works best.",
+      "shelfHint": "Get close enough that the titles on the spines are readable.",
+      "recognize": "Recognize the games",
+      "listLabel": "Game names (one per line)",
+      "listCheck": "Check the list",
+      "review": "{count, plural, =0 {Nothing found} one {# game found — check before importing} other {# games found — check before importing}}",
+      "selectAll": "Select all",
+      "selectNone": "Select none",
+      "noneFound": "No game recognized. Try a closer or sharper photo, or another source.",
+      "nameLabel": "Game name",
+      "inDatabase": "In our database",
+      "newGame": "New game",
+      "lowConfidence": "Unsure",
+      "undoMatch": "Use the first match",
+      "useMatch": "Use the database match",
+      "didYouMean": "Did you mean:",
+      "notThis": "Not this one",
+      "into": "Into",
+      "as": "As",
+      "useMyPhoto": "Use my photo as the game's picture",
+      "importN": "{count, plural, =0 {Validate at least one game} one {Import # validated game} other {Import # validated games}}",
+      "seeKallax": "See my Kallax",
+      "pickImages": "{count, plural, one {# game has no picture — pick one} other {# games have no picture — pick some}}",
+      "notMember": "You don't share this kallax.",
+      "invalid": "Something is wrong with the list. Try again.",
+      "nothingSelected": "Select at least one game.",
+      "done": "{added, plural, =0 {No games added} one {# game added} other {# games added}}{attached, plural, =0 {} one {, # expansion attached to its game} other {, # expansions attached to their game}}{skipped, plural, =0 {} one { (# already in your Kallax: completed)} other { (# already in your Kallax: completed)}}.",
+      "errors": {
+        "visionUnavailable": "The rules AI is turned off: photo reading isn't available.",
+        "visionBusy": "The chosen AI is busy right now. Try again in a minute or pick another option.",
+        "visionError": "The AI couldn't read the photo. Try again or pick another option.",
+        "noImage": "Add a photo first.",
+        "badImage": "That photo is too large or isn't an image.",
+        "unknown": "Something went wrong. Try again.",
+        "ai_blocked": "The AI isn't available for your account.",
+        "ai_limit": "You've reached today's AI usage limit.",
+        "ai_budget": "The site's Claude budget is used up for this month. Pick the free option or your personal Claude.",
+        "ai_notConfigured": "Claude isn't set up on the site. Pick another option.",
+        "ai_claudeUnavailable": "Claude isn't available right now. Pick another option.",
+        "ai_freeUnavailable": "The free option isn't available. Pick another option.",
+        "ai_ownUnavailable": "Your Claude key is no longer available. Check it in your settings.",
+        "ai_ownKeyInvalid": "Anthropic rejected your Claude key. Check it in your settings.",
+        "ai_ownKeyCredit": "Your Anthropic account is out of credit. Pick another option.",
+        "visionQuota": "Google's free quota is used up for now. Try again later or pick Claude."
+      },
+      "whoReads": "Which AI reads your photos?",
+      "checkNote": "Some titles may be misread: you check everything before importing.",
+      "readBy": "Photos read by {who}.",
+      "switched": "(Claude wasn't available: the free option took over.)",
+      "aiFilling": "The free AI is completing {count, plural, one {# game} other {# games}}…",
+      "aiBusy": "The free AI is busy: fill in the details yourself if needed.",
+      "validateAll": "Validate all ({count})",
+      "players": "players",
+      "fromImport": "(in this import)",
+      "expansion": "Expansion",
+      "aiDone": "Completed by the AI",
+      "aiWorking": "the AI is looking…",
+      "noDetails": "No details yet.",
+      "expansionOf": "Expansion of:",
+      "standalone": "— a game of its own —",
+      "baseNotFound": "(“{name}” isn't in your Kallax)",
+      "validate": "Validate",
+      "validated": "Validated",
+      "skip": "Skip",
+      "skipped": "Skipped",
+      "edit": "Edit",
+      "aiQuota": "Google's free quota is used up for now: fill in the details yourself, or try again later."
+    },
+    "pick": {
+      "empty": "No games in your Kallax yet.",
+      "goKallax": "Add games to my Kallax",
+      "remove": "Remove {name}",
+      "change": "Change game",
+      "search": "Search my Kallax…",
+      "noMatch": "No game matches."
+    },
+    "seeInLudo": "See in the Ludothèque",
+    "rulebooksShared": "Rulebooks are shared with every member who has this game.",
+    "editTitle": "My details for this game",
+    "editLead": "These details are yours (and the members sharing this Kallax). The Ludothèque itself doesn't change.",
+    "save": "Save",
+    "removeFromKallax": "Remove from my Kallax",
+    "expansionsCount": "{count, plural, one {# expansion} other {# expansions}}",
+    "expansions": {
+      "of": "Expansion of",
+      "title": "{count, plural, one {# expansion} other {# expansions}}",
+      "manage": "Expansions",
+      "isExpansionOf": "This game is an expansion of…",
+      "standalone": "— a game of its own —",
+      "add": "Attach another game as an expansion of this one",
+      "attach": "Attach",
+      "tidy": "Tidy my expansions",
+      "noneFound": "No expansions to tidy: everything is in order.",
+      "proposals": "{count, plural, one {# expansion found: confirm} other {# expansions found: confirm the ones to attach}}",
+      "of2": "expansion of",
+      "attached": "{count, plural, =0 {Nothing was attached.} one {# expansion attached to its game.} other {# expansions attached to their game.}}",
+      "close": "Close"
+    }
   },
   "plays": {
     "title": "Play tracker",
@@ -451,6 +623,53 @@
       "currentPassword": "Your current password is incorrect.",
       "passwordLength": "Passwords need at least 8 characters.",
       "passwordMismatch": "The passwords don't match."
+    },
+    "ownKey": {
+      "title": "Rules AI: my Claude credits",
+      "lead": "Have an Anthropic API account? Add your key to ask Claude with your own credits, with no site limits.",
+      "step1": "Go to console.anthropic.com and add credit (a Claude.ai Pro or Max subscription doesn't work: you need API credits).",
+      "step2": "In “API Keys”, create a key (it starts with sk-ant-).",
+      "step3": "Paste it here. We check it with Anthropic before saving it.",
+      "keyLabel": "My Anthropic API key",
+      "keepKey": "Current key ••••{hint} (leave empty to keep it)",
+      "model": "Model",
+      "models": {
+        "claude-sonnet-5-5": "Sonnet 5.5 (recommended)",
+        "claude-opus-5-5": "Opus 5.5 (most precise, pricier)",
+        "claude-haiku-4-5": "Haiku 4.5 (cheapest)"
+      },
+      "save": "Check and save",
+      "update": "Save",
+      "checking": "Checking with Anthropic…",
+      "saved": "Done! “My Claude credits” is now available in the rules AI.",
+      "active": "Active key: ••••{hint}",
+      "spend": "This month: ${usd} on your credits ({count, plural, =0 {no answers} one {# answer} other {# answers}})",
+      "remove": "Remove my key",
+      "removeConfirm": "Remove your Claude key from the site?",
+      "privacy": "Your key is encrypted, never shown again and only used for your own questions. Anthropic bills your account directly. The FAQ is always checked first, for free.",
+      "notAllowed": "This option isn't enabled on the site.",
+      "missing": "Paste your API key.",
+      "format": "That doesn't look like an Anthropic API key (it starts with sk-ant-).",
+      "invalid": "Anthropic rejected this key. Check it in console.anthropic.com.",
+      "unreachable": "Couldn't reach Anthropic to check the key. Try again in a moment."
+    },
+    "notifications": {
+      "title": "Email notifications",
+      "lead": "Choose what's sent to {email}. Nothing is sent until you tick something.",
+      "unverified": "Confirm your email address to get notifications.",
+      "mailOff": "Email isn't set up on this site yet.",
+      "save": "Save my notifications",
+      "saved": "Your notifications are saved.",
+      "types": {
+        "friendRequest": "A friend request",
+        "playToConfirm": "A play logged with me, to confirm",
+        "eventJoinRequest": "Someone wants to join my game",
+        "eventJoinAccepted": "My request for a game is accepted",
+        "eventCancelled": "A game I'm going to is cancelled",
+        "kallaxInvite": "An invitation to share a Kallax",
+        "bazaarMessage": "A new bazar message",
+        "suggestionUpdate": "The team answers my suggestion"
+      }
     }
   },
   "home": {
@@ -489,8 +708,8 @@
       "dashboard": "Dashboard",
       "members": "Members",
       "events": "Games & events",
-      "games": "Game catalogue",
-      "libraries": "Kallax libraries",
+      "games": "Ludothèque",
+      "libraries": "Kallax",
       "plays": "Plays",
       "modules": "Modules",
       "appearance": "Appearance",
@@ -505,7 +724,10 @@
       },
       "ai": "Rules AI",
       "bazaar": "Bazar",
-      "facebook": "Facebook groups"
+      "facebook": "Facebook groups",
+      "suggestions": "Suggestions",
+      "faq": "Rules FAQ",
+      "registrations": "Sign-ups"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -540,7 +762,8 @@
       "allStatuses": "All statuses",
       "statuses": {
         "ACTIVE": "Active",
-        "SUSPENDED": "Suspended"
+        "SUSPENDED": "Suspended",
+        "PENDING": "Pending"
       },
       "member": "Member",
       "email": "Email",
@@ -605,8 +828,8 @@
       "moduleOff": "The Games module is turned off, so edits are blocked until it's turned back on."
     },
     "games": {
-      "title": "Game catalogue",
-      "lead": "{count, plural, one {# game} other {# games}} — shared by every kallax, event and play.",
+      "title": "Ludothèque",
+      "lead": "{count, plural, one {# game} other {# games}} — the shared reference, filled automatically from what members add to their Kallax.",
       "add": "Add a game",
       "create": "Create",
       "search": "Search games…",
@@ -624,10 +847,15 @@
       "merge": "Merge",
       "mergeConfirm": "Merge {name} into the selected game? Copies, plays and events move over.",
       "delete": "Delete",
-      "deleteConfirm": "Delete {name}? It disappears from every kallax and play."
+      "deleteConfirm": "Delete {name} from the Ludothèque? It also disappears from every Kallax and play.",
+      "aiLead": "{count, plural, =0 {Every entry is complete.} one {# entry has missing details or no picture.} other {# entries have missing details or no picture.}} The free AI only fills empty fields.",
+      "aiAll": "Complete with the AI ({count})",
+      "aiOne": "Complete with the AI",
+      "expansionOf": "Expansion of",
+      "standalone": "— a game of its own —"
     },
     "libraries": {
-      "title": "Kallax libraries",
+      "title": "Kallax",
       "lead": "{count, plural, one {# library} other {# libraries}}",
       "search": "Library or member…",
       "name": "Name",
@@ -656,15 +884,16 @@
       "enabled": "Enabled",
       "descriptions": {
         "events": "Members announce home games and events and find games near them.",
-        "kallax": "Game libraries, shareable between members of a household.",
+        "kallax": "My Kallax: each member's private games, shareable with their household.",
         "plays": "Play log with scores, winners and friend confirmation.",
         "friends": "Friend requests and friend lists.",
         "profiles": "Member profile pages and what members can share.",
         "donations": "A discreet link for donations in the header and footer.",
-        "games": "The site's own game database: covers, info, meeple ratings, reviews and rulebooks.",
+        "games": "The Ludothèque: the shared game reference, filled automatically from the Kallax, with the members' rating.",
         "ai": "Rules assistant: answers questions about a game from its uploaded rulebook.",
         "bazaar": "Members sell or trade games, with photos and private messages.",
-        "facebook": "A page with tabs linking to your Facebook groups."
+        "facebook": "A page with tabs linking to your Facebook groups.",
+        "suggestions": "Suggestion box: members suggest ideas and vote. Duplicates become votes."
       },
       "settings": {
         "events": {
@@ -697,7 +926,9 @@
           "membersCanAddGames": "Members can add new games to the database",
           "communityEditing": "Any member can complete or fix a game's info",
           "allowCoverUploads": "Allow cover image uploads",
-          "allowRulebookUploads": "Allow rulebook (PDF) uploads"
+          "allowRulebookUploads": "Allow rulebook (PDF) uploads",
+          "imageSearch": "Picture suggestions (free sources: BGG, Wikimedia)",
+          "autoEnrich": "The free AI completes added games (details + verified picture)"
         },
         "ai": {
           "model": "Claude model",
@@ -712,18 +943,27 @@
           "freeProviderName": "Free option: provider name",
           "freeBaseUrl": "Free option: API URL (OpenAI-compatible)",
           "freeModel": "Free option: model",
-          "freeMaxContextChars": "Free option: max rulebook characters per question"
+          "freeMaxContextChars": "Free option: max rulebook characters per question",
+          "faqEnabled": "Rules FAQ (built from the questions asked)",
+          "faqAutoPublish": "Publish new answers without review",
+          "allowOwnKeys": "Members can use their own Claude credits (their API key)",
+          "freeTaskModel": "Free model for background tasks (completing games, photos)"
         },
         "bazaar": {
           "allowTrades": "Allow trades (not only sales)",
           "currency": "Currency (ISO code)",
           "maxPhotos": "Photos per listing"
+        },
+        "suggestions": {
+          "showToMembers": "Members see the suggestions and can vote"
         }
       },
       "aiKeyOk": "API key detected — the assistant is ready.",
       "aiKeyMissing": "No ANTHROPIC_API_KEY in the server environment — the assistant can't answer yet.",
       "moveUp": "Move up in the menu",
-      "moveDown": "Move down in the menu"
+      "moveDown": "Move down in the menu",
+      "useMyOrder": "Use my menu order as the default",
+      "useMyOrderHint": "Takes the order of your own sidebar and makes it the default for every member (members who reordered their menu keep theirs)."
     },
     "appearance": {
       "title": "Appearance",
@@ -751,7 +991,19 @@
       "defaultLocale": "Default language",
       "announcement": "Announcement banner",
       "announcementHint": "Shown under the header for every member. Leave empty to hide.",
-      "registrationOpen": "New members can create an account"
+      "registrationOpen": "New members can create an account",
+      "registrationApproval": "Approve each new sign-up (against fake accounts)",
+      "requireEmailConfirmation": "New members confirm their email address before signing in (when email is set up)",
+      "minimumAge": "Minimum age to sign up",
+      "minimumAgeHint": "At least 18: the age of majority in Québec.",
+      "mailTitle": "Sending email",
+      "mailOn": "Set up. Emails are sent from: {from}",
+      "mailOff": "Not set up: add the SMTP lines to the .env file (see docs/EMAIL-SETUP.md), then restart the server.",
+      "testMail": "Send me a test email",
+      "testMailTitle": "Test email",
+      "testMailBody": "If you're reading this, the site's email works.",
+      "testMailSent": "Email sent to {email}. Check your inbox (and spam folder).",
+      "testMailFailed": "Sending failed: {reason}"
     },
     "audit": {
       "title": "Audit log",
@@ -771,7 +1023,9 @@
       "passwordLength": "Passwords need at least 8 characters.",
       "passwordReset": "Password changed; the member was signed out everywhere.",
       "timeZone": "Unknown time zone (example: America/Toronto).",
-      "gameName": "Enter a name."
+      "gameName": "Enter a name.",
+      "gameExists": "The Ludothèque already has “{name}”. Merge the two instead.",
+      "notAllowed": "Only a full admin can edit this account."
     },
     "ai": {
       "title": "Rules AI",
@@ -839,6 +1093,137 @@
       "counts": "{photos} photos · {messages} messages",
       "delete": "Delete",
       "deleteConfirm": "Delete the listing “{title}”?"
+    },
+    "suggestions": {
+      "title": "Member suggestions",
+      "lead": "{count, plural, =0 {No suggestions} one {# suggestion} other {# suggestions}}, sorted by votes. Duplicates automatically become votes.",
+      "filterAll": "All",
+      "empty": "No suggestions.",
+      "by": "By {name}",
+      "anonymous": "deleted member",
+      "voters": "Votes",
+      "titleLabel": "Suggestion",
+      "status": "Status",
+      "note": "Reply to members (visible to everyone)",
+      "notePlaceholder": "E.g. Great idea, planned for this summer!",
+      "save": "Save",
+      "saved": "Saved.",
+      "mergeInto": "It's a duplicate of…",
+      "merge": "Merge",
+      "mergedInto": "Merged into “{title}”: the votes moved over.",
+      "pickTarget": "Pick another suggestion.",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this suggestion and its votes?"
+    },
+    "faq": {
+      "title": "Rules FAQ",
+      "lead": "{count, plural, =0 {No questions} one {# question} other {# questions}}. The FAQ fills itself from the questions asked to the AI. Check, fix or hide answers.",
+      "add": "Add a question by hand",
+      "create": "Add",
+      "game": "Game",
+      "question": "Question",
+      "answer": "Answer (Markdown)",
+      "status": "Status",
+      "statuses": {
+        "AUTO": "Automatic",
+        "VERIFIED": "Verified",
+        "HIDDEN": "Hidden"
+      },
+      "allGames": "All games",
+      "allStatuses": "All statuses",
+      "asked": "{count, plural, one {asked # time} other {asked # times}}",
+      "source": "Answer source: {provider}",
+      "providers": {
+        "claude": "Claude",
+        "free": "free AI",
+        "manual": "added by hand"
+      },
+      "save": "Save",
+      "saved": "Saved.",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this question from the FAQ?",
+      "empty": "No questions yet.",
+      "required": "The question and the answer are required.",
+      "pickGame": "Pick a game."
+    },
+    "registrations": {
+      "title": "Sign-ups to approve",
+      "lead": "Each new account waits for your approval before it can sign in (against fake accounts).",
+      "leadOff": "Sign-up approval is off (Site settings): new accounts are active right away.",
+      "empty": "No sign-ups waiting.",
+      "note": "Their message:",
+      "noNote": "No message.",
+      "approve": "Approve",
+      "reject": "Refuse",
+      "rejectConfirm": "Refuse {name}'s sign-up? The account will be deleted."
+    },
+    "permissions": {
+      "title": "Console access",
+      "lead": "Tick the sections this person can manage. Applies to moderators and to admins who aren't “full”.",
+      "fullAdmin": "Full admin: every section, and can give rights to others",
+      "staffLocked": "This is a team account: only a full admin can edit it.",
+      "items": {
+        "registrations": {
+          "title": "Sign-ups",
+          "text": "Approve or refuse new accounts."
+        },
+        "members": {
+          "title": "Members",
+          "text": "Manage member accounts (not the team's)."
+        },
+        "games": {
+          "title": "Ludothèque",
+          "text": "Edit game entries and complete them with the AI."
+        },
+        "events": {
+          "title": "Games & events",
+          "text": "Edit or cancel anyone's events."
+        },
+        "libraries": {
+          "title": "Kallax",
+          "text": "View and delete Kallax."
+        },
+        "plays": {
+          "title": "Logged plays",
+          "text": "Fix or delete logged plays."
+        },
+        "bazaar": {
+          "title": "Bazar",
+          "text": "Manage bazar listings."
+        },
+        "facebook": {
+          "title": "Facebook groups",
+          "text": "Manage the list of groups."
+        },
+        "faq": {
+          "title": "Rules FAQ",
+          "text": "Check, fix and hide answers."
+        },
+        "suggestions": {
+          "title": "Suggestions",
+          "text": "Answer suggestions, change their status."
+        },
+        "ai": {
+          "title": "Rules AI",
+          "text": "Budgets, limits and members' AI access."
+        },
+        "modules": {
+          "title": "Modules",
+          "text": "Turn modules on, their settings and the menu order."
+        },
+        "appearance": {
+          "title": "Appearance",
+          "text": "Themes and site pictures."
+        },
+        "settings": {
+          "title": "Site settings",
+          "text": "Name, sign-ups, announcement, time zone."
+        },
+        "audit": {
+          "title": "Audit log",
+          "text": "See the history of the team's actions."
+        }
+      }
     }
   },
   "moderation": {
@@ -867,8 +1252,8 @@
     "noResults": "Nothing found."
   },
   "games": {
-    "title": "Game library",
-    "lead": "Our own game database, built by the community. Every game a member adds is here for everyone.",
+    "title": "Ludothèque",
+    "lead": "Every game added to a member's Kallax shows up here — one shared reference to look up a game and add it to yours in a click.",
     "add": "Add a game",
     "addLead": "Describe the game once — everyone can then find it and add it to their kallax.",
     "create": "Create the game",
@@ -910,7 +1295,8 @@
       "upload": "Upload a rulebook (PDF)",
       "uploadSubmit": "Upload",
       "titlePlaceholder": "Title (e.g. Rules v2, Expansion)",
-      "hint": "PDF only, 30 MB max. Share only rulebooks you're allowed to share (publishers usually offer them on their website)."
+      "hint": "PDF only, 30 MB max. Share only rulebooks you're allowed to share (publishers usually offer them on their website).",
+      "noneLudo": "No rulebook yet. Members who own this game can upload one from their Kallax."
     },
     "reviews": {
       "title": "Member ratings",
@@ -923,7 +1309,8 @@
       "already": "Already on your shelf ({name}).",
       "add": "Add to my kallax",
       "which": "Which kallax",
-      "stats": "In {kallax} kallax · {plays} plays logged"
+      "stats": "In {kallax} kallax · {plays} plays logged",
+      "open": "See it in my Kallax"
     },
     "addedBy": "Added to the database by",
     "updated": "Last updated {date}",
@@ -953,7 +1340,7 @@
       "change": "Change game",
       "newGame": "New game for the database",
       "backToSearch": "Back to search",
-      "newGameHint": "This game isn't in our database yet. Fill in what you know — the next members will find it with these details.",
+      "newGameHint": "This game isn't in the Ludothèque yet. Fill in what you know — it will be added automatically.",
       "create": "Add “{name}” as a new game"
     },
     "errors": {
@@ -969,8 +1356,56 @@
         "type": "This file type isn't allowed.",
         "size": "This file is too large.",
         "empty": "Choose a file."
-      }
-    }
+      },
+      "notInKallax": "This game must be in your Kallax."
+    },
+    "images": {
+      "find": "Find a picture",
+      "searching": "Looking for pictures of {name}…",
+      "none": "No picture found. You can upload a photo of your box from the game's page.",
+      "chosen": "Picture saved — thanks!",
+      "pick": "Pick a picture for {name}:",
+      "note": "Pictures from {source}. Only a link is saved; pictures belong to their owners."
+    },
+    "ludo": "Ludothèque",
+    "firstAdded": "In the Ludothèque since {date}.",
+    "reader": {
+      "back": "Back to the rules AI",
+      "page": "Page",
+      "previous": "Previous page",
+      "next": "Next page",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "original": "Original PDF",
+      "download": "Download",
+      "loading": "Opening the rulebook…",
+      "error": "This PDF can't be shown here. Use “Original PDF” or “Download”.",
+      "title": "Rulebook",
+      "close": "Close"
+    },
+    "enrich": {
+      "running": "The free AI is filling in details and looking for a picture… ({done}/{total})",
+      "done": "Details filled in by the free AI",
+      "free": "Free AI",
+      "nothing": "nothing more found",
+      "failed": "The free AI is busy: some games weren't completed. You can fill them in yourself.",
+      "check": "Only empty fields are filled. Check the game's page if needed.",
+      "pickPictures": "{count, plural, one {No picture found: pick one} other {# games without a picture: pick one}}",
+      "fields": {
+        "year": "year",
+        "players": "players",
+        "playTime": "play time",
+        "minAge": "age",
+        "designer": "designer",
+        "publisher": "publisher",
+        "description": "description",
+        "image": "picture",
+        "expansion": "attached as an expansion"
+      },
+      "quota": "Google's free quota is used up for now: fill in the details yourself, or try again later.",
+      "stop": "Stop"
+    },
+    "editLudo": "Edit"
   },
   "ai": {
     "title": "Rules AI",
@@ -983,7 +1418,7 @@
     "generalKnowledge": "General knowledge",
     "generalHint": "No rulebook — answers from what the AI knows about the game.",
     "deleteConfirm": "Delete this conversation?",
-    "pickGame": "Which game are you playing?",
+    "pickGame": "Pick a game from your Kallax",
     "continue": "Continue",
     "pickSource": "Answer from which source?",
     "rulebookOption": "Rulebook ({lang}) — answers with page citations",
@@ -1016,9 +1451,14 @@
       "claudeUnavailable": "Claude isn't available right now.",
       "freeBusy": "The free service is busy (its free limit may be reached). Try again in a minute or use Claude.",
       "freeError": "The free service didn't answer. Try again or use Claude.",
-      "api": "Claude didn't answer. Try again in a moment."
+      "api": "Claude didn't answer. Try again in a moment.",
+      "noFaqMatch": "No answer in the FAQ for this question, and the AI isn't available right now.",
+      "freeIncomplete": "The free option's answer was cut off (service overloaded). Ask again or use Claude.",
+      "ownUnavailable": "Your Claude key is no longer available. Check it in your settings.",
+      "ownKeyInvalid": "Anthropic rejected your Claude key. Check it in your settings.",
+      "ownKeyCredit": "Your Anthropic account is out of credit. Add some at console.anthropic.com or pick another option."
     },
-    "pickGameHint": "Pick a suggestion from the list. Not in the database yet? Choose “Add … as a new game”.",
+    "pickGameHint": "Only games from your Kallax are listed.",
     "uploadRulebook": "Upload the rulebook (PDF)",
     "uploadRulebookHint": "Not in our library yet? Add it — it'll be available to everyone for this game.",
     "uploadAndAsk": "Upload and start asking",
@@ -1029,7 +1469,7 @@
       "budgetUsed": "Precise · {pct}% of your monthly budget used",
       "free": "{name} (free)",
       "freeSub": "Free · less reliable",
-      "badgeClaude": "Answered by Claude",
+      "badgeClaude": "Answer from Claude {site}",
       "badgeFree": "Answered by {name} (free)",
       "unavailable": {
         "disabled": "Turned off by the admins",
@@ -1052,7 +1492,12 @@
         "tip": "Tip: for a quick reminder the free option is fine; for a rules dispute at the table, use Claude or check the rulebook.",
         "stay": "Keep Claude",
         "switch": "Use the free option"
-      }
+      },
+      "own": "My personal Claude",
+      "ownSub": "Your key ••••{hint} · your credits",
+      "badgeOwn": "Answer from your personal Claude",
+      "claudeSite": "Claude {site}",
+      "ownNone": "Add your key in Settings"
     },
     "switched": {
       "disabled": "Claude is turned off — the free option answered.",
@@ -1061,7 +1506,45 @@
       "memberBudget": "Your Claude budget is used up this month — the free option answered.",
       "restricted": "Your account uses the free option.",
       "claudeError": "Claude couldn't answer — the free option answered instead."
-    }
+    },
+    "faq": {
+      "title": "Rules FAQ",
+      "lead": "Questions already asked to the AI, game by game. Have a look before asking: the answer may already be there.",
+      "gameCard": "{name} FAQ",
+      "gameCardHint": "{count, plural, =0 {No questions yet: yours will be the first!} one {# question already answered: have a look before asking.} other {# questions already answered: have a look before asking.}}",
+      "gameLead": "Questions asked by members, most frequent first.",
+      "searchPlaceholder": "Search a question…",
+      "searchGames": "Search a game…",
+      "count": "{count, plural, =0 {No questions} one {# question} other {# questions}}",
+      "empty": "No questions for this game yet",
+      "emptyHint": "Ask the AI: your question will be added to the FAQ for the next players.",
+      "noMatch": "No question matches",
+      "notFound": "Didn't find your answer?",
+      "askAi": "Ask the AI",
+      "asked": "{count, plural, one {asked # time} other {asked # times}}",
+      "verified": "Verified",
+      "fromFaq": "Answer from the FAQ",
+      "fromFaqVerified": "Verified answer from the FAQ",
+      "matchedQuestion": "Similar question already asked: “{question}”",
+      "askAnyway": "Not what I was looking for: ask the AI",
+      "back": "Back to the FAQ",
+      "backToAi": "Back to the rules AI",
+      "myGames": "My games",
+      "otherGames": "Other games",
+      "noGames": "No FAQ yet",
+      "noGamesHint": "Questions asked to the rules AI build each game's FAQ.",
+      "onlyFaq": "Ask your question: we'll look in the FAQ…",
+      "onlyFaqNotice": "{reason} You can still ask: we'll look for the answer in this game's FAQ."
+    },
+    "flow": "Every question goes to the FAQ first, then {who} answers{count, plural, =0 {.} one { by reading the game's rulebook.} other { by reading the game's # rulebooks.}}",
+    "stage": {
+      "faq": "Searching the FAQ…",
+      "reading": "{who} is reading {count, plural, one {the rulebook} other {the # rulebooks}}…",
+      "general": "{who} is writing the answer…"
+    },
+    "withRulebooks": "Answers from {count, plural, one {the game's rulebook} other {the game's # rulebooks}}",
+    "readingRulebooks": "The AI reads:",
+    "addRulebook": "+ Add a rulebook"
   },
   "facebook": {
     "title": "Facebook groups",
@@ -1157,6 +1640,102 @@
       "price": "Enter a price.",
       "forbidden": "You can't do that on this listing.",
       "message": "Write a message."
+    }
+  },
+  "suggestions": {
+    "title": "Suggestion box",
+    "lead": "Members' ideas to improve the site. Vote for the ones you want to see.",
+    "dialogTitle": "Suggestion box",
+    "dialogLead": "An idea to improve the site? We're listening.",
+    "titleLabel": "Your idea",
+    "titlePlaceholder": "E.g. a player leaderboard for each game",
+    "detailsLabel": "Details (optional)",
+    "detailsPlaceholder": "Explain what you'd like and why.",
+    "submit": "Send",
+    "similarTitle": "Already suggested? You can just vote:",
+    "vote": "Vote for this suggestion",
+    "unvote": "Remove my vote",
+    "sent": "Thanks! Your suggestion was sent.",
+    "merged": "A similar suggestion already existed: “{title}”. We added your vote to it.",
+    "alreadyVoted": "A similar suggestion already exists and you already voted for it: “{title}”.",
+    "forcePost": "It's a different idea: post it anyway",
+    "another": "Suggest another idea",
+    "seeAll": "See all suggestions",
+    "newSuggestion": "Suggest an idea",
+    "empty": "No suggestions yet",
+    "emptyHint": "Be the first to suggest an idea!",
+    "sort": {
+      "popular": "Popular",
+      "recent": "Recent"
+    },
+    "filterAll": "Active",
+    "status": {
+      "OPEN": "Open",
+      "PLANNED": "Planned",
+      "DONE": "Done",
+      "DECLINED": "Declined"
+    },
+    "adminReply": "Team reply:",
+    "mine": "Your suggestion",
+    "delete": "Delete",
+    "deleteConfirm": "Delete your suggestion?",
+    "close": "Close",
+    "errors": {
+      "title": "Describe your idea in a few words (at least 5 characters)."
+    }
+  },
+  "email": {
+    "verify": {
+      "subject": "Confirm your email address — {site}",
+      "title": "Welcome, {name}!",
+      "body": "One step left to join {site}: confirm your email address with the button below.",
+      "expires": "This link is valid for 48 hours.",
+      "button": "Confirm my address",
+      "footer": "Didn't create an account? Just ignore this email."
+    },
+    "reset": {
+      "subject": "Reset your password — {site}",
+      "title": "Hello {name},",
+      "body": "You asked for a new password. Click the button to choose one.",
+      "expires": "This link is valid for one hour and works once.",
+      "button": "Choose a new password",
+      "footer": "Wasn't you? Ignore this email: your password doesn't change."
+    },
+    "notify": {
+      "open": "See it on the site",
+      "footer": "You get this email because you turned this notification on. To change it: {url}",
+      "friendRequest": {
+        "title": "{name} wants to be your friend",
+        "body": "{name} sent you a friend request. Accept it to log your plays together."
+      },
+      "playToConfirm": {
+        "title": "A play of {game} to confirm",
+        "body": "{name} logged a play of {game} with you. Confirm it to add it to your history."
+      },
+      "eventJoinRequest": {
+        "title": "{name} wants to join “{event}”",
+        "body": "{name} asked for a seat at your game “{event}”. Accept or decline the request."
+      },
+      "eventJoinAccepted": {
+        "title": "You have a seat at “{event}”",
+        "body": "Your request for “{event}” was accepted. Have a good game!"
+      },
+      "eventCancelled": {
+        "title": "“{event}” is cancelled",
+        "body": "The game “{event}” you were going to was cancelled."
+      },
+      "kallaxInvite": {
+        "title": "{name} invites you to share their Kallax",
+        "body": "{name} invites you to share their Kallax: you'll see and manage the same games."
+      },
+      "bazaarMessage": {
+        "title": "New message about “{listing}”",
+        "body": "{name} wrote to you about the bazar listing “{listing}”."
+      },
+      "suggestionUpdate": {
+        "title": "Your suggestion has an answer",
+        "body": "The team updated your suggestion “{title}”."
+      }
     }
   }
 }

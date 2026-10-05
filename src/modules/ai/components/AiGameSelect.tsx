@@ -1,10 +1,10 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { GamePicker } from "@/modules/games/components/GamePicker";
+import { MyGameSelect, type MyGameOption } from "@/modules/kallax/components/MyGameSelect";
 
-/** Picking a game in the AI assistant goes straight to choosing the rules source. */
-export function AiGameSelect() {
+/** Picking a game from your Kallax goes straight to choosing the rules source. */
+export function AiGameSelect({ games }: { games: MyGameOption[] }) {
   const router = useRouter();
-  return <GamePicker allowCreate createHref={(name) => `/games/new?name=${encodeURIComponent(name)}&returnTo=ai`} onPick={(g) => g && router.push(`/ai?game=${g.id}`)} />;
+  return <MyGameSelect games={games} onChange={(ids) => ids[0] && router.push(`/ai?game=${ids[0]}`)} />;
 }

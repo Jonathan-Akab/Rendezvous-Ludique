@@ -16,7 +16,7 @@ export async function GET(req: Request) {
       playTimeMin: g.playTimeMin,
       designer: g.designer,
       cover: coverUrl(g),
-      owners: g._count.libraryGames,
+      owners: g._count.kallaxGames,
       rating: g.rating,
     })),
   );

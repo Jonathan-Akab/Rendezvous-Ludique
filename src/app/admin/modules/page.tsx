@@ -1,10 +1,11 @@
 import { getTranslations } from "next-intl/server";
+import { requirePermission } from "@/lib/auth/guards";
 import { getModuleStates, getOrderedModules } from "@/lib/modules";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowDownUp, ArrowUp } from "lucide-react";
 import { ActionForm } from "@/components/ActionForm";
 import { ModuleIcon } from "@/components/icons";
 import { AdminHeader } from "@/modules/admin/components/AdminUi";
-import { moveModuleAction, saveModuleAction } from "@/modules/admin/actions";
+import { moveModuleAction, saveModuleAction, applyMyMenuOrderAsDefaultAction } from "@/modules/admin/actions";
 import { aiConfigured } from "@/modules/ai/service";
 
 export async function generateMetadata() {
@@ -13,11 +14,18 @@ export async function generateMetadata() {
 
 // Rendered straight from the module registry: a new module shows up here automatically.
 export default async function AdminModulesPage() {
+  await requirePermission("modules");
   const [states, ordered, t, tn] = await Promise.all([getModuleStates(), getOrderedModules(), getTranslations("admin.modules"), getTranslations("nav")]);
 
   return (
     <div className="space-y-6">
-      <AdminHeader title={t("title")} lead={t("lead")} />
+      <AdminHeader title={t("title")} lead={t("lead")}>
+        <form action={applyMyMenuOrderAsDefaultAction}>
+          <button className="btn btn-secondary btn-sm" title={t("useMyOrderHint")}>
+            <ArrowDownUp className="size-4" /> {t("useMyOrder")}
+          </button>
+        </form>
+      </AdminHeader>
       <div className="grid gap-4 xl:grid-cols-2">
         {ordered.map((m, index) => {
           const state = states[m.key];

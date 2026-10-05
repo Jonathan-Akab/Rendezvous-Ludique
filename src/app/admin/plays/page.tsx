@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth/guards";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { ilike } from "@/lib/search";
@@ -11,6 +12,7 @@ export async function generateMetadata() {
 }
 
 export default async function AdminPlaysPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  await requirePermission("plays");
   const [sp, t, format] = await Promise.all([searchParams, getTranslations("admin.plays"), getFormatter()]);
   const plays = await db.play.findMany({
     where: sp.q ? { OR: [{ game: { name: ilike(sp.q) } }, { createdBy: { displayName: ilike(sp.q) } }] } : {},

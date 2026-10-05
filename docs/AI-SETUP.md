@@ -32,7 +32,7 @@ Haiku 4.5 (cheapest).
 4. Restart the server.
 5. In **Admin → Modules → Rules AI**, check the free option settings:
    - API URL: `https://generativelanguage.googleapis.com/v1beta/openai` (default)
-   - Model: `gemini-2.5-flash` (default) — check the current free model names in AI Studio
+   - Model: `gemini-3.8-flash` (default) — check the current free model names in AI Studio
      and update this field if Google has renamed it.
 6. **Admin → Rules AI → Providers** should show the free option as *ready*.
 
@@ -48,3 +48,16 @@ Any OpenAI-compatible endpoint works — change the URL, model and key:
 | Groq | `https://api.groq.com/openai/v1` | Free tier, very fast, small token limits per minute |
 | OpenRouter | `https://openrouter.ai/api/v1` | Models ending in `:free` cost nothing, daily limits |
 | Ollama (local) | `http://localhost:11434/v1` | Free and private, needs a powerful server; no key needed |
+
+## 3. Kallax import & box pictures (free)
+
+- **Photo of a box / of a shelf**: uses the free AI option above (Gemini) — never Claude, so it costs nothing.
+- **BGG box pictures** (optional): BGG requires a (free) application token
+  since July 2025.
+  1. Sign in on <https://boardgamegeek.com/applications> and create an application
+     (name: Rendezvous Ludique, non-commercial).
+  2. Once approved, copy its token.
+  3. Put it in `.env` / `.env.production` → `BGG_API_TOKEN="..."` and restart the server.
+- **Picture suggestions** (Admin → Modules → Game library → "Picture suggestions"): `auto` uses BGG when the
+  token is set, otherwise Wikimedia Commons (free, no key, fewer results). Only a link to the chosen picture is
+  saved.

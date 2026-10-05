@@ -2,7 +2,8 @@ import Link from "next/link";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { ilike } from "@/lib/search";
-import { requireRole } from "@/lib/auth/guards";
+import { requirePermission } from "@/lib/auth/guards";
+import { isFullAdmin } from "@/lib/auth/permissions";
 import { ROLES, USER_STATUSES } from "@/lib/constants";
 import { MeepleAvatar } from "@/components/Meeple";
 import { AdminHeader, AdminTable, SearchBar, Td } from "@/modules/admin/components/AdminUi";
@@ -14,7 +15,9 @@ export async function generateMetadata() {
 }
 
 export default async function AdminMembersPage({ searchParams }: { searchParams: Promise<{ q?: string; role?: string; status?: string }> }) {
-  const [me, sp, t, format] = await Promise.all([requireRole("ADMIN"), searchParams, getTranslations("admin.members"), getFormatter()]);
+  const [me, sp, t, format] = await Promise.all([requirePermission("members"), searchParams, getTranslations("admin.members"), getFormatter()]);
+  // roles and staff accounts: full admins only
+  const full = isFullAdmin(me);
   const where: Prisma.UserWhereInput = {};
   if (sp.q) where.OR = [{ displayName: ilike(sp.q) }, { username: ilike(sp.q) }, { email: ilike(sp.q) }, { city: ilike(sp.q) }];
   if (ROLES.includes(sp.role as never)) where.role = sp.role;
@@ -62,7 +65,7 @@ export default async function AdminMembersPage({ searchParams }: { searchParams:
             </Td>
             <Td className="text-muted">{u.email}</Td>
             <Td>
-              {u.id === me.id ? (
+              {u.id === me.id || !full ? (
                 <span className="chip">{t(`roles.${u.role}`)}</span>
               ) : (
                 <form action={quickSetRoleAction.bind(null, u.id)} className="flex gap-1">
@@ -78,13 +81,13 @@ export default async function AdminMembersPage({ searchParams }: { searchParams:
               )}
             </Td>
             <Td>
-              <span className={`chip ${u.status === "ACTIVE" ? "text-success" : "text-danger"}`}>{t(`statuses.${u.status}`)}</span>
+              <span className={`chip ${u.status === "ACTIVE" ? "text-success" : u.status === "PENDING" ? "text-[#c78f1f]" : "text-danger"}`}>{t(`statuses.${u.status}`)}</span>
             </Td>
             <Td className="text-xs text-muted">{t("activityCount", { events: u._count.hostedEvents, plays: u._count.playsCreated })}</Td>
             <Td className="whitespace-nowrap text-xs text-muted">{format.dateTime(u.createdAt, { dateStyle: "medium" })}</Td>
             <Td>
               <div className="flex justify-end gap-1">
-                {u.id !== me.id && (
+                {u.id !== me.id && (full || u.role === "MEMBER") && (
                   <form action={setMemberStatusAction.bind(null, u.id, u.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE")}>
                     <button className="btn btn-ghost btn-sm">{u.status === "ACTIVE" ? t("suspend") : t("reactivate")}</button>
                   </form>

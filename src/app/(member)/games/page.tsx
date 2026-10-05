@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Clock, Plus, Search, Users } from "lucide-react";
+import { Clock, Search, Users } from "lucide-react";
 import { requireUser } from "@/lib/auth/guards";
 import { requireModule } from "@/lib/modules";
 import { Stagger, StaggerItem } from "@/components/Motion";
@@ -17,7 +17,7 @@ type Search = { q?: string; players?: string; time?: string; sort?: string };
 const SORTS: CatalogueSort[] = ["popular", "rating", "name", "recent"];
 
 export default async function GamesPage({ searchParams }: { searchParams: Promise<Search> }) {
-  const [, mod, sp, t] = await Promise.all([requireUser(), requireModule("games"), searchParams, getTranslations("games")]);
+  const [, , sp, t] = await Promise.all([requireUser(), requireModule("games"), searchParams, getTranslations("games")]);
   const sort = SORTS.find((s) => s === sp.sort) ?? "popular";
   const games = await listCatalogue({
     q: sp.q?.trim() || undefined,
@@ -33,11 +33,7 @@ export default async function GamesPage({ searchParams }: { searchParams: Promis
           <h1 className="page-title">{t("title")}</h1>
           <p className="text-muted">{t("lead")}</p>
         </div>
-        {mod.settings.membersCanAddGames && (
-          <Link href="/games/new" className="btn btn-primary">
-            <Plus className="size-4" /> {t("add")}
-          </Link>
-        )}
+
       </div>
 
       <form className="glass flex flex-wrap items-end gap-3 rounded-2xl p-4" role="search">
@@ -102,7 +98,7 @@ export default async function GamesPage({ searchParams }: { searchParams: Promis
                   </p>
                   <div className="flex items-center justify-between">
                     <MeepleRating avg={g.rating.avg} count={g.rating.count} compact label={t("rating.site")} />
-                    <span className="text-[11px] text-muted">{t("inKallax", { count: g._count.libraryGames })}</span>
+                    <span className="text-[11px] text-muted">{t("inKallax", { count: g._count.kallaxGames })}</span>
                   </div>
                 </div>
               </Link>

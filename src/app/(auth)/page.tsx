@@ -4,9 +4,10 @@ import { getSiteSettings } from "@/lib/settings";
 import { FadeIn } from "@/components/Motion";
 import { Meeple } from "@/components/Meeple";
 import { LoginForm } from "@/modules/auth/components/AuthForms";
+import { mailConfigured } from "@/lib/mail";
 
-export default async function LandingPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
-  const [{ next }, settings, t] = await Promise.all([searchParams, getSiteSettings(), getTranslations("landing")]);
+export default async function LandingPage({ searchParams }: { searchParams: Promise<{ next?: string; pending?: string; verify?: string; verified?: string; reset?: string }> }) {
+  const [{ next, pending, verify, verified, reset }, settings, t, ta] = await Promise.all([searchParams, getSiteSettings(), getTranslations("landing"), getTranslations("auth")]);
   const features = [
     { icon: CalendarDays, title: t("f1Title"), text: t("f1Text") },
     { icon: LibraryBig, title: t("f2Title"), text: t("f2Text") },
@@ -50,7 +51,15 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
         </div>
         <h2 className="section-title mb-1 mt-2">{t("welcomeBack")}</h2>
         <p className="mb-5 text-sm text-muted">{t("signInLead")}</p>
-        <LoginForm next={next} registrationOpen={settings.registrationOpen} />
+        {verify === "invalid" ? (
+          <p className="mb-4 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">{ta("errors.linkInvalid")}</p>
+        ) : verify ? (
+          <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("checkEmail")}</p>
+        ) : null}
+        {verified && <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("emailConfirmed")}</p>}
+        {reset && <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("passwordChanged")}</p>}
+        {pending && <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("pendingSignup")}</p>}
+        <LoginForm next={next} registrationOpen={settings.registrationOpen} mailOn={mailConfigured()} />
       </FadeIn>
     </div>
   );

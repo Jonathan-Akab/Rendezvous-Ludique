@@ -6,30 +6,47 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
-import { requireRole } from "@/lib/auth/guards";
+import { requireFullAdmin, requirePermission } from "@/lib/auth/guards";
+import { isFullAdmin, serializePermissions } from "@/lib/auth/permissions";
 import { hashPassword } from "@/lib/auth/password";
 import { audit } from "@/lib/audit";
-import { getModule, moveModule, saveModule } from "@/lib/modules";
+import { getModule, moveModule, saveModule, setModuleOrder } from "@/lib/modules";
 import { getSiteSettings, saveSiteSettings } from "@/lib/settings";
+import { appUrl, emailLayout, mailConfigured, sendMail } from "@/lib/mail";
 import { bool, HEX_COLOR, oneOf, optFloat, optInt, optStr, str, type ActionState } from "@/lib/forms";
 import { LOCALES, ROLES, THEME_KEYS, USER_STATUSES, VISIBILITIES, type ThemeKey } from "@/lib/constants";
-import { getManifest, type ModuleKey } from "@/modules/registry";
+import { getManifest, MODULES, type ModuleKey } from "@/modules/registry";
 import { readGameFields, storeCoverFromForm } from "@/modules/games/mutations";
+import { normalizeName } from "@/modules/games/service";
 import { deleteStored, saveUpload, UploadError } from "@/lib/storage";
 
-const admin = () => requireRole("ADMIN");
 const refresh = () => revalidatePath("/", "layout");
 
 // ───────────── Members ─────────────
+// With the "members" right you manage member accounts; staff accounts (moderators,
+// admins), roles and rights are for full admins only.
+
+async function manageableUser(me: { id: string; role: string; permissions: string | null }, userId: string) {
+  const target = await db.user.findUnique({ where: { id: userId } });
+  if (!target) return null;
+  if (!isFullAdmin(me) && target.role !== "MEMBER") return null;
+  return target;
+}
 
 export async function updateMemberAction(userId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  const me = await admin();
+  const me = await requirePermission("members");
   const t = await getTranslations("admin.errors");
-  const target = await db.user.findUnique({ where: { id: userId } });
-  if (!target) return { error: t("notFound") };
+  const target = await manageableUser(me, userId);
+  if (!target) return { error: t("notAllowed") };
 
-  const role = oneOf(str(fd, "role"), ROLES, "MEMBER");
+  const full = isFullAdmin(me);
+  const role = full ? oneOf(str(fd, "role"), ROLES, "MEMBER") : target.role;
   const status = oneOf(str(fd, "status"), USER_STATUSES, "ACTIVE");
+  // Rights per console section (full admins only). "fullAdmin" keeps an admin unrestricted.
+  const permissions = full
+    ? serializePermissions(role, bool(fd, "fullAdmin"), fd.getAll("permissions").map(String))
+    : target.permissions;
+  if (userId === me.id && full && permissions !== null) return { error: t("selfLockout") };
   if (userId === me.id && (role !== "ADMIN" || status !== "ACTIVE")) return { error: t("selfLockout") };
 
   const email = str(fd, "email").toLowerCase();
@@ -45,6 +62,7 @@ export async function updateMemberAction(userId: string, _prev: ActionState, fd:
     username,
     role,
     status,
+    permissions,
     meepleColor: HEX_COLOR.test(meepleColor) ? meepleColor : target.meepleColor,
     bio: optStr(fd, "bio"),
     city: optStr(fd, "city"),
@@ -61,13 +79,14 @@ export async function updateMemberAction(userId: string, _prev: ActionState, fd:
   await audit(me.id, "admin.member.update", target.username, {
     role: target.role !== role ? `${target.role}→${role}` : undefined,
     status: target.status !== status ? `${target.status}→${status}` : undefined,
+    permissions: target.permissions !== permissions ? permissions ?? "full" : undefined,
   });
   revalidatePath("/admin/members");
   return { ok: true, message: t("saved") };
 }
 
 export async function quickSetRoleAction(userId: string, fd: FormData) {
-  const me = await admin();
+  const me = await requireFullAdmin();
   const role = oneOf(str(fd, "role"), ROLES, "MEMBER");
   if (userId === me.id) return;
   const u = await db.user.update({ where: { id: userId }, data: { role } });
@@ -76,7 +95,8 @@ export async function quickSetRoleAction(userId: string, fd: FormData) {
 }
 
 export async function setMemberStatusAction(userId: string, status: "ACTIVE" | "SUSPENDED") {
-  const me = await admin();
+  const me = await requirePermission("members");
+  if (!(await manageableUser(me, userId))) return;
   if (userId === me.id) return;
   const u = await db.user.update({ where: { id: userId }, data: { status } });
   if (status === "SUSPENDED") await db.session.deleteMany({ where: { userId } });
@@ -85,7 +105,8 @@ export async function setMemberStatusAction(userId: string, status: "ACTIVE" | "
 }
 
 export async function resetPasswordAction(userId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  const me = await admin();
+  const me = await requirePermission("members");
+  if (!(await manageableUser(me, userId))) return { error: (await getTranslations("admin.errors"))("notAllowed") };
   const t = await getTranslations("admin.errors");
   const password = str(fd, "password");
   if (password.length < 8) return { error: t("passwordLength") };
@@ -96,14 +117,16 @@ export async function resetPasswordAction(userId: string, _prev: ActionState, fd
 }
 
 export async function revokeSessionsAction(userId: string) {
-  const me = await admin();
+  const me = await requirePermission("members");
+  if (!(await manageableUser(me, userId))) return;
   await db.session.deleteMany({ where: { userId } });
   await audit(me.id, "admin.member.revokeSessions", userId);
   revalidatePath(`/admin/members/${userId}`);
 }
 
 export async function deleteMemberAction(userId: string) {
-  const me = await admin();
+  const me = await requirePermission("members");
+  if (!(await manageableUser(me, userId))) return;
   if (userId === me.id) return;
   const u = await db.user.delete({ where: { id: userId } });
   // clean up libraries left without members
@@ -116,7 +139,7 @@ export async function deleteMemberAction(userId: string) {
 // ───────────── Modules ─────────────
 
 export async function saveModuleAction(key: ModuleKey, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  const me = await admin();
+  const me = await requirePermission("modules");
   const manifest = getManifest(key);
   const settings: Record<string, string | number | boolean> = {};
   for (const field of manifest.settings) {
@@ -142,7 +165,7 @@ export async function saveModuleAction(key: ModuleKey, _prev: ActionState, fd: F
 // ───────────── Site & appearance ─────────────
 
 export async function saveSiteSettingsAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
-  const me = await admin();
+  const me = await requirePermission("settings");
   const t = await getTranslations("admin.errors");
   const timeZone = str(fd, "timeZone");
   try {
@@ -153,6 +176,10 @@ export async function saveSiteSettingsAction(_prev: ActionState, fd: FormData): 
   const patch = {
     siteName: str(fd, "siteName").slice(0, 60) || "Rendezvous Ludique",
     registrationOpen: bool(fd, "registrationOpen"),
+    registrationApproval: bool(fd, "registrationApproval"),
+    requireEmailConfirmation: bool(fd, "requireEmailConfirmation"),
+    // never below the age of majority in Québec
+    minimumAge: Math.min(99, Math.max(18, optInt(fd, "minimumAge") ?? 18)),
     announcement: str(fd, "announcement").slice(0, 300),
     defaultLocale: oneOf(str(fd, "defaultLocale"), LOCALES, "fr"),
     timeZone,
@@ -164,7 +191,7 @@ export async function saveSiteSettingsAction(_prev: ActionState, fd: FormData): 
 }
 
 export async function saveAppearanceAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
-  const me = await admin();
+  const me = await requirePermission("appearance");
   const t = await getTranslations("admin.errors");
   const enabledThemes = fd.getAll("enabledThemes").filter((v): v is ThemeKey => THEME_KEYS.includes(v as ThemeKey));
   const defaultTheme = oneOf(str(fd, "defaultTheme"), THEME_KEYS, "system");
@@ -177,11 +204,15 @@ export async function saveAppearanceAction(_prev: ActionState, fd: FormData): Pr
 
 // ───────────── Content ─────────────
 
-export async function saveGameAction(gameId: string | null, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  const me = await admin();
+/** Admins can correct a Ludothèque entry (it is never edited by members). */
+export async function saveGameAction(gameId: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  const me = await requirePermission("games");
   const t = await getTranslations("admin.errors");
   const data = readGameFields(fd);
   if (!data.name) return { error: t("gameName") };
+  const normalizedName = normalizeName(data.name);
+  const clash = await db.game.findFirst({ where: { normalizedName, id: { not: gameId } } });
+  if (clash) return { error: t("gameExists", { name: clash.name }) };
   let coverFileId: string | null | undefined;
   try {
     coverFileId = await storeCoverFromForm(fd, me.id);
@@ -189,33 +220,52 @@ export async function saveGameAction(gameId: string | null, _prev: ActionState, 
     if (e instanceof UploadError) return { error: (await getTranslations("games.errors"))(`upload.${e.code}`) };
     throw e;
   }
-  if (gameId) {
-    const old = await db.game.findUnique({ where: { id: gameId } });
-    if (coverFileId && old?.coverFileId) await deleteStored(old.coverFileId);
-    await db.game.update({ where: { id: gameId }, data: { ...data, ...(coverFileId ? { coverFileId } : {}) } });
-  } else {
-    await db.game.create({ data: { ...data, coverFileId, createdById: me.id } });
-  }
-  await audit(me.id, gameId ? "admin.game.update" : "admin.game.create", data.name);
+  const old = await db.game.findUnique({ where: { id: gameId } });
+  if (!old) return { error: t("notFound") };
+  if (coverFileId && old.coverFileId) await deleteStored(old.coverFileId);
+  // Ludothèque-only details, and "expansion of" (never itself, never an expansion's expansion).
+  const baseGameId = str(fd, "baseGameId") || null;
+  const base = baseGameId && baseGameId !== gameId ? await db.game.findUnique({ where: { id: baseGameId }, select: { id: true, baseGameId: true } }) : null;
+  const weight = optFloat(fd, "weight");
+  await db.game.update({
+    where: { id: gameId },
+    data: {
+      ...data,
+      normalizedName,
+      weight: weight != null && weight >= 1 && weight <= 5 ? weight : null,
+      categories: optStr(fd, "categories")?.slice(0, 300) ?? null,
+      description: optStr(fd, "description")?.slice(0, 4000) ?? null,
+      baseGameId: base ? (base.baseGameId ?? base.id) : null,
+      ...(coverFileId ? { coverFileId } : {}),
+    },
+  });
+  await audit(me.id, "admin.game.update", data.name);
   revalidatePath("/admin/games");
   return { ok: true, message: t("saved") };
 }
-/** Merge a duplicate game into another: moves library copies, plays and event links. */
+
+/** Merge a duplicate Ludothèque entry into another: moves Kallax copies, ratings, rulebooks, plays, events, chats and listings. */
 export async function mergeGameAction(fromId: string, fd: FormData) {
-  const me = await admin();
+  const me = await requirePermission("games");
   const intoId = str(fd, "intoId");
   if (!intoId || intoId === fromId) return;
   const [from, into] = await Promise.all([db.game.findUnique({ where: { id: fromId } }), db.game.findUnique({ where: { id: intoId } })]);
   if (!from || !into) return;
-  const copies = await db.libraryGame.findMany({ where: { gameId: fromId } });
-  for (const c of copies) {
-    const dup = await db.libraryGame.findUnique({ where: { libraryId_gameId: { libraryId: c.libraryId, gameId: intoId } } });
-    if (dup) await db.libraryGame.delete({ where: { id: c.id } });
-    else await db.libraryGame.update({ where: { id: c.id }, data: { gameId: intoId } });
+  for (const c of await db.kallaxGame.findMany({ where: { gameId: fromId } })) {
+    const dup = await db.kallaxGame.findUnique({ where: { libraryId_gameId: { libraryId: c.libraryId, gameId: intoId } } });
+    if (dup) await db.kallaxGame.delete({ where: { id: c.id } });
+    else await db.kallaxGame.update({ where: { id: c.id }, data: { gameId: intoId } });
   }
+  for (const r of await db.gameRating.findMany({ where: { gameId: fromId } })) {
+    const dup = await db.gameRating.findUnique({ where: { gameId_userId: { gameId: intoId, userId: r.userId } } });
+    if (dup) await db.gameRating.delete({ where: { id: r.id } });
+    else await db.gameRating.update({ where: { id: r.id }, data: { gameId: intoId } });
+  }
+  await db.rulebook.updateMany({ where: { gameId: fromId }, data: { gameId: intoId } });
   await db.play.updateMany({ where: { gameId: fromId }, data: { gameId: intoId } });
-  const links = await db.eventGame.findMany({ where: { gameId: fromId } });
-  for (const l of links) {
+  await db.aiChat.updateMany({ where: { gameId: fromId }, data: { gameId: intoId } });
+  await db.bazaarListing.updateMany({ where: { gameId: fromId }, data: { gameId: intoId } });
+  for (const l of await db.eventGame.findMany({ where: { gameId: fromId } })) {
     await db.eventGame.delete({ where: { eventId_gameId: { eventId: l.eventId, gameId: fromId } } });
     await db.eventGame.upsert({
       where: { eventId_gameId: { eventId: l.eventId, gameId: intoId } },
@@ -229,35 +279,35 @@ export async function mergeGameAction(fromId: string, fd: FormData) {
 }
 
 export async function deleteGameAction(gameId: string) {
-  const me = await admin();
+  const me = await requirePermission("games");
   const g = await db.game.delete({ where: { id: gameId } });
   await audit(me.id, "admin.game.delete", g.name);
   revalidatePath("/admin/games");
 }
 
 export async function adminEventStatusAction(eventId: string, status: "SCHEDULED" | "CANCELLED") {
-  const me = await admin();
+  const me = await requirePermission("events");
   const e = await db.event.update({ where: { id: eventId }, data: { status } });
   await audit(me.id, `admin.event.${status.toLowerCase()}`, e.title);
   revalidatePath("/admin/events");
 }
 
 export async function adminDeleteEventAction(eventId: string) {
-  const me = await admin();
+  const me = await requirePermission("events");
   const e = await db.event.delete({ where: { id: eventId } });
   await audit(me.id, "admin.event.delete", e.title);
   revalidatePath("/admin/events");
 }
 
 export async function adminDeleteLibraryAction(libraryId: string) {
-  const me = await admin();
+  const me = await requirePermission("libraries");
   const l = await db.library.delete({ where: { id: libraryId } });
   await audit(me.id, "admin.library.delete", l.name);
   revalidatePath("/admin/libraries");
 }
 
 export async function adminDeletePlayAction(playId: string) {
-  const me = await admin();
+  const me = await requirePermission("plays");
   await db.play.delete({ where: { id: playId } });
   await audit(me.id, "admin.play.delete", playId);
   revalidatePath("/admin/plays");
@@ -267,7 +317,7 @@ export async function adminDeletePlayAction(playId: string) {
 
 /** Quick AI controls (global switches and budgets) without touching the other settings. */
 export async function saveAiLimitsAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
-  const me = await admin();
+  const me = await requirePermission("ai");
   const current = await getModule("ai");
   const settings = {
     ...current.settings,
@@ -287,7 +337,7 @@ export async function saveAiLimitsAction(_prev: ActionState, fd: FormData): Prom
 
 /** Per-member AI access and limits. Empty budget/limit fields mean "use the default". */
 export async function setMemberAiAction(userId: string, fd: FormData) {
-  const me = await admin();
+  const me = await requirePermission("ai");
   const access = oneOf(str(fd, "access"), ["DEFAULT", "FREE_ONLY", "NONE"] as const, "DEFAULT");
   const monthlyBudgetUsd = optFloat(fd, "monthlyBudgetUsd");
   const dailyLimit = optInt(fd, "dailyLimit");
@@ -302,7 +352,7 @@ export async function setMemberAiAction(userId: string, fd: FormData) {
 }
 /** Default menu order for everyone (members can still set their own). */
 export async function moveModuleAction(key: ModuleKey, direction: -1 | 1) {
-  const me = await admin();
+  const me = await requirePermission("modules");
   await moveModule(key, direction);
   await audit(me.id, "admin.module.move", key, { direction });
   refresh();
@@ -312,7 +362,7 @@ export async function moveModuleAction(key: ModuleKey, direction: -1 | 1) {
 const PICTURE_KEYS = [...THEME_KEYS, "login"] as string[];
 
 export async function saveThemeImageAction(key: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  const me = await admin();
+  const me = await requirePermission("appearance");
   const t = await getTranslations("admin.errors");
   if (!PICTURE_KEYS.includes(key)) return { error: t("notFound") };
   const file = fd.get("image");
@@ -332,7 +382,7 @@ export async function saveThemeImageAction(key: string, _prev: ActionState, fd: 
 }
 
 export async function removeThemeImageAction(key: string) {
-  const me = await admin();
+  const me = await requirePermission("appearance");
   const { themeImages } = await getSiteSettings();
   if (!themeImages[key]) return;
   await deleteStored(themeImages[key]);
@@ -341,4 +391,66 @@ export async function removeThemeImageAction(key: string) {
   await saveSiteSettings({ themeImages: next });
   await audit(me.id, "admin.appearance.picture.remove", key);
   refresh();
+}
+/** Makes the admin's own sidebar order the default order for every member. */
+export async function applyMyMenuOrderAsDefaultAction() {
+  const me = await requirePermission("modules");
+  const user = await db.user.findUnique({ where: { id: me.id }, select: { navOrder: true } });
+  let hrefs: string[] = [];
+  try {
+    hrefs = user?.navOrder ? JSON.parse(user.navOrder) : [];
+  } catch {
+    hrefs = [];
+  }
+  const keys = hrefs.map((h) => MODULES.find((m) => m.href === h)?.key).filter((k): k is ModuleKey => Boolean(k));
+  if (!keys.length) return;
+  await setModuleOrder(keys);
+  await audit(me.id, "admin.module.order", undefined, { keys });
+  refresh();
+}
+
+// ───────────── Sign-ups ─────────────
+
+/** Approves a pending sign-up: the account becomes active. */
+export async function approveSignupAction(userId: string) {
+  const me = await requirePermission("registrations");
+  const u = await db.user.findUnique({ where: { id: userId } });
+  if (!u || u.status !== "PENDING") return;
+  await db.user.update({ where: { id: userId }, data: { status: "ACTIVE" } });
+  await audit(me.id, "admin.signup.approve", u.username);
+  revalidatePath("/admin", "layout");
+}
+
+/** Refuses a pending sign-up: the account is removed. */
+export async function rejectSignupAction(userId: string) {
+  const me = await requirePermission("registrations");
+  const u = await db.user.findUnique({ where: { id: userId } });
+  if (!u || u.status !== "PENDING") return;
+  await db.user.delete({ where: { id: userId } });
+  await db.library.deleteMany({ where: { members: { none: {} } } });
+  await audit(me.id, "admin.signup.reject", u.username, { email: u.email });
+  revalidatePath("/admin", "layout");
+}
+
+// ───────────── Email ─────────────
+
+/** Sends a test email to the admin's own address (checks the SMTP settings). */
+export async function sendTestEmailAction(_prev: ActionState): Promise<ActionState> {
+  const me = await requirePermission("settings");
+  const t = await getTranslations("admin.site");
+  if (!mailConfigured()) return { error: t("mailOff") };
+  const { siteName } = await getSiteSettings();
+  const { html, text } = emailLayout({
+    siteName,
+    title: t("testMailTitle"),
+    paragraphs: [t("testMailBody")],
+    button: { label: siteName, url: appUrl() },
+    footer: appUrl(),
+  });
+  try {
+    await sendMail({ to: me.email, subject: t("testMailTitle"), html, text });
+  } catch (e) {
+    return { error: t("testMailFailed", { reason: (e as Error).message.slice(0, 200) }) };
+  }
+  return { ok: true, message: t("testMailSent", { email: me.email }) };
 }

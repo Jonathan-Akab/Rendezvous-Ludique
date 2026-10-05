@@ -5,12 +5,14 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { hasRole, requireUser } from "@/lib/auth/guards";
+import { can } from "@/lib/auth/permissions";
 import { getModule } from "@/lib/modules";
 import { audit } from "@/lib/audit";
 import { deleteStored, saveUpload, UploadError } from "@/lib/storage";
 import { oneOf, optFloat, optStr, str, type ActionState } from "@/lib/forms";
-import { createGameRecord, findGameByName } from "@/modules/games/mutations";
+import { getMyKallaxGames } from "@/modules/kallax/service";
 import { CONDITIONS, DELIVERY, LISTING_KINDS, LISTING_STATUSES } from "./service";
+import { notify } from "@/modules/notifications/emails";
 
 async function guard() {
   const user = await requireUser();
@@ -24,12 +26,11 @@ const refresh = (id?: string) => {
   if (id) revalidatePath(`/bazaar/${id}`);
 };
 
+/** The game being sold must come from the seller's Kallax. */
 async function resolveGame(fd: FormData, userId: string) {
   const id = str(fd, "gameId");
-  if (id) return db.game.findUnique({ where: { id } });
-  const name = str(fd, "game.name");
-  if (!name) return null;
-  return (await findGameByName(name)) ?? createGameRecord(fd, userId);
+  if (!id || !(await getMyKallaxGames(userId)).some((g) => g.gameId === id)) return null;
+  return db.game.findUnique({ where: { id } });
 }
 
 function readListing(fd: FormData, allowTrades: boolean) {
@@ -83,7 +84,7 @@ async function ownListing(id: string) {
   const { user, mod } = await guard();
   const listing = await db.bazaarListing.findUnique({ where: { id } });
   if (!listing) return null;
-  const isAdmin = hasRole(user.role, "ADMIN");
+  const isAdmin = can(user, "bazaar");
   if (listing.sellerId !== user.id && !isAdmin) return null;
   return { user, mod, listing, viaAdmin: listing.sellerId !== user.id };
 }
@@ -142,6 +143,7 @@ export async function sendBazaarMessageAction(listingId: string, buyerId: string
   if (!thread || (isSeller && thread === user.id)) return { error: t("forbidden") };
   if (isSeller && !(await db.bazaarMessage.findFirst({ where: { listingId, buyerId: thread } }))) return { error: t("forbidden") };
   await db.bazaarMessage.create({ data: { listingId, buyerId: thread, senderId: user.id, body } });
+  void notify(isSeller ? thread : listing.sellerId, "bazaarMessage", { name: user.displayName, listing: listing.title }, `/bazaar/${listingId}`);
   refresh(listingId);
   return { ok: true };
 }

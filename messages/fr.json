@@ -1,11 +1,11 @@
 {
   "landing": {
     "badge": "Communauté de jeux de société",
-    "tagline": "Annoncez vos soirées de jeux, trouvez une table près de chez vous, gérez votre kallax et chaque partie jouée.",
+    "tagline": "Annoncez vos soirées de jeux, trouvez une table près de chez vous, gérez votre Kallax et chaque partie jouée.",
     "f1Title": "Parties et événements",
     "f1Text": "Recevez chez vous ou trouvez une soirée de jeux près de vous.",
-    "f2Title": "Mon Kallax",
-    "f2Text": "Votre ludothèque, partagée avec votre foyer.",
+    "f2Title": "Ma Kallax",
+    "f2Text": "Votre ludothèque personnelle, partagée avec votre foyer si vous le voulez.",
     "f3Title": "Suivi des parties",
     "f3Text": "Notez chaque partie, les scores et qui a gagné.",
     "f4Title": "Amis",
@@ -46,9 +46,42 @@
         "password": "Le mot de passe doit contenir au moins 8 caractères.",
         "meepleColor": "Choisissez une couleur de meeple.",
         "locale": "Choisissez une langue.",
-        "form": "Vérifiez le formulaire et réessayez."
-      }
-    }
+        "form": "Vérifiez le formulaire et réessayez.",
+        "signupNote": "Dis-nous en quelques mots comment tu as connu le groupe (10 caractères minimum).",
+        "birthDate": "Entre une date de naissance valide."
+      },
+      "pending": "Ton inscription attend encore la validation de l'équipe.",
+      "bot": "Ton inscription n'a pas pu être envoyée. Prends le temps de remplir le formulaire et réessaie.",
+      "tooMany": "Trop d'inscriptions depuis cette connexion. Réessaie dans une heure.",
+      "unverified": "Confirme d'abord ton adresse courriel avec le lien reçu à l'inscription.",
+      "tooYoung": "Il faut avoir {age} ans ou plus pour s'inscrire.",
+      "linkInvalid": "Ce lien n'est plus valide (expiré ou déjà utilisé).",
+      "mailOff": "L'envoi de courriels n'est pas configuré sur ce site. Demande à un admin de réinitialiser ton mot de passe."
+    },
+    "becomeMember": "Devenir membre",
+    "signupNote": "Comment as-tu connu le groupe?",
+    "signupNotePlaceholder": "Ex. : Je joue au café ludique du jeudi avec Marie.",
+    "approvalHint": "Un membre de l'équipe valide chaque inscription (contre les faux comptes). Tu pourras te connecter dès que c'est fait.",
+    "pendingSignup": "Merci! Ton inscription est reçue. Tu pourras te connecter dès qu'un membre de l'équipe l'aura validée.",
+    "birthDate": "Date de naissance",
+    "ageHint": "Il faut avoir {age} ans ou plus pour s'inscrire. Ta date de naissance sert seulement à le vérifier : elle n'est pas conservée.",
+    "forgot": "Mot de passe oublié?",
+    "forgotTitle": "Mot de passe oublié",
+    "forgotLead": "Entre ton courriel ou ton nom d'utilisateur : on t'envoie un lien pour choisir un nouveau mot de passe.",
+    "forgotAgain": "Demander un nouveau lien",
+    "sendResetLink": "M'envoyer le lien",
+    "sending": "Envoi…",
+    "resetSent": "Si un compte correspond, un lien vient de t'être envoyé par courriel. Regarde aussi dans les indésirables.",
+    "resetTitle": "Nouveau mot de passe",
+    "resetLead": "Choisis ton nouveau mot de passe (8 caractères minimum).",
+    "newPassword": "Nouveau mot de passe",
+    "savePassword": "Enregistrer et me connecter",
+    "backToSignIn": "Retour à la connexion",
+    "checkEmail": "Presque fini! On t'a envoyé un courriel : clique sur le lien pour confirmer ton adresse et te connecter.",
+    "emailConfirmed": "Ton adresse courriel est confirmée.",
+    "passwordChanged": "Ton mot de passe a été changé.",
+    "resendVerify": "Renvoyer le courriel de confirmation",
+    "verifySent": "C'est envoyé : regarde ta boîte de réception (et les indésirables)."
   },
   "meeple": {
     "yours": "Votre meeple",
@@ -85,7 +118,7 @@
   "nav": {
     "home": "Accueil",
     "events": "Parties",
-    "kallax": "Mon Kallax",
+    "kallax": "Ma Kallax",
     "plays": "Parties jouées",
     "friends": "Amis",
     "profiles": "Profils",
@@ -106,7 +139,15 @@
     "reorder": "Réorganiser le menu",
     "reorderHint": "Glisse les éléments dans l'ordre qui te plaît.",
     "reorderDone": "Terminé",
-    "reorderReset": "Revenir à l'ordre par défaut"
+    "reorderReset": "Revenir à l'ordre par défaut",
+    "dragHandle": "Glisser pour déplacer",
+    "moveUp": "Monter {item}",
+    "moveDown": "Descendre {item}",
+    "saveOrder": "Enregistrer cet ordre",
+    "orderSaved": "Ordre enregistré!",
+    "menuOrder": "Ordre du menu",
+    "menuOrderLead": "Choisis l'ordre des éléments de ton menu. Glisse-les par la poignée ou utilise les flèches.",
+    "suggestions": "Boîte à suggestions"
   },
   "donations": {
     "support": "Soutenir le projet",
@@ -236,8 +277,8 @@
     }
   },
   "kallax": {
-    "title": "Mon Kallax",
-    "lead": "Votre ludothèque, case par case — partagée avec les gens avec qui vous vivez.",
+    "title": "Ma Kallax",
+    "lead": "Tes jeux, case par case. Privée : seuls toi et les personnes avec qui tu la partages la voient.",
     "addGame": "Ajouter un jeu",
     "form": {
       "name": "Jeu",
@@ -250,8 +291,16 @@
       "playTime": "Durée (min)",
       "notes": "Notes",
       "submit": "Le ranger sur l'étagère",
-      "pickerHint": "Commencez à taper : les jeux déjà ajoutés par des membres apparaissent avec leurs infos et leur note meeple.",
-      "rating": "Votre note"
+      "pickerHint": "Commence à taper : les jeux déjà dans la Ludothèque apparaissent avec leurs infos et leur note meeple.",
+      "rating": "Votre note",
+      "modes": {
+        "manual": "Saisie manuelle",
+        "search": "Chercher dans la Ludothèque"
+      },
+      "manualHint": "Entre toi-même les infos de ton jeu. Seul le nom est obligatoire; s'il n'est pas encore dans la Ludothèque, il y sera ajouté.",
+      "how": "Comment veux-tu ajouter ton jeu?",
+      "expansionOf": "C'est une extension de… (facultatif)",
+      "notExpansion": "Non, c'est un jeu à part entière"
     },
     "status": {
       "OWNED": "Possédé",
@@ -263,46 +312,47 @@
       "title": "Partagé avec",
       "usernamePlaceholder": "@nomutilisateur",
       "invite": "Inviter",
-      "invitedTo": "Vous êtes invité à partager « {name} » avec {people}.",
+      "invitedTo": "Tu es invité à partager « {name} » avec {people}.",
       "accept": "Accepter",
       "decline": "Refuser",
       "owner": "propriétaire",
-      "remove": "Retirer de ce kallax",
+      "remove": "Retirer de cette Kallax",
       "pending": "invité",
-      "hint": "Partagez ce kallax avec votre partenaire ou colocataire : vous verrez et gérerez les mêmes jeux.",
-      "leave": "Quitter ce kallax",
-      "deleteLibrary": "Supprimer ce kallax",
-      "leaveConfirm": "Quitter ce kallax? Vos jeux restent avec les autres membres.",
-      "deleteConfirm": "Supprimer ce kallax et tous ses jeux?"
+      "hint": "Partage cette Kallax avec ton ou ta partenaire ou un colocataire : vous verrez et gérerez les mêmes jeux.",
+      "leave": "Quitter cette Kallax",
+      "deleteLibrary": "Supprimer cette Kallax",
+      "leaveConfirm": "Quitter cette Kallax? Tes jeux restent avec les autres membres.",
+      "deleteConfirm": "Supprimer cette Kallax et tous ses jeux?"
     },
     "remove": "Retirer",
     "removeConfirm": "Retirer {name} de l'étagère?",
     "errors": {
-      "notMember": "Vous ne partagez pas ce kallax.",
+      "notMember": "Tu ne partages pas cette Kallax.",
       "name": "Entrez le nom du jeu.",
       "catalogueLocked": "Seuls les jeux existants peuvent être ajoutés pour le moment.",
       "duplicate": "{name} est déjà sur cette étagère.",
       "added": "{name} est sur l'étagère!",
       "sharingDisabled": "Le partage est désactivé pour le moment.",
       "unknownMember": "Aucun membre avec ce nom d'utilisateur.",
-      "full": "Un kallax peut être partagé par {max} membres au maximum.",
-      "alreadyInvited": "Ce membre partage déjà ce kallax ou a déjà été invité.",
-      "invited": "Invitation envoyée à {name}."
+      "full": "Une Kallax peut être partagée par {max} membres au maximum.",
+      "alreadyInvited": "Ce membre partage déjà cette Kallax ou a déjà été invité.",
+      "invited": "Invitation envoyée à {name}.",
+      "saved": "Enregistré."
     },
     "libraries": "Ludothèques",
-    "noLibrary": "Vous n'avez pas encore de kallax",
+    "noLibrary": "Tu n'as pas encore de Kallax",
     "create": "Créer",
     "searchPlaceholder": "Chercher sur l'étagère…",
     "allStatuses": "Tous",
     "playersFilter": "Joueurs",
     "filter": "Filtrer",
     "noMatch": "Aucun jeu ne correspond",
-    "emptyShelf": "Votre kallax est vide",
+    "emptyShelf": "Ta Kallax est vide",
     "emptyShelfHint": "Ajoutez votre premier jeu ci-dessus — chaque case mérite sa boîte.",
     "count": "{count, plural, one {# jeu} other {# jeux}}",
     "name": "Nom",
     "rename": "Renommer",
-    "newLibrary": "Créer un autre kallax",
+    "newLibrary": "Créer une autre Kallax",
     "newLibraryPlaceholder": "Étagère du chalet",
     "siteRating": "Note meeple Rendezvous Ludique",
     "myRating": "Moi : {score}/10",
@@ -310,7 +360,129 @@
       "shelf": "Étagère",
       "list": "Liste"
     },
-    "sell": "Vendre ou échanger au bazar"
+    "sell": "Vendre ou échanger au bazar",
+    "import": {
+      "button": "Importer des jeux",
+      "title": "Importer des jeux dans ma Kallax",
+      "lead": "Ajoute plusieurs jeux d'un coup : une photo d'une boîte, une photo de toute ta bibliothèque, ta collection BoardGameGeek ou une simple liste.",
+      "back": "Retour à ma Kallax",
+      "sources": {
+        "box": {
+          "title": "Photo d'une boîte",
+          "text": "Photographie la boîte, on lit le titre.",
+          "unavailable": "Demande une IA configurée sur le site (voir un admin)."
+        },
+        "shelf": {
+          "title": "Photo de ma bibliothèque",
+          "text": "Jusqu'à 4 photos de tes étagères.",
+          "unavailable": "Demande une IA configurée sur le site (voir un admin)."
+        },
+        "list": {
+          "title": "Une liste",
+          "text": "Colle ou tape des noms de jeux, un par ligne.",
+          "unavailable": ""
+        }
+      },
+      "takeBox": "Prends ou choisis une photo de la boîte",
+      "takeShelf": "Prends ou choisis jusqu'à 4 photos de tes étagères",
+      "boxHint": "Le devant de la boîte, avec le titre bien visible, donne les meilleurs résultats.",
+      "shelfHint": "Approche-toi assez pour que les titres sur les tranches soient lisibles.",
+      "recognize": "Reconnaître les jeux",
+      "listLabel": "Noms des jeux (un par ligne)",
+      "listCheck": "Vérifier la liste",
+      "review": "{count, plural, =0 {Rien trouvé} one {# jeu trouvé — vérifie avant d'importer} other {# jeux trouvés — vérifie avant d'importer}}",
+      "selectAll": "Tout cocher",
+      "selectNone": "Tout décocher",
+      "noneFound": "Aucun jeu reconnu. Essaie une photo plus proche ou plus nette, ou une autre source.",
+      "nameLabel": "Nom du jeu",
+      "inDatabase": "Dans notre base",
+      "newGame": "Nouveau jeu",
+      "lowConfidence": "Incertain",
+      "undoMatch": "Revenir à la première correspondance",
+      "useMatch": "Utiliser le jeu de la base",
+      "didYouMean": "Voulais-tu dire :",
+      "notThis": "Pas celui-là",
+      "into": "Dans",
+      "as": "Comme",
+      "useMyPhoto": "Utiliser ma photo comme image du jeu",
+      "importN": "{count, plural, =0 {Valide au moins un jeu} one {Importer # jeu validé} other {Importer # jeux validés}}",
+      "seeKallax": "Voir ma Kallax",
+      "pickImages": "{count, plural, one {# jeu n'a pas d'image — choisis-en une} other {# jeux n'ont pas d'image — choisis-en}}",
+      "notMember": "Tu ne partages pas cette Kallax.",
+      "invalid": "La liste a un problème. Réessaie.",
+      "nothingSelected": "Coche au moins un jeu.",
+      "done": "{added, plural, =0 {Aucun jeu ajouté} one {# jeu ajouté} other {# jeux ajoutés}}{attached, plural, =0 {} one {, # extension rattachée à son jeu} other {, # extensions rattachées à leur jeu}}{skipped, plural, =0 {} one { (# déjà dans ta Kallax : complété)} other { (# déjà dans ta Kallax : complétés)}}.",
+      "errors": {
+        "visionUnavailable": "L'IA des règles est désactivée : la lecture de photos n'est pas disponible.",
+        "visionBusy": "L'IA choisie est occupée en ce moment. Réessaie dans une minute ou choisis une autre option.",
+        "visionError": "L'IA n'a pas pu lire la photo. Réessaie ou choisis une autre option.",
+        "noImage": "Ajoute d'abord une photo.",
+        "badImage": "Cette photo est trop lourde ou n'est pas une image.",
+        "unknown": "Un problème est survenu. Réessaie.",
+        "ai_blocked": "L'IA n'est pas disponible pour ton compte.",
+        "ai_limit": "Tu as atteint la limite d'utilisation de l'IA pour aujourd'hui.",
+        "ai_budget": "Le budget Claude du site est épuisé pour ce mois. Choisis l'option gratuite ou ton Claude personnel.",
+        "ai_notConfigured": "Claude n'est pas configuré sur le site. Choisis une autre option.",
+        "ai_claudeUnavailable": "Claude n'est pas disponible pour le moment. Choisis une autre option.",
+        "ai_freeUnavailable": "L'option gratuite n'est pas disponible. Choisis une autre option.",
+        "ai_ownUnavailable": "Ta clé Claude n'est plus disponible. Vérifie-la dans tes paramètres.",
+        "ai_ownKeyInvalid": "Anthropic a refusé ta clé Claude. Vérifie-la dans tes paramètres.",
+        "ai_ownKeyCredit": "Ton compte Anthropic n'a plus de crédit. Choisis une autre option.",
+        "visionQuota": "Le quota gratuit de Google est épuisé pour l'instant. Réessaie plus tard ou choisis Claude."
+      },
+      "whoReads": "Quelle IA lit tes photos?",
+      "checkNote": "Des titres peuvent être mal lus : tu vérifies tout avant d'importer.",
+      "readBy": "Photos lues par {who}.",
+      "switched": "(Claude n'était pas disponible : l'option gratuite a pris le relais.)",
+      "aiFilling": "L'IA gratuite complète {count, plural, one {# jeu} other {# jeux}}…",
+      "aiBusy": "L'IA gratuite est occupée : complète les infos toi-même au besoin.",
+      "validateAll": "Tout valider ({count})",
+      "players": "joueurs",
+      "fromImport": "(dans cet import)",
+      "expansion": "Extension",
+      "aiDone": "Complété par l'IA",
+      "aiWorking": "l'IA cherche…",
+      "noDetails": "Aucune info pour l'instant.",
+      "expansionOf": "Extension de :",
+      "standalone": "— jeu à part entière —",
+      "baseNotFound": "(« {name} » n'est pas dans ta Kallax)",
+      "validate": "Valider",
+      "validated": "Validé",
+      "skip": "Passer",
+      "skipped": "Passé",
+      "edit": "Modifier",
+      "aiQuota": "Le quota gratuit de Google est épuisé pour l'instant : complète les infos toi-même, ou réessaie plus tard."
+    },
+    "pick": {
+      "empty": "Aucun jeu dans ta Kallax pour l'instant.",
+      "goKallax": "Ajouter des jeux à ma Kallax",
+      "remove": "Retirer {name}",
+      "change": "Changer de jeu",
+      "search": "Chercher dans ma Kallax…",
+      "noMatch": "Aucun jeu ne correspond."
+    },
+    "seeInLudo": "Voir dans la Ludothèque",
+    "rulebooksShared": "Les livrets sont partagés avec tous les membres qui ont ce jeu.",
+    "editTitle": "Mes infos sur ce jeu",
+    "editLead": "Ces infos sont à toi (et aux membres qui partagent cette Kallax). La Ludothèque, elle, ne change pas.",
+    "save": "Enregistrer",
+    "removeFromKallax": "Retirer de ma Kallax",
+    "expansionsCount": "{count, plural, one {# extension} other {# extensions}}",
+    "expansions": {
+      "of": "Extension de",
+      "title": "{count, plural, one {# extension} other {# extensions}}",
+      "manage": "Extensions",
+      "isExpansionOf": "Ce jeu est une extension de…",
+      "standalone": "— jeu à part entière —",
+      "add": "Rattacher un autre jeu comme extension de celui-ci",
+      "attach": "Rattacher",
+      "tidy": "Ranger mes extensions",
+      "noneFound": "Aucune extension à ranger : tout est déjà en ordre.",
+      "proposals": "{count, plural, one {# extension trouvée : confirme} other {# extensions trouvées : confirme celles à rattacher}}",
+      "of2": "extension de",
+      "attached": "{count, plural, =0 {Rien n'a été rattaché.} one {# extension rattachée à son jeu.} other {# extensions rattachées à leur jeu.}}",
+      "close": "Fermer"
+    }
   },
   "plays": {
     "title": "Suivi des parties",
@@ -434,7 +606,7 @@
       "FRIENDS": "Seulement vos amis.",
       "PRIVATE": "Personne d'autre que vous."
     },
-    "showLibrary": "Afficher mon kallax sur mon profil",
+    "showLibrary": "Afficher ma Kallax sur mon profil",
     "showPlays": "Afficher mes parties sur mon profil",
     "appearance": "Thème et langue",
     "language": "Langue",
@@ -451,6 +623,53 @@
       "currentPassword": "Votre mot de passe actuel est incorrect.",
       "passwordLength": "Le mot de passe doit contenir au moins 8 caractères.",
       "passwordMismatch": "Les mots de passe ne correspondent pas."
+    },
+    "ownKey": {
+      "title": "IA des règles : mes crédits Claude",
+      "lead": "Tu as un compte API Anthropic? Ajoute ta clé pour poser tes questions à Claude avec tes propres crédits, sans limite du site.",
+      "step1": "Va sur console.anthropic.com et ajoute du crédit (un abonnement Claude.ai Pro ou Max ne fonctionne pas : il faut des crédits API).",
+      "step2": "Dans « API Keys », crée une clé (elle commence par sk-ant-).",
+      "step3": "Colle-la ici. On la vérifie auprès d'Anthropic avant de l'enregistrer.",
+      "keyLabel": "Ma clé API Anthropic",
+      "keepKey": "Clé actuelle ••••{hint} (laisser vide pour la garder)",
+      "model": "Modèle",
+      "models": {
+        "claude-sonnet-5-5": "Sonnet 5.5 (recommandé)",
+        "claude-opus-5-5": "Opus 5.5 (le plus précis, plus cher)",
+        "claude-haiku-4-5": "Haiku 4.5 (le moins cher)"
+      },
+      "save": "Vérifier et enregistrer",
+      "update": "Enregistrer",
+      "checking": "Vérification auprès d'Anthropic…",
+      "saved": "C'est noté! « Mes crédits Claude » est maintenant disponible dans l'IA des règles.",
+      "active": "Clé active : ••••{hint}",
+      "spend": "Ce mois-ci : {usd} $ sur tes crédits ({count, plural, =0 {aucune réponse} one {# réponse} other {# réponses}})",
+      "remove": "Retirer ma clé",
+      "removeConfirm": "Retirer ta clé Claude du site?",
+      "privacy": "Ta clé est chiffrée, n'est jamais réaffichée et sert seulement à tes propres questions. Anthropic facture directement ton compte. La FAQ est toujours consultée avant, sans frais.",
+      "notAllowed": "Cette option n'est pas activée sur le site.",
+      "missing": "Colle ta clé API.",
+      "format": "Ça ne ressemble pas à une clé API Anthropic (elle commence par sk-ant-).",
+      "invalid": "Anthropic a refusé cette clé. Vérifie-la dans console.anthropic.com.",
+      "unreachable": "Impossible de joindre Anthropic pour vérifier la clé. Réessaie dans un moment."
+    },
+    "notifications": {
+      "title": "Notifications par courriel",
+      "lead": "Choisis ce qui t'est envoyé à {email}. Rien n'est envoyé tant que tu ne coches rien.",
+      "unverified": "Confirme ton adresse courriel pour recevoir des notifications.",
+      "mailOff": "L'envoi de courriels n'est pas encore configuré sur ce site.",
+      "save": "Enregistrer mes notifications",
+      "saved": "Tes notifications sont enregistrées.",
+      "types": {
+        "friendRequest": "Une demande d'amitié",
+        "playToConfirm": "Une partie notée avec moi, à confirmer",
+        "eventJoinRequest": "Quelqu'un veut se joindre à ma partie",
+        "eventJoinAccepted": "Ma demande pour une partie est acceptée",
+        "eventCancelled": "Une partie où je vais est annulée",
+        "kallaxInvite": "Une invitation à partager une Kallax",
+        "bazaarMessage": "Un nouveau message au bazar",
+        "suggestionUpdate": "L'équipe répond à ma suggestion"
+      }
     }
   },
   "home": {
@@ -461,14 +680,14 @@
       "title": "En attente de vous",
       "friends": "{count, plural, one {# demande d'amitié} other {# demandes d'amitié}}",
       "plays": "{count, plural, one {# partie à confirmer} other {# parties à confirmer}}",
-      "kallax": "{count, plural, one {# invitation de kallax} other {# invitations de kallax}}",
+      "kallax": "{count, plural, one {# invitation à partager une Kallax} other {# invitations à partager une Kallax}}",
       "joinRequests": "{count, plural, one {# joueur veut se joindre} other {# joueurs veulent se joindre}}",
       "bazaar": "{count, plural, one {# nouveau message au bazar} other {# nouveaux messages au bazar}}"
     },
     "quick": {
       "announce": "Annoncer une partie",
       "log": "Noter une partie",
-      "kallax": "Mon Kallax",
+      "kallax": "Ma Kallax",
       "friends": "Trouver des joueurs",
       "ai": "Demander à l'IA"
     },
@@ -489,8 +708,8 @@
       "dashboard": "Tableau de bord",
       "members": "Membres",
       "events": "Parties et événements",
-      "games": "Catalogue de jeux",
-      "libraries": "Ludothèques Kallax",
+      "games": "Ludothèque",
+      "libraries": "Kallax",
       "plays": "Parties jouées",
       "modules": "Modules",
       "appearance": "Apparence",
@@ -505,7 +724,10 @@
       },
       "ai": "IA des règles",
       "bazaar": "Bazar",
-      "facebook": "Groupes Facebook"
+      "facebook": "Groupes Facebook",
+      "suggestions": "Suggestions",
+      "faq": "FAQ des règles",
+      "registrations": "Inscriptions"
     },
     "dashboard": {
       "title": "Tableau de bord",
@@ -540,7 +762,8 @@
       "allStatuses": "Tous les statuts",
       "statuses": {
         "ACTIVE": "Actif",
-        "SUSPENDED": "Suspendu"
+        "SUSPENDED": "Suspendu",
+        "PENDING": "En attente"
       },
       "member": "Membre",
       "email": "Courriel",
@@ -564,13 +787,13 @@
       "visibility": "Visibilité du profil",
       "locale": "Langue",
       "bio": "Bio",
-      "showLibrary": "Afficher le kallax sur le profil",
+      "showLibrary": "Afficher la Kallax sur le profil",
       "showPlays": "Afficher les parties sur le profil",
       "save": "Enregistrer",
       "overview": "Aperçu",
       "hostedEvents": "{count, plural, one {# partie organisée} other {# parties organisées}}",
       "loggedPlays": "{count, plural, one {# partie notée} other {# parties notées}}",
-      "libraries": "{count, plural, one {# kallax} other {# kallax}}",
+      "libraries": "{count, plural, one {# Kallax} other {# Kallax}}",
       "lastSeen": "Dernière connexion : {date}",
       "neverSeen": "Jamais connecté",
       "resetPassword": "Définir un nouveau mot de passe",
@@ -578,7 +801,7 @@
       "sessions": "Sessions actives ({count})",
       "revokeSessions": "Déconnecter partout",
       "dangerZone": "Zone dangereuse",
-      "deleteWarning": "Supprime le compte, ses parties annoncées et notées et sa place dans les kallax partagés. Action irréversible.",
+      "deleteWarning": "Supprime le compte, ses parties annoncées et notées et sa place dans les Kallax partagées. Action irréversible.",
       "delete": "Supprimer le membre",
       "deleteConfirm": "Supprimer {name} définitivement?"
     },
@@ -605,12 +828,12 @@
       "moduleOff": "Le module Parties est désactivé : les modifications sont bloquées jusqu'à sa réactivation."
     },
     "games": {
-      "title": "Catalogue de jeux",
-      "lead": "{count, plural, one {# jeu} other {# jeux}} — partagés par tous les kallax, événements et parties.",
+      "title": "Ludothèque",
+      "lead": "{count, plural, one {# jeu} other {# jeux}} — la référence commune, remplie automatiquement par les ajouts dans les Kallax.",
       "add": "Ajouter un jeu",
       "create": "Créer",
       "search": "Chercher un jeu…",
-      "usage": "{copies} dans des kallax · {plays} parties · {events} événements",
+      "usage": "{copies} dans des Kallax · {plays} parties · {events} événements",
       "name": "Nom",
       "year": "Année",
       "minPlayers": "Min",
@@ -624,10 +847,15 @@
       "merge": "Fusionner",
       "mergeConfirm": "Fusionner {name} dans le jeu choisi? Exemplaires, parties et événements seront déplacés.",
       "delete": "Supprimer",
-      "deleteConfirm": "Supprimer {name}? Il disparaîtra de tous les kallax et parties."
+      "deleteConfirm": "Supprimer {name} de la Ludothèque? Il disparaîtra aussi de toutes les Kallax et parties.",
+      "aiLead": "{count, plural, =0 {Toutes les fiches sont complètes.} one {# fiche a des infos ou une photo manquantes.} other {# fiches ont des infos ou une photo manquantes.}} L'IA gratuite remplit seulement les champs vides.",
+      "aiAll": "Compléter avec l'IA ({count})",
+      "aiOne": "Compléter avec l'IA",
+      "expansionOf": "Extension de",
+      "standalone": "— jeu à part entière —"
     },
     "libraries": {
-      "title": "Ludothèques Kallax",
+      "title": "Kallax",
       "lead": "{count, plural, one {# ludothèque} other {# ludothèques}}",
       "search": "Ludothèque ou membre…",
       "name": "Nom",
@@ -656,15 +884,16 @@
       "enabled": "Activé",
       "descriptions": {
         "events": "Les membres annoncent des parties et événements et trouvent des parties près d'eux.",
-        "kallax": "Ludothèques, partageables entre les membres d'un même foyer.",
+        "kallax": "Ma Kallax : les jeux de chaque membre, privés, partageables avec son foyer.",
         "plays": "Historique des parties avec scores, gagnants et confirmation des amis.",
         "friends": "Demandes et listes d'amis.",
         "profiles": "Pages de profil et ce que les membres peuvent partager.",
         "donations": "Un lien discret pour les dons dans l'en-tête et le pied de page.",
-        "games": "La base de données de jeux du site : couvertures, infos, notes meeple, avis et livrets de règles.",
+        "games": "La Ludothèque : la référence commune des jeux, remplie automatiquement par les Kallax, avec la note des membres.",
         "ai": "Assistant des règles : répond aux questions sur un jeu à partir de son livret téléversé.",
         "bazaar": "Les membres vendent ou échangent des jeux, avec photos et messages privés.",
-        "facebook": "Une page avec des onglets vers vos groupes Facebook."
+        "facebook": "Une page avec des onglets vers vos groupes Facebook.",
+        "suggestions": "Boîte à suggestions : les membres proposent des idées et votent. Les doublons deviennent des votes."
       },
       "settings": {
         "events": {
@@ -674,8 +903,8 @@
           "maxPlayersCap": "Nombre maximal de places par événement"
         },
         "kallax": {
-          "allowSharing": "Permettre le partage d'un kallax",
-          "maxSharedMembers": "Membres par kallax partagé",
+          "allowSharing": "Permettre le partage d'une Kallax",
+          "maxSharedMembers": "Membres par Kallax partagée",
           "membersCanAddGames": "Les membres peuvent ajouter des jeux au catalogue"
         },
         "plays": {
@@ -697,7 +926,9 @@
           "membersCanAddGames": "Les membres peuvent ajouter des jeux à la base",
           "communityEditing": "Tout membre peut compléter ou corriger les infos d'un jeu",
           "allowCoverUploads": "Permettre le téléversement de couvertures",
-          "allowRulebookUploads": "Permettre le téléversement de livrets (PDF)"
+          "allowRulebookUploads": "Permettre le téléversement de livrets (PDF)",
+          "imageSearch": "Suggestions d'images (sources gratuites : BGG, Wikimedia)",
+          "autoEnrich": "L'IA gratuite complète les jeux ajoutés (infos + photo vérifiée)"
         },
         "ai": {
           "model": "Modèle Claude",
@@ -712,18 +943,27 @@
           "freeProviderName": "Option gratuite : nom du fournisseur",
           "freeBaseUrl": "Option gratuite : URL de l'API (compatible OpenAI)",
           "freeModel": "Option gratuite : modèle",
-          "freeMaxContextChars": "Option gratuite : caractères max. du livret par question"
+          "freeMaxContextChars": "Option gratuite : caractères max. du livret par question",
+          "faqEnabled": "FAQ des règles (construite à partir des questions posées)",
+          "faqAutoPublish": "Publier les nouvelles réponses sans vérification",
+          "allowOwnKeys": "Les membres peuvent utiliser leurs propres crédits Claude (leur clé API)",
+          "freeTaskModel": "Modèle gratuit pour les tâches de fond (compléter les jeux, photos)"
         },
         "bazaar": {
           "allowTrades": "Permettre les échanges (pas seulement les ventes)",
           "currency": "Devise (code ISO)",
           "maxPhotos": "Photos par annonce"
+        },
+        "suggestions": {
+          "showToMembers": "Les membres voient les suggestions et peuvent voter"
         }
       },
       "aiKeyOk": "Clé API détectée — l'assistant est prêt.",
       "aiKeyMissing": "Aucune ANTHROPIC_API_KEY dans l'environnement du serveur — l'assistant ne peut pas encore répondre.",
       "moveUp": "Monter dans le menu",
-      "moveDown": "Descendre dans le menu"
+      "moveDown": "Descendre dans le menu",
+      "useMyOrder": "Utiliser mon ordre de menu par défaut",
+      "useMyOrderHint": "Prend l'ordre de ton propre menu et en fait l'ordre par défaut pour tous les membres (ceux qui ont réorganisé leur menu gardent le leur)."
     },
     "appearance": {
       "title": "Apparence",
@@ -751,7 +991,19 @@
       "defaultLocale": "Langue par défaut",
       "announcement": "Bannière d'annonce",
       "announcementHint": "Affichée sous l'en-tête pour tous les membres. Laissez vide pour la masquer.",
-      "registrationOpen": "Les nouveaux membres peuvent créer un compte"
+      "registrationOpen": "Les nouveaux membres peuvent créer un compte",
+      "registrationApproval": "Valider chaque nouvelle inscription (contre les faux comptes)",
+      "requireEmailConfirmation": "Les nouveaux membres confirment leur adresse courriel avant de se connecter (si l'envoi de courriels est configuré)",
+      "minimumAge": "Âge minimum pour s'inscrire",
+      "minimumAgeHint": "18 ans minimum : l'âge de la majorité au Québec.",
+      "mailTitle": "Envoi de courriels",
+      "mailOn": "Configuré. Les courriels partent de : {from}",
+      "mailOff": "Pas configuré : ajoute les lignes SMTP dans le fichier .env (voir docs/EMAIL-SETUP.md), puis redémarre le serveur.",
+      "testMail": "M'envoyer un courriel de test",
+      "testMailTitle": "Courriel de test",
+      "testMailBody": "Si tu lis ceci, l'envoi de courriels du site fonctionne.",
+      "testMailSent": "Courriel envoyé à {email}. Regarde ta boîte de réception (et les indésirables).",
+      "testMailFailed": "L'envoi a échoué : {reason}"
     },
     "audit": {
       "title": "Journal d'audit",
@@ -771,7 +1023,9 @@
       "passwordLength": "Le mot de passe doit contenir au moins 8 caractères.",
       "passwordReset": "Mot de passe changé; le membre a été déconnecté partout.",
       "timeZone": "Fuseau horaire inconnu (exemple : America/Toronto).",
-      "gameName": "Entrez un nom."
+      "gameName": "Entrez un nom.",
+      "gameExists": "La Ludothèque contient déjà « {name} ». Fusionne plutôt les deux.",
+      "notAllowed": "Seul un admin complet peut modifier ce compte."
     },
     "ai": {
       "title": "IA des règles",
@@ -839,6 +1093,137 @@
       "counts": "{photos} photos · {messages} messages",
       "delete": "Supprimer",
       "deleteConfirm": "Supprimer l'annonce « {title} »?"
+    },
+    "suggestions": {
+      "title": "Suggestions des membres",
+      "lead": "{count, plural, =0 {Aucune suggestion} one {# suggestion} other {# suggestions}}, triées par votes. Les doublons deviennent automatiquement des votes.",
+      "filterAll": "Toutes",
+      "empty": "Aucune suggestion.",
+      "by": "Par {name}",
+      "anonymous": "membre supprimé",
+      "voters": "Votes",
+      "titleLabel": "Suggestion",
+      "status": "Statut",
+      "note": "Réponse aux membres (visible par tous)",
+      "notePlaceholder": "Ex. : Bonne idée, c'est prévu pour cet été!",
+      "save": "Enregistrer",
+      "saved": "Enregistré.",
+      "mergeInto": "C'est un doublon de…",
+      "merge": "Fusionner",
+      "mergedInto": "Fusionnée dans « {title} » : les votes ont suivi.",
+      "pickTarget": "Choisis une autre suggestion.",
+      "delete": "Supprimer",
+      "deleteConfirm": "Supprimer cette suggestion et ses votes?"
+    },
+    "faq": {
+      "title": "FAQ des règles",
+      "lead": "{count, plural, =0 {Aucune question} one {# question} other {# questions}}. La FAQ se remplit toute seule avec les questions posées à l'IA. Vérifie, corrige ou masque les réponses.",
+      "add": "Ajouter une question à la main",
+      "create": "Ajouter",
+      "game": "Jeu",
+      "question": "Question",
+      "answer": "Réponse (Markdown)",
+      "status": "Statut",
+      "statuses": {
+        "AUTO": "Automatique",
+        "VERIFIED": "Vérifiée",
+        "HIDDEN": "Masquée"
+      },
+      "allGames": "Tous les jeux",
+      "allStatuses": "Tous les statuts",
+      "asked": "{count, plural, one {posée # fois} other {posée # fois}}",
+      "source": "Source de la réponse : {provider}",
+      "providers": {
+        "claude": "Claude",
+        "free": "IA gratuite",
+        "manual": "ajoutée à la main"
+      },
+      "save": "Enregistrer",
+      "saved": "Enregistré.",
+      "delete": "Supprimer",
+      "deleteConfirm": "Supprimer cette question de la FAQ?",
+      "empty": "Aucune question pour l'instant.",
+      "required": "La question et la réponse sont obligatoires.",
+      "pickGame": "Choisis un jeu."
+    },
+    "registrations": {
+      "title": "Inscriptions à valider",
+      "lead": "Chaque nouveau compte attend ta validation avant de pouvoir se connecter (contre les faux comptes).",
+      "leadOff": "La validation des inscriptions est désactivée (Paramètres du site) : les nouveaux comptes sont actifs tout de suite.",
+      "empty": "Aucune inscription en attente.",
+      "note": "Son message :",
+      "noNote": "Pas de message.",
+      "approve": "Accepter",
+      "reject": "Refuser",
+      "rejectConfirm": "Refuser l'inscription de {name}? Le compte sera supprimé."
+    },
+    "permissions": {
+      "title": "Accès à la console",
+      "lead": "Coche les sections que cette personne peut gérer. S'applique aux modérateurs et aux admins qui ne sont pas « complets ».",
+      "fullAdmin": "Admin complet : tous les accès, et peut donner des droits aux autres",
+      "staffLocked": "C'est un compte de l'équipe : seul un admin complet peut le modifier.",
+      "items": {
+        "registrations": {
+          "title": "Inscriptions",
+          "text": "Valider ou refuser les nouveaux comptes."
+        },
+        "members": {
+          "title": "Membres",
+          "text": "Gérer les comptes des membres (pas ceux de l'équipe)."
+        },
+        "games": {
+          "title": "Ludothèque",
+          "text": "Modifier les fiches de jeux et les compléter avec l'IA."
+        },
+        "events": {
+          "title": "Parties et événements",
+          "text": "Modifier ou annuler les parties de tous."
+        },
+        "libraries": {
+          "title": "Kallax",
+          "text": "Voir et supprimer des Kallax."
+        },
+        "plays": {
+          "title": "Parties jouées",
+          "text": "Corriger ou supprimer les parties notées."
+        },
+        "bazaar": {
+          "title": "Bazar",
+          "text": "Gérer les annonces du bazar."
+        },
+        "facebook": {
+          "title": "Groupes Facebook",
+          "text": "Gérer la liste des groupes."
+        },
+        "faq": {
+          "title": "FAQ des règles",
+          "text": "Vérifier, corriger et masquer les réponses."
+        },
+        "suggestions": {
+          "title": "Suggestions",
+          "text": "Répondre aux suggestions, changer leur statut."
+        },
+        "ai": {
+          "title": "IA des règles",
+          "text": "Budgets, limites et accès des membres à l'IA."
+        },
+        "modules": {
+          "title": "Modules",
+          "text": "Activer les modules, leurs réglages et l'ordre du menu."
+        },
+        "appearance": {
+          "title": "Apparence",
+          "text": "Thèmes et images du site."
+        },
+        "settings": {
+          "title": "Paramètres du site",
+          "text": "Nom, inscriptions, annonce, fuseau horaire."
+        },
+        "audit": {
+          "title": "Journal d'audit",
+          "text": "Voir l'historique des actions de l'équipe."
+        }
+      }
     }
   },
   "moderation": {
@@ -858,7 +1243,7 @@
     "actions": "Actions rapides",
     "announce": "Annoncer une partie",
     "logPlay": "Noter une partie",
-    "kallax": "Mon Kallax",
+    "kallax": "Ma Kallax",
     "calendar": "Calendrier des événements",
     "ai": "Demander à l'IA des règles",
     "games": "Jeux",
@@ -868,7 +1253,7 @@
   },
   "games": {
     "title": "Ludothèque",
-    "lead": "Notre propre base de données de jeux, bâtie par la communauté. Chaque jeu ajouté par un membre est ici pour tous.",
+    "lead": "Chaque jeu ajouté dans une Kallax se retrouve ici. Une référence commune pour trouver l'info d'un jeu et l'ajouter à la tienne en un clic.",
     "add": "Ajouter un jeu",
     "addLead": "Décrivez le jeu une fois — tout le monde pourra ensuite le trouver et l'ajouter à son kallax.",
     "create": "Créer le jeu",
@@ -885,7 +1270,7 @@
     },
     "filter": "Filtrer",
     "empty": "Aucun jeu ne correspond.",
-    "inKallax": "{count, plural, =0 {dans aucun kallax} one {dans # kallax} other {dans # kallax}}",
+    "inKallax": "{count, plural, =0 {dans aucune Kallax} one {dans # Kallax} other {dans # Kallax}}",
     "rating": {
       "site": "Note meeple",
       "count": "{count, plural, =0 {Aucune note} one {# note de membre} other {# notes de membres}}",
@@ -910,7 +1295,8 @@
       "upload": "Téléverser un livret de règles (PDF)",
       "uploadSubmit": "Téléverser",
       "titlePlaceholder": "Titre (ex. Règles v2, Extension)",
-      "hint": "PDF seulement, 30 Mo max. Partagez seulement des règles que vous avez le droit de partager (les éditeurs les offrent souvent sur leur site)."
+      "hint": "PDF seulement, 30 Mo max. Partagez seulement des règles que vous avez le droit de partager (les éditeurs les offrent souvent sur leur site).",
+      "noneLudo": "Aucun livret pour l'instant. Les membres qui ont ce jeu peuvent en téléverser un depuis leur Kallax."
     },
     "reviews": {
       "title": "Notes des membres",
@@ -919,11 +1305,12 @@
       "rateFirst": "Notez le jeu ci-dessus pour ajouter un avis."
     },
     "kallax": {
-      "title": "Mon Kallax",
+      "title": "Ma Kallax",
       "already": "Déjà sur votre étagère ({name}).",
-      "add": "Ajouter à mon kallax",
-      "which": "Quel kallax",
-      "stats": "Dans {kallax} kallax · {plays} parties notées"
+      "add": "Ajouter à ma Kallax",
+      "which": "Quelle Kallax",
+      "stats": "Dans {kallax} Kallax · {plays} parties notées",
+      "open": "Voir dans ma Kallax"
     },
     "addedBy": "Ajouté à la base par",
     "updated": "Mis à jour le {date}",
@@ -949,11 +1336,11 @@
     "picker": {
       "placeholder": "Tapez le nom d'un jeu… (ex. Azul)",
       "rating": "Note meeple",
-      "owners": "{count, plural, =0 {dans aucun kallax pour l'instant} one {dans # kallax} other {dans # kallax}}",
+      "owners": "{count, plural, =0 {dans aucune Kallax pour l'instant} one {dans # Kallax} other {dans # Kallax}}",
       "change": "Changer de jeu",
       "newGame": "Nouveau jeu pour la base de données",
       "backToSearch": "Retour à la recherche",
-      "newGameHint": "Ce jeu n'est pas encore dans notre base. Remplissez ce que vous savez — les prochains membres le trouveront avec ces détails.",
+      "newGameHint": "Ce jeu n'est pas encore dans la Ludothèque. Remplis ce que tu sais : il y sera ajouté automatiquement.",
       "create": "Ajouter « {name} » comme nouveau jeu"
     },
     "errors": {
@@ -969,8 +1356,56 @@
         "type": "Ce type de fichier n'est pas permis.",
         "size": "Ce fichier est trop volumineux.",
         "empty": "Choisissez un fichier."
-      }
-    }
+      },
+      "notInKallax": "Ce jeu doit être dans ta Kallax."
+    },
+    "images": {
+      "find": "Trouver une image",
+      "searching": "Recherche d'images pour {name}…",
+      "none": "Aucune image trouvée. Tu peux téléverser une photo de ta boîte depuis la page du jeu.",
+      "chosen": "Image enregistrée — merci!",
+      "pick": "Choisis une image pour {name} :",
+      "note": "Images de {source}. Seul un lien est enregistré; les images appartiennent à leurs auteurs."
+    },
+    "ludo": "Ludothèque",
+    "firstAdded": "Dans la Ludothèque depuis le {date}.",
+    "reader": {
+      "back": "Retour à l'IA des règles",
+      "page": "Page",
+      "previous": "Page précédente",
+      "next": "Page suivante",
+      "zoomIn": "Agrandir",
+      "zoomOut": "Réduire",
+      "original": "PDF original",
+      "download": "Télécharger",
+      "loading": "Ouverture du livret…",
+      "error": "Impossible d'afficher ce PDF ici. Utilise « PDF original » ou « Télécharger ».",
+      "title": "Livret de règles",
+      "close": "Fermer"
+    },
+    "enrich": {
+      "running": "L'IA gratuite complète les infos et cherche une photo… ({done}/{total})",
+      "done": "Infos complétées par l'IA gratuite",
+      "free": "IA gratuite",
+      "nothing": "rien de plus trouvé",
+      "failed": "L'IA gratuite est occupée : certains jeux n'ont pas été complétés. Tu peux les compléter toi-même.",
+      "check": "Seuls les champs vides sont remplis. Vérifie au besoin dans la fiche du jeu.",
+      "pickPictures": "{count, plural, one {Pas de photo trouvée : choisis-en une} other {# jeux sans photo : choisis-en une}}",
+      "fields": {
+        "year": "année",
+        "players": "joueurs",
+        "playTime": "durée",
+        "minAge": "âge",
+        "designer": "auteur",
+        "publisher": "éditeur",
+        "description": "description",
+        "image": "photo",
+        "expansion": "rattaché comme extension"
+      },
+      "quota": "Le quota gratuit de Google est épuisé pour l'instant : complète les infos toi-même, ou réessaie plus tard.",
+      "stop": "Arrêter"
+    },
+    "editLudo": "Modifier"
   },
   "ai": {
     "title": "IA des règles",
@@ -983,7 +1418,7 @@
     "generalKnowledge": "Connaissances générales",
     "generalHint": "Sans livret — réponses selon ce que l'IA sait du jeu.",
     "deleteConfirm": "Supprimer cette conversation?",
-    "pickGame": "À quel jeu jouez-vous?",
+    "pickGame": "Choisis un jeu de ta Kallax",
     "continue": "Continuer",
     "pickSource": "Répondre à partir de quelle source?",
     "rulebookOption": "Livret ({lang}) — réponses avec citations des pages",
@@ -1016,9 +1451,14 @@
       "claudeUnavailable": "Claude n'est pas disponible pour le moment.",
       "freeBusy": "Le service gratuit est occupé (sa limite gratuite est peut-être atteinte). Réessaie dans une minute ou utilise Claude.",
       "freeError": "Le service gratuit n'a pas répondu. Réessaie ou utilise Claude.",
-      "api": "Claude n'a pas répondu. Réessaie dans un instant."
+      "api": "Claude n'a pas répondu. Réessaie dans un instant.",
+      "noFaqMatch": "Pas de réponse dans la FAQ pour cette question, et l'IA n'est pas disponible pour le moment.",
+      "freeIncomplete": "La réponse de l'option gratuite a été coupée en cours de route (service surchargé). Repose ta question ou utilise Claude.",
+      "ownUnavailable": "Ta clé Claude n'est plus disponible. Vérifie-la dans tes paramètres.",
+      "ownKeyInvalid": "Anthropic a refusé ta clé Claude. Vérifie-la dans tes paramètres.",
+      "ownKeyCredit": "Ton compte Anthropic n'a plus de crédit. Ajoutes-en sur console.anthropic.com ou choisis une autre option."
     },
-    "pickGameHint": "Choisissez une suggestion dans la liste. Le jeu n'est pas encore dans la base? Choisissez « Ajouter … comme nouveau jeu ».",
+    "pickGameHint": "Seuls les jeux de ta Kallax sont proposés.",
     "uploadRulebook": "Téléverser le livret de règles (PDF)",
     "uploadRulebookHint": "Pas encore dans notre ludothèque? Ajoutez-le — il sera disponible pour tout le monde pour ce jeu.",
     "uploadAndAsk": "Téléverser et poser mes questions",
@@ -1029,7 +1469,7 @@
       "budgetUsed": "Précis · {pct} % de ton budget du mois utilisé",
       "free": "{name} (gratuit)",
       "freeSub": "Gratuit · moins fiable",
-      "badgeClaude": "Réponse de Claude",
+      "badgeClaude": "Réponse de Claude {site}",
       "badgeFree": "Réponse de {name} (gratuit)",
       "unavailable": {
         "disabled": "Désactivé par les admins",
@@ -1052,7 +1492,12 @@
         "tip": "Astuce : pour un rappel rapide, l'option gratuite suffit; pour trancher un litige à la table, utilise Claude ou vérifie le livret.",
         "stay": "Garder Claude",
         "switch": "Utiliser l'option gratuite"
-      }
+      },
+      "own": "Mon Claude personnel",
+      "ownSub": "Ta clé ••••{hint} · tes crédits",
+      "badgeOwn": "Réponse de ton Claude personnel",
+      "claudeSite": "Claude {site}",
+      "ownNone": "Ajoute ta clé dans Paramètres"
     },
     "switched": {
       "disabled": "Claude est désactivé — l'option gratuite a répondu.",
@@ -1061,7 +1506,45 @@
       "memberBudget": "Ton budget Claude est épuisé ce mois-ci — l'option gratuite a répondu.",
       "restricted": "Ton compte utilise l'option gratuite.",
       "claudeError": "Claude n'a pas pu répondre — l'option gratuite a répondu à sa place."
-    }
+    },
+    "faq": {
+      "title": "FAQ des règles",
+      "lead": "Les questions déjà posées à l'IA, jeu par jeu. Jette un œil avant de demander : la réponse y est peut-être déjà.",
+      "gameCard": "FAQ de {name}",
+      "gameCardHint": "{count, plural, =0 {Aucune question pour l'instant : la tienne sera la première!} one {# question déjà répondue : regarde avant de demander.} other {# questions déjà répondues : regarde avant de demander.}}",
+      "gameLead": "Les questions posées par les membres, les plus fréquentes en premier.",
+      "searchPlaceholder": "Chercher une question…",
+      "searchGames": "Chercher un jeu…",
+      "count": "{count, plural, =0 {Aucune question} one {# question} other {# questions}}",
+      "empty": "Pas encore de questions pour ce jeu",
+      "emptyHint": "Pose ta question à l'IA : elle sera ajoutée à la FAQ pour les prochains.",
+      "noMatch": "Aucune question ne correspond",
+      "notFound": "Tu n'as pas trouvé ta réponse?",
+      "askAi": "Demander à l'IA",
+      "asked": "{count, plural, one {posée # fois} other {posée # fois}}",
+      "verified": "Vérifiée",
+      "fromFaq": "Réponse tirée de la FAQ",
+      "fromFaqVerified": "Réponse vérifiée de la FAQ",
+      "matchedQuestion": "Question semblable déjà posée : « {question} »",
+      "askAnyway": "Pas ce que je cherchais : demander à l'IA",
+      "back": "Retour à la FAQ",
+      "backToAi": "Retour à l'IA des règles",
+      "myGames": "Mes jeux",
+      "otherGames": "Autres jeux",
+      "noGames": "Aucune FAQ pour l'instant",
+      "noGamesHint": "Les questions posées à l'IA des règles construisent la FAQ de chaque jeu.",
+      "onlyFaq": "Pose ta question : on cherche dans la FAQ…",
+      "onlyFaqNotice": "{reason} Tu peux quand même poser ta question : on cherchera la réponse dans la FAQ de ce jeu."
+    },
+    "flow": "Chaque question passe d'abord par la FAQ, puis {who} répond{count, plural, =0 {.} one { en lisant le livret du jeu.} other { en lisant les # livrets du jeu.}}",
+    "stage": {
+      "faq": "Recherche dans la FAQ…",
+      "reading": "{who} lit {count, plural, one {le livret} other {les # livrets}}…",
+      "general": "{who} prépare la réponse…"
+    },
+    "withRulebooks": "Réponses tirées {count, plural, one {du livret du jeu} other {des # livrets du jeu}}",
+    "readingRulebooks": "L'IA lit :",
+    "addRulebook": "+ Ajouter un livret"
   },
   "facebook": {
     "title": "Groupes Facebook",
@@ -1157,6 +1640,102 @@
       "price": "Entre un prix.",
       "forbidden": "Tu ne peux pas faire ça sur cette annonce.",
       "message": "Écris un message."
+    }
+  },
+  "suggestions": {
+    "title": "Boîte à suggestions",
+    "lead": "Les idées des membres pour améliorer le site. Vote pour celles que tu veux voir arriver.",
+    "dialogTitle": "Boîte à suggestions",
+    "dialogLead": "Une idée pour améliorer le site? On t'écoute.",
+    "titleLabel": "Ton idée",
+    "titlePlaceholder": "Ex. : un classement des joueurs par jeu",
+    "detailsLabel": "Détails (facultatif)",
+    "detailsPlaceholder": "Explique ce que tu aimerais et pourquoi.",
+    "submit": "Envoyer",
+    "similarTitle": "Déjà proposé? Tu peux simplement voter :",
+    "vote": "Voter pour cette suggestion",
+    "unvote": "Retirer mon vote",
+    "sent": "Merci! Ta suggestion est envoyée.",
+    "merged": "Une suggestion semblable existait déjà : « {title} ». On a ajouté ton vote.",
+    "alreadyVoted": "Une suggestion semblable existe déjà et tu as déjà voté pour elle : « {title} ».",
+    "forcePost": "Ce n'est pas la même idée : publier quand même",
+    "another": "Proposer une autre idée",
+    "seeAll": "Voir toutes les suggestions",
+    "newSuggestion": "Proposer une idée",
+    "empty": "Aucune suggestion pour l'instant",
+    "emptyHint": "Sois le premier à proposer une idée!",
+    "sort": {
+      "popular": "Populaires",
+      "recent": "Récentes"
+    },
+    "filterAll": "En cours",
+    "status": {
+      "OPEN": "Ouverte",
+      "PLANNED": "Prévue",
+      "DONE": "Réalisée",
+      "DECLINED": "Refusée"
+    },
+    "adminReply": "Réponse de l'équipe :",
+    "mine": "Ta suggestion",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer ta suggestion?",
+    "close": "Fermer",
+    "errors": {
+      "title": "Décris ton idée en quelques mots (au moins 5 caractères)."
+    }
+  },
+  "email": {
+    "verify": {
+      "subject": "Confirme ton adresse courriel — {site}",
+      "title": "Bienvenue, {name}!",
+      "body": "Il reste une étape pour rejoindre {site} : confirme ton adresse courriel en cliquant sur le bouton.",
+      "expires": "Ce lien est valide 48 heures.",
+      "button": "Confirmer mon adresse",
+      "footer": "Tu n'as pas créé de compte? Ignore simplement ce courriel."
+    },
+    "reset": {
+      "subject": "Réinitialiser ton mot de passe — {site}",
+      "title": "Bonjour {name},",
+      "body": "Tu as demandé un nouveau mot de passe. Clique sur le bouton pour en choisir un.",
+      "expires": "Ce lien est valide une heure et ne sert qu'une fois.",
+      "button": "Choisir un nouveau mot de passe",
+      "footer": "Ce n'est pas toi? Ignore ce courriel : ton mot de passe ne change pas."
+    },
+    "notify": {
+      "open": "Voir sur le site",
+      "footer": "Tu reçois ce courriel parce que tu as activé cette notification. Pour la changer : {url}",
+      "friendRequest": {
+        "title": "{name} veut être ton ami",
+        "body": "{name} t'a envoyé une demande d'amitié. Accepte-la pour noter vos parties ensemble."
+      },
+      "playToConfirm": {
+        "title": "Une partie de {game} à confirmer",
+        "body": "{name} a noté une partie de {game} avec toi. Confirme-la pour l'ajouter à ton historique."
+      },
+      "eventJoinRequest": {
+        "title": "{name} veut se joindre à « {event} »",
+        "body": "{name} a demandé une place à ta partie « {event} ». Accepte ou refuse sa demande."
+      },
+      "eventJoinAccepted": {
+        "title": "Tu as une place à « {event} »",
+        "body": "Ta demande pour « {event} » a été acceptée. Bonne partie!"
+      },
+      "eventCancelled": {
+        "title": "« {event} » est annulée",
+        "body": "La partie « {event} » à laquelle tu participais a été annulée."
+      },
+      "kallaxInvite": {
+        "title": "{name} t'invite à partager sa Kallax",
+        "body": "{name} t'invite à partager sa Kallax : vous verrez et gérerez les mêmes jeux."
+      },
+      "bazaarMessage": {
+        "title": "Nouveau message à propos de « {listing} »",
+        "body": "{name} t'a écrit au sujet de l'annonce « {listing} » au bazar."
+      },
+      "suggestionUpdate": {
+        "title": "Ta suggestion a une réponse",
+        "body": "L'équipe a mis à jour ta suggestion « {title} »."
+      }
     }
   }
 }

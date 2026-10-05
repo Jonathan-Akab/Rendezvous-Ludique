@@ -1,4 +1,5 @@
 import { getFormatter, getTranslations } from "next-intl/server";
+import { requirePermission } from "@/lib/auth/guards";
 import { db } from "@/lib/db";
 import { AdminHeader, AdminTable, Td } from "@/modules/admin/components/AdminUi";
 
@@ -7,6 +8,7 @@ export async function generateMetadata() {
 }
 
 export default async function AdminAuditPage() {
+  await requirePermission("audit");
   const [t, format] = await Promise.all([getTranslations("admin.audit"), getFormatter()]);
   const logs = await db.auditLog.findMany({ orderBy: { createdAt: "desc" }, take: 300, include: { actor: { select: { displayName: true } } } });
   return (

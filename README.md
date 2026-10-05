@@ -8,11 +8,14 @@ Wingspan, Azul, Terraforming Mars, Carcassonne), each with its own original illu
 
 ## Features at a glance
 
-- **Game library** (`/games`): the site's own game database. When a member adds a game it becomes a
-  catalogue entry; the next member typing its name gets it as a suggestion, with its info, cover and
-  rating. Box art is generated when no cover is uploaded.
-- **Meeple rating**: each member rates games 1–10; the site shows the average, the distribution and
-  member reviews.
+- **Ma Kallax** (`/kallax`): each member's games, private to them (and to the people they share a
+  Kallax with, e.g. a partner). Each Kallax keeps its own record of a game: name, details, picture,
+  status, notes. Bulk import from a photo, a shelf photo or a list.
+- **Ludothèque** (`/games`): the site-wide game reference, read-only. It fills itself: when a game is
+  added to a Kallax, we look it up (by normalised name) and create it only if it doesn't
+  exist. Plays, events, rulebooks, the AI and the bazar all pick games **from the member's Kallax**
+  and point to the Ludothèque entry.- **Meeple rating**: members rate games from their Kallax (1–10); the Kallax and the Ludothèque show
+  the members' average next to your own rating.
 - **Rulebooks**: PDF uploads per game, served to signed-in members.
 - **Rules AI** (`/ai`): pick a game and its rulebook (or upload it right there), ask questions.
   - **Claude** (default, `ANTHROPIC_API_KEY`): reads the whole PDF, cites pages. Paid per question,

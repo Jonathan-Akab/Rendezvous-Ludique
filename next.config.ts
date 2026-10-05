@@ -7,6 +7,8 @@ const I18N_REQUEST = "./src/i18n/request.ts";
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // dev only: lets http://127.0.0.1:3000 load the dev scripts (handy to test while signed out on localhost)
+  allowedDevOrigins: ["127.0.0.1"],
   serverExternalPackages: ["better-sqlite3", "@prisma/adapter-better-sqlite3", "pg", "@prisma/adapter-pg"],
   experimental: {
     // rulebook PDFs (30 MB max) are uploaded through server actions

@@ -16,7 +16,7 @@ export default async function RegisterPage() {
       <h1 className="page-title mb-1">{t("registerTitle")}</h1>
       <p className="mb-6 text-sm text-muted">{t("registerLead")}</p>
       {settings.registrationOpen ? (
-        <RegisterForm />
+        <RegisterForm approval={settings.registrationApproval} minimumAge={settings.minimumAge} />
       ) : (
         <p className="text-muted">
           {t("errors.registrationClosed")}{" "}

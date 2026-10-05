@@ -24,7 +24,13 @@ model User {
   passwordHash String
   displayName  String
   role         String @default("MEMBER") // MEMBER | MODERATOR | ADMIN
-  status       String @default("ACTIVE") // ACTIVE | SUSPENDED
+  status       String @default("ACTIVE") // ACTIVE | SUSPENDED | PENDING (sign-up awaiting approval)
+  // Console sections this admin or moderator may use (JSON array). For an ADMIN, null
+  // means a full admin (everything, including giving rights to others).
+  permissions  String?
+  signupNote   String? // what the person wrote when signing up (helps the team approve)
+  emailVerifiedAt DateTime? // set when the person clicked the confirmation link
+  notifyPrefs     String? // JSON: email notifications the member turned on (all off by default)
 
   // Personalisation
   meepleColor String @default("#d9480f")
@@ -51,18 +57,23 @@ model User {
   sentFriendships   Friendship[]      @relation("FriendshipRequester")
   recvFriendships   Friendship[]      @relation("FriendshipAddressee")
   libraryMembers    LibraryMember[]
-  libraryGames      LibraryGame[]     @relation("LibraryGameOwner")
+  kallaxOwned       KallaxGame[]      @relation("KallaxOwner")
+  kallaxAdded       KallaxGame[]      @relation("KallaxAdder")
   hostedEvents      Event[]           @relation("EventHost")
   attendances       EventAttendee[]
   playsCreated      Play[]            @relation("PlayCreator")
   playParticipation PlayParticipant[]
-  gamesCreated      Game[]            @relation("GameCreator")
+  ludoFirstAdded    Game[]            @relation("LudoFirstAdder")
   auditLogs         AuditLog[]
   ratings           GameRating[]
   files             StoredFile[]
   rulebooks         Rulebook[]
   aiChats           AiChat[]
+  suggestions       Suggestion[]
+  suggestionVotes   SuggestionVote[]
   aiSetting         AiMemberSetting?
+  aiUsage           AiUsage[]
+  emailTokens       EmailToken[]
   bazaarListings    BazaarListing[]
   bazaarMessages    BazaarMessage[]   @relation("BazaarSender")
   bazaarThreads     BazaarMessage[]   @relation("BazaarBuyer")
@@ -95,42 +106,51 @@ model Friendship {
   @@index([addresseeId])
 }
 
-// ───────────────────────────── Games catalogue ─────────────────────────────
+// ───────────────────────────── Ludothèque ─────────────────────────────
 
+// The site-wide game reference ("Ludothèque"). Nobody edits it directly: when a game is
+// added to any Kallax we look it up by its normalised name and create it only if it
+// doesn't exist yet. Ratings, rulebooks, plays, events and the bazar point here, so
+// everyone shares the same game identity while each Kallax keeps its own private record.
 model Game {
-  id          String   @id @default(cuid())
-  name        String
-  year        Int?
-  minPlayers  Int?
-  maxPlayers  Int?
-  playTimeMin Int?
-  weight      Float? // complexity 1–5
-  minAge      Int?
-  designer    String?
-  publisher   String?
-  categories  String? // comma separated tags (mechanics, themes)
-  imageUrl    String? // external cover image
-  coverFileId String? // uploaded cover (takes priority over imageUrl)
-  bggId       Int?     @unique
-  description String?
-  createdById String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
+  id             String   @id @default(cuid())
+  name           String
+  normalizedName String   @unique // lowercase, no accents/punctuation — the duplicate check
+  year           Int?
+  minPlayers     Int?
+  maxPlayers     Int?
+  playTimeMin    Int?
+  minAge         Int?
+  weight         Float? // complexity 1–5
+  designer       String?
+  publisher      String?
+  categories     String?
+  description    String?
+  imageUrl       String?
+  coverFileId    String?
+  bggId          Int?     @unique
+  baseGameId     String? // set for an expansion: the game it extends
+  createdById    String? // first member who added it to a Kallax
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @default(now()) @updatedAt
 
-  createdBy    User?           @relation("GameCreator", fields: [createdById], references: [id], onDelete: SetNull)
-  coverFile    StoredFile?     @relation("GameCover", fields: [coverFileId], references: [id], onDelete: SetNull)
-  libraryGames LibraryGame[]
-  plays        Play[]
-  eventGames   EventGame[]
-  ratings      GameRating[]
-  rulebooks    Rulebook[]
-  aiChats      AiChat[]
-  listings     BazaarListing[]
+  createdBy   User?           @relation("LudoFirstAdder", fields: [createdById], references: [id], onDelete: SetNull)
+  baseGame    Game?           @relation("Expansions", fields: [baseGameId], references: [id], onDelete: SetNull)
+  expansions  Game[]          @relation("Expansions")
+  coverFile   StoredFile?     @relation("GameCover", fields: [coverFileId], references: [id], onDelete: SetNull)
+  kallaxGames KallaxGame[]
+  plays       Play[]
+  eventGames  EventGame[]
+  ratings     GameRating[]
+  rulebooks   Rulebook[]
+  aiChats     AiChat[]
+  faqs        RuleFaq[]
+  listings    BazaarListing[]
 
   @@index([name])
 }
 
-// ───────────────────────────── My Kallax (libraries) ─────────────────────────────
+// ───────────────────────────── Ma Kallax (libraries) ─────────────────────────────
 
 // A library is a shelf that one or more members share (e.g. a couple).
 model Library {
@@ -139,7 +159,7 @@ model Library {
   createdAt DateTime @default(now())
 
   members LibraryMember[]
-  games   LibraryGame[]
+  games   KallaxGame[]
 }
 
 model LibraryMember {
@@ -158,21 +178,42 @@ model LibraryMember {
   @@index([userId])
 }
 
-model LibraryGame {
-  id        String   @id @default(cuid())
-  libraryId String
-  gameId    String
-  ownerId   String? // which member physically owns the copy
-  status    String   @default("OWNED") // OWNED | WISHLIST | FOR_TRADE | PREORDERED
-  condition String?
-  notes     String?
-  addedAt   DateTime @default(now())
+// A game on a Kallax shelf: the Kallax's own private record (its own name, details,
+// picture, status and notes), linked to the shared Ludothèque entry by gameId.
+model KallaxGame {
+  id          String   @id @default(cuid())
+  libraryId   String
+  gameId      String
+  addedById   String?
+  ownerId     String? // which member physically owns the copy
+  name        String
+  year        Int?
+  minPlayers  Int?
+  maxPlayers  Int?
+  playTimeMin Int?
+  minAge      Int?
+  designer    String?
+  publisher   String?
+  imageUrl    String?
+  coverFileId String?
+  status      String   @default("OWNED") // OWNED | WISHLIST | FOR_TRADE | PREORDERED
+  condition   String?
+  notes       String?
+  parentId    String? // expansion: the Kallax record of its base game
+  addedAt     DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
 
-  library Library @relation(fields: [libraryId], references: [id], onDelete: Cascade)
-  game    Game    @relation(fields: [gameId], references: [id], onDelete: Cascade)
-  owner   User?   @relation("LibraryGameOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  library   Library     @relation(fields: [libraryId], references: [id], onDelete: Cascade)
+  game      Game        @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  addedBy   User?       @relation("KallaxAdder", fields: [addedById], references: [id], onDelete: SetNull)
+  owner     User?       @relation("KallaxOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  coverFile StoredFile? @relation("KallaxCover", fields: [coverFileId], references: [id], onDelete: SetNull)
+  // Removing the base game keeps its expansions (they become games of their own again).
+  parent     KallaxGame?  @relation("KallaxExpansions", fields: [parentId], references: [id], onDelete: SetNull)
+  expansions KallaxGame[] @relation("KallaxExpansions")
 
   @@unique([libraryId, gameId])
+  @@index([parentId])
 }
 
 // ───────────────────────────── Events & home games ─────────────────────────────
@@ -328,6 +369,7 @@ model StoredFile {
 
   owner       User?        @relation(fields: [ownerId], references: [id], onDelete: SetNull)
   gameCover   Game[]       @relation("GameCover")
+  kallaxCover KallaxGame[] @relation("KallaxCover")
   rulebook    Rulebook?
   bazaarPhoto BazaarPhoto?
 }
@@ -347,6 +389,7 @@ model Rulebook {
   file       StoredFile @relation(fields: [fileId], references: [id], onDelete: Cascade)
   uploadedBy User?      @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
   aiChats    AiChat[]
+  faqs       RuleFaq[]
 
   @@index([gameId])
 }
@@ -358,6 +401,7 @@ model AiChat {
   userId     String
   gameId     String?
   rulebookId String?
+  kind       String   @default("chat") // conversation type; only "chat" for now
   title      String
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -395,7 +439,11 @@ model AiMemberSetting {
   access            String   @default("DEFAULT") // DEFAULT | FREE_ONLY | NONE
   monthlyBudgetUsd  Float? // overrides the default per-member Claude budget
   dailyLimit        Int? // overrides the default questions per day
-  preferredProvider String   @default("claude") // claude | free
+  preferredProvider String   @default("claude") // claude | free | own
+  // The member's own Anthropic API key ("use my Claude credits"), encrypted with APP_SECRET.
+  ownKeyEncrypted   String?
+  ownKeyHint        String? // last characters, to recognise the key
+  ownModel          String? // Claude model used with the member's key
   updatedAt         DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -466,4 +514,89 @@ model BazaarMessage {
   sender  User          @relation("BazaarSender", fields: [senderId], references: [id], onDelete: Cascade)
 
   @@index([listingId, buyerId])
+}
+
+// Rules FAQ: built from the questions members ask the rules AI, one list per game.
+// Similar questions are grouped (askCount); admins can verify, edit or hide answers.
+model RuleFaq {
+  id          String   @id @default(cuid())
+  gameId      String
+  rulebookId  String?
+  question    String
+  answer      String
+  citations   String? // JSON: [{ page, endPage, text }]
+  provider    String? // claude | free | manual
+  status      String   @default("AUTO") // AUTO | VERIFIED | HIDDEN
+  askCount    Int      @default(1)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  game     Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  rulebook Rulebook? @relation(fields: [rulebookId], references: [id], onDelete: SetNull)
+
+  @@index([gameId])
+}
+
+// Suggestion box: members propose ideas and vote; duplicates become votes.
+model Suggestion {
+  id        String   @id @default(cuid())
+  title     String
+  details   String?
+  authorId  String?
+  status    String   @default("OPEN") // OPEN | PLANNED | DONE | DECLINED
+  adminNote String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author User?            @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  votes  SuggestionVote[]
+
+  @@index([status])
+}
+
+model SuggestionVote {
+  suggestionId String
+  userId       String
+  createdAt    DateTime @default(now())
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([suggestionId, userId])
+  @@index([userId])
+}
+
+// AI calls outside the rules chat (e.g. reading game titles from Kallax photos), so their
+// Claude cost counts in the same budgets as the rules questions.
+model AiUsage {
+  id           String   @id @default(cuid())
+  userId       String
+  purpose      String // photo
+  provider     String // claude | free | own
+  model        String?
+  inputTokens  Int      @default(0)
+  outputTokens Int      @default(0)
+  costUsd      Float    @default(0)
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([userId])
+}
+
+// One-time links sent by email (confirm the address, reset the password). Only a hash of
+// the token is stored; it expires and can be used once.
+model EmailToken {
+  id        String    @id @default(cuid())
+  userId    String
+  kind      String // verify | reset
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, kind])
 }

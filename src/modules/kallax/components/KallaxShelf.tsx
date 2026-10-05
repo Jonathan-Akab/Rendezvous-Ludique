@@ -1,16 +1,17 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Clock, Users } from "lucide-react";
+import { Clock, Users, Puzzle } from "lucide-react";
 import { Meeple } from "@/components/Meeple";
 import { GameCover } from "@/modules/games/components/GameCover";
 import { MeepleRating } from "@/modules/games/components/MeepleRating";
-import { coverUrl } from "@/modules/games/service";
 import { GameCubeActions } from "./GameCubeActions";
 
+/** A Kallax record as shown on the shelf (`game` holds the Kallax's own details; `game.id` is the Ludothèque id). */
 export type ShelfGame = {
   id: string;
   status: string;
   notes: string | null;
+  cover: string | null;
   game: {
     id: string;
     name: string;
@@ -18,12 +19,12 @@ export type ShelfGame = {
     maxPlayers: number | null;
     playTimeMin: number | null;
     year: number | null;
-    coverFileId: string | null;
-    imageUrl: string | null;
   };
   owner: { displayName: string; meepleColor: string } | null;
   rating?: { avg: number | null; count: number };
   myRating?: number | null;
+  /** names of the expansions attached to this game */
+  expansions?: string[];
 };
 
 const STATUS_STYLE: Record<string, string> = {
@@ -60,11 +61,11 @@ export async function KallaxShelf({
       <div className="card divide-y divide-line">
         {games.map((g) => (
           <div key={g.id} className="group flex items-center gap-4 p-3">
-            <Link href={`/games/${g.game.id}`}>
-              <GameCover name={g.game.name} src={coverUrl(g.game)} size="sm" />
+            <Link href={editable ? `/kallax/${g.id}` : `/games/${g.game.id}`}>
+              <GameCover name={g.game.name} src={g.cover} size="sm" />
             </Link>
             <div className="min-w-0 flex-1">
-              <Link href={`/games/${g.game.id}`} className="font-display text-lg font-bold hover:text-accent">
+              <Link href={editable ? `/kallax/${g.id}` : `/games/${g.game.id}`} className="font-display text-lg font-bold hover:text-accent">
                 {g.game.name}
               </Link>
               <p className="flex flex-wrap items-center gap-x-3 text-xs text-muted">
@@ -80,6 +81,11 @@ export async function KallaxShelf({
                 )}
                 {g.game.year && <span>{g.game.year}</span>}
                 {g.status !== "OWNED" && <span className="chip">{t(`status.${g.status}`)}</span>}
+                {g.expansions && g.expansions.length > 0 && (
+                  <span className="chip border-transparent bg-[#1c5fbf]/15 text-[#3b82f6]" title={g.expansions.join(", ")}>
+                    <Puzzle className="size-3" /> {t("expansionsCount", { count: g.expansions.length })}
+                  </span>
+                )}
               </p>
             </div>
             {g.rating && <MeepleRating avg={g.rating.avg} count={g.rating.count} compact label={t("siteRating")} />}
@@ -104,8 +110,8 @@ export async function KallaxShelf({
             key={g.id}
             className="group relative flex aspect-square flex-col items-center justify-end overflow-hidden bg-[linear-gradient(180deg,color-mix(in_oklab,var(--surface)_92%,black),var(--surface))] px-3 pb-2 pt-4 shadow-[inset_0_10px_18px_-8px_rgb(0_0_0/0.45)]"
           >
-            <Link href={`/games/${g.game.id}`} className={`flex w-full flex-1 items-end justify-center ${STATUS_STYLE[g.status]}`}>
-              <GameCover name={g.game.name} src={coverUrl(g.game)} size="fill" tilt className="max-h-full max-w-[62%]" />
+            <Link href={editable ? `/kallax/${g.id}` : `/games/${g.game.id}`} className={`flex w-full flex-1 items-end justify-center ${STATUS_STYLE[g.status]}`}>
+              <GameCover name={g.game.name} src={g.cover} size="fill" tilt className="max-h-full max-w-[62%]" />
             </Link>
             {/* shelf lip */}
             <div className="mt-1 h-1 w-full rounded-full bg-black/20" />
@@ -115,6 +121,11 @@ export async function KallaxShelf({
             </div>
             <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
               {g.status !== "OWNED" && <span className="chip bg-surface/90 px-1.5 text-[10px] backdrop-blur">{t(`status.${g.status}`)}</span>}
+              {g.expansions && g.expansions.length > 0 && (
+                <span className="chip gap-0.5 bg-[#1c5fbf]/85 px-1.5 text-[10px] text-white backdrop-blur" title={g.expansions.join(", ")}>
+                  <Puzzle className="size-3" /> +{g.expansions.length}
+                </span>
+              )}
             </div>
             {shared && g.owner && (
               <span className="absolute right-2 top-2" title={g.owner.displayName}>

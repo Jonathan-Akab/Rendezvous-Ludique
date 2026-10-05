@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { MapPin, MessageCircle, Package, Pencil, Trash2, Truck } from "lucide-react";
 import { hasRole, requireUser } from "@/lib/auth/guards";
+import { can } from "@/lib/auth/permissions";
 import { requireModule } from "@/lib/modules";
 import { FadeIn } from "@/components/Motion";
 import { MeepleAvatar } from "@/components/Meeple";
@@ -26,7 +27,7 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
   if (!listing) notFound();
 
   const isSeller = listing.sellerId === user.id;
-  const canManage = isSeller || hasRole(user.role, "ADMIN");
+  const canManage = isSeller || can(user, "bazaar");
   const threads = await getThreads(listing.id, user.id, isSeller);
   await markThreadsRead(listing.id, user.id, isSeller);
   const rating = listing.game ? (await getRatingStats([listing.game.id])).get(listing.game.id) : null;

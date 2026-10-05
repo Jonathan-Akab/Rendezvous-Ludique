@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth/guards";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { getModule } from "@/lib/modules";
@@ -13,6 +14,7 @@ export async function generateMetadata() {
 }
 
 export default async function AdminBazaarPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  await requirePermission("bazaar");
   const [{ q }, mod, t, tb, format, locale] = await Promise.all([
     searchParams,
     getModule("bazaar"),

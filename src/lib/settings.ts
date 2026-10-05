@@ -7,6 +7,12 @@ import { THEME_KEYS, type Locale, type ThemeKey } from "@/lib/constants";
 export type SiteSettings = {
   siteName: string;
   registrationOpen: boolean;
+  /** new accounts wait for a team member's approval (off: anyone who signs up gets in) */
+  registrationApproval: boolean;
+  /** new accounts confirm their email address before signing in (only when email is set up) */
+  requireEmailConfirmation: boolean;
+  /** youngest age allowed to sign up (Québec: age of majority, 18) */
+  minimumAge: number;
   announcement: string;
   defaultTheme: ThemeKey;
   defaultLocale: Locale;
@@ -19,6 +25,9 @@ export type SiteSettings = {
 export const SITE_DEFAULTS: SiteSettings = {
   siteName: "Rendezvous Ludique",
   registrationOpen: true,
+  registrationApproval: false,
+  requireEmailConfirmation: true,
+  minimumAge: 18,
   announcement: "",
   defaultTheme: "system",
   defaultLocale: "fr",

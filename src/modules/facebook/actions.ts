@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
-import { requireRole } from "@/lib/auth/guards";
+import { requirePermission } from "@/lib/auth/guards";
 import { audit } from "@/lib/audit";
 import { bool, optStr, str, type ActionState } from "@/lib/forms";
 
@@ -26,7 +26,7 @@ const refresh = () => {
 };
 
 export async function saveFacebookGroupAction(groupId: string | null, _prev: ActionState, fd: FormData): Promise<ActionState> {
-  const me = await requireRole("ADMIN");
+  const me = await requirePermission("facebook");
   const t = await getTranslations("facebook.errors");
   const data = readGroup(fd);
   if (!data.name) return { error: t("name") };
@@ -43,7 +43,7 @@ export async function saveFacebookGroupAction(groupId: string | null, _prev: Act
 }
 
 export async function moveFacebookGroupAction(groupId: string, direction: -1 | 1) {
-  await requireRole("ADMIN");
+  await requirePermission("facebook");
   const groups = await db.facebookGroup.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] });
   const i = groups.findIndex((g) => g.id === groupId);
   const j = i + direction;
@@ -54,7 +54,7 @@ export async function moveFacebookGroupAction(groupId: string, direction: -1 | 1
 }
 
 export async function deleteFacebookGroupAction(groupId: string) {
-  const me = await requireRole("ADMIN");
+  const me = await requirePermission("facebook");
   const g = await db.facebookGroup.delete({ where: { id: groupId } });
   await audit(me.id, "admin.facebook.delete", g.name);
   refresh();

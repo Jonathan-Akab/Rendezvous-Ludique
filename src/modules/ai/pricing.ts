@@ -22,8 +22,13 @@ export type ClaudeUsage = {
   cache_read_input_tokens?: number | null;
 };
 
+/** Price of a model; the API may answer with a dated id ("claude-haiku-4-5-20251001"). */
+function priceOf(model: string) {
+  return PRICES[model] ?? PRICES[model.replace(/-\d{8}$/, "")] ?? FALLBACK;
+}
+
 export function claudeCostUsd(model: string, u: ClaudeUsage) {
-  const p = PRICES[model] ?? FALLBACK;
+  const p = priceOf(model);
   const write = u.cache_creation_input_tokens ?? 0;
   const read = u.cache_read_input_tokens ?? 0;
   return (u.input_tokens * p.input + write * p.input * 1.25 + read * p.cacheRead + u.output_tokens * p.output) / 1_000_000;

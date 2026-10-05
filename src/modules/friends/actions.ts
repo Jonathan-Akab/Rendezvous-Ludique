@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { requireUser } from "@/lib/auth/guards";
 import { getModule } from "@/lib/modules";
+import { notify } from "@/modules/notifications/emails";
 
 async function guard() {
   const user = await requireUser();
@@ -30,6 +31,7 @@ export async function sendFriendRequest(otherId: string) {
     }
   } else {
     await db.friendship.create({ data: { requesterId: user.id, addresseeId: otherId } });
+    void notify(otherId, "friendRequest", { name: user.displayName }, "/friends");
   }
   revalidatePath("/", "layout");
 }

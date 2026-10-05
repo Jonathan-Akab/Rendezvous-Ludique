@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
-import { requireRole } from "@/lib/auth/guards";
+import { requireStaff } from "@/lib/auth/guards";
+import { permissionsOf, type Permission } from "@/lib/auth/permissions";
+import { db } from "@/lib/db";
 import { getSiteSettings } from "@/lib/settings";
 import { MeepleAvatar } from "@/components/Meeple";
 import { LocaleSwitch } from "@/components/PreferenceControls";
@@ -14,16 +16,30 @@ export async function generateMetadata() {
 // The admin console is its own area with its own shell. Admins keep the normal member
 // experience on the main site and come here only through "Admin console" in their menu.
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const user = await requireRole("ADMIN");
+  const user = await requireStaff();
+  const allowed = permissionsOf(user);
   const [settings, t] = await Promise.all([getSiteSettings(), getTranslations("admin.nav")]);
+  const pendingSignups = allowed.has("registrations") ? await db.user.count({ where: { status: "PENDING" } }) : 0;
+  // The sign-ups section only matters when approval is on (or someone still waits).
+  const showSignups = settings.registrationApproval || pendingSignups > 0;
 
-  const items: AdminNavItem[] = [
+  const all: (AdminNavItem & { permission?: Permission; hidden?: boolean })[] = [
     { href: "/admin", label: t("dashboard"), icon: "Gauge", group: "overview" },
+    {
+      href: "/admin/registrations",
+      label: pendingSignups ? `${t("registrations")} (${pendingSignups})` : t("registrations"),
+      icon: "UserCheck",
+      group: "community",
+      permission: "registrations",
+      hidden: !showSignups,
+    },
     { href: "/admin/members", label: t("members"), icon: "Users", group: "community" },
+    { href: "/admin/suggestions", label: t("suggestions"), icon: "Lightbulb", group: "community" },
     { href: "/admin/events", label: t("events"), icon: "CalendarDays", group: "content" },
     { href: "/admin/games", label: t("games"), icon: "Swords", group: "content" },
     { href: "/admin/libraries", label: t("libraries"), icon: "LibraryBig", group: "content" },
     { href: "/admin/plays", label: t("plays"), icon: "Dices", group: "content" },
+    { href: "/admin/faq", label: t("faq"), icon: "MessageCircleQuestion", group: "content" },
     { href: "/admin/bazaar", label: t("bazaar"), icon: "Store", group: "content" },
     { href: "/admin/facebook", label: t("facebook"), icon: "Users2", group: "content" },
     { href: "/admin/ai", label: t("ai"), icon: "Sparkles", group: "platform" },
@@ -32,6 +48,18 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/settings", label: t("settings"), icon: "Settings2", group: "platform" },
     { href: "/admin/audit", label: t("audit"), icon: "ScrollText", group: "platform" },
   ];
+  // Each section needs its permission (the route's first segment is the permission name).
+  const PERM: Record<string, Permission> = {
+    members: "members", suggestions: "suggestions", events: "events", games: "games", faq: "faq", libraries: "libraries",
+    plays: "plays", bazaar: "bazaar", facebook: "facebook", ai: "ai", modules: "modules", appearance: "appearance", settings: "settings", audit: "audit",
+  };
+  const items: AdminNavItem[] = all
+    .filter((i) => {
+      if (i.hidden) return false;
+      const p = i.permission ?? PERM[i.href.split("/")[2] ?? ""];
+      return !p || allowed.has(p);
+    })
+    .map(({ permission: _p, hidden: _h, ...i }) => i);
   const groups = { overview: t("groups.overview"), community: t("groups.community"), content: t("groups.content"), platform: t("groups.platform") };
 
   return (

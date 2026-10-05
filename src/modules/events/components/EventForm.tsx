@@ -7,6 +7,7 @@ import { House, PartyPopper, Swords, Tent } from "lucide-react";
 import { FormMessage, SubmitButton } from "@/components/forms";
 import { LocationFields } from "@/components/LocationFields";
 import type { ActionState } from "@/lib/forms";
+import { MyGameSelect, type MyGameOption } from "@/modules/kallax/components/MyGameSelect";
 
 export type EventFormValues = {
   title?: string;
@@ -22,7 +23,7 @@ export type EventFormValues = {
   visibility?: string;
   maxPlayers?: number | null;
   requiresApproval?: boolean;
-  games?: string;
+  gameIds?: string[];
 };
 
 const KINDS = [
@@ -39,6 +40,7 @@ export function EventForm({
   allowPublic,
   submitLabel,
   returnTo,
+  myGames,
 }: {
   action: (prev: ActionState, fd: FormData) => Promise<ActionState>;
   values?: EventFormValues;
@@ -46,6 +48,8 @@ export function EventForm({
   allowPublic: boolean;
   submitLabel: string;
   returnTo?: "admin";
+  /** games from the host's Kallax, to put on the menu */
+  myGames: MyGameOption[];
 }) {
   const t = useTranslations("events");
   const [state, formAction] = useActionState(action, undefined);
@@ -108,10 +112,8 @@ export function EventForm({
       </div>
 
       <div>
-        <label className="label" htmlFor="games">
-          {t("form.games")}
-        </label>
-        <input id="games" name="games" className="input" defaultValue={values.games} placeholder={t("form.gamesPlaceholder")} />
+        <span className="label">{t("form.games")}</span>
+        <MyGameSelect games={myGames} name="gameIds" multiple defaultValue={values.gameIds} />
       </div>
 
       <div className="card space-y-4 bg-surface-2/50 p-4">

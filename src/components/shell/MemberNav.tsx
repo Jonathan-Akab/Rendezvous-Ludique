@@ -3,14 +3,38 @@
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion, Reorder } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { ArrowDownUp, Check, Ellipsis, GripVertical, PanelLeftClose, PanelLeftOpen, RotateCcw, X } from "lucide-react";
+import { ArrowDownUp, Check, Ellipsis, PanelLeftClose, PanelLeftOpen, RotateCcw, X } from "lucide-react";
 import { ModuleIcon } from "@/components/icons";
 import { Meeple } from "@/components/Meeple";
 import { saveNavOrderAction } from "@/modules/preferences/actions";
+import { openSuggestionBox } from "@/modules/suggestions/components/SuggestionDialog";
+import { MenuOrderEditor } from "./MenuOrderEditor";
 
-export type NavItem = { href: string; label: string; icon: string };
+/** A menu entry. `dialog` entries open a popup instead of navigating. */
+export type NavItem = { href: string; label: string; icon: string; dialog?: "suggestions" };
+
+/** A menu link, or a button for entries that open a popup. */
+function NavEntry({ item, onOpen, ...props }: { item: NavItem; onOpen?: () => void } & Omit<React.ComponentProps<"a">, "href">) {
+  if (item.dialog) {
+    const { className, title, children } = props;
+    return (
+      <button
+        type="button"
+        className={className}
+        title={title}
+        onClick={() => {
+          onOpen?.();
+          openSuggestionBox();
+        }}
+      >
+        {children}
+      </button>
+    );
+  }
+  return <Link href={item.href} {...props} />;
+}
 
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -69,28 +93,17 @@ export function AppSidebar({ items, siteName, meepleColor }: { items: NavItem[];
       </div>
 
       {editing ? (
-        <Reorder.Group axis="y" values={order} onReorder={setOrder} className="flex flex-1 flex-col gap-1 overflow-y-auto" aria-label={t("reorder")}>
-          {order.map((item) => (
-            <Reorder.Item
-              key={item.href}
-              value={item}
-              whileDrag={{ scale: 1.04, boxShadow: "0 12px 30px -10px rgb(0 0 0 / 0.5)" }}
-              className="flex cursor-grab items-center gap-3 rounded-2xl border border-dashed border-accent/50 bg-surface/80 px-3 py-2.5 text-sm font-semibold active:cursor-grabbing"
-            >
-              <GripVertical className="size-4 shrink-0 text-muted" />
-              <ModuleIcon name={item.icon} className="size-5 shrink-0" />
-              <span className="sidebar-label truncate">{item.label}</span>
-            </Reorder.Item>
-          ))}
-        </Reorder.Group>
+        <div className="flex-1 overflow-y-auto" aria-label={t("reorder")}>
+          <MenuOrderEditor items={order} onChange={setOrder} compact />
+        </div>
       ) : (
         <nav className="flex flex-1 flex-col gap-1 overflow-y-auto" aria-label="Main">
           {order.map((item) => {
             const active = isActive(pathname, item.href);
             return (
-              <Link
+              <NavEntry
                 key={item.href}
-                href={item.href}
+                item={item}
                 title={item.label}
                 aria-current={active ? "page" : undefined}
                 className={`group relative flex items-center gap-3 rounded-2xl px-3 py-2.5 text-sm font-semibold transition ${
@@ -105,8 +118,8 @@ export function AppSidebar({ items, siteName, meepleColor }: { items: NavItem[];
                   />
                 )}
                 <ModuleIcon name={item.icon} className="relative size-5 shrink-0 transition group-hover:scale-110" />
-                <span className="sidebar-label relative truncate">{item.label}</span>
-              </Link>
+                <span className="sidebar-label relative line-clamp-2 text-left leading-tight">{item.label}</span>
+              </NavEntry>
             );
           })}
         </nav>
@@ -131,7 +144,7 @@ export function AppSidebar({ items, siteName, meepleColor }: { items: NavItem[];
             </button>
           </>
         ) : (
-          <button type="button" onClick={() => setEditing(true)} className="btn btn-ghost btn-sm w-full justify-start text-muted" title={t("reorder")}>
+          <button type="button" onClick={() => setEditing(true)} className="btn btn-secondary btn-sm w-full justify-start" title={t("reorder")}>
             <ArrowDownUp className="size-4" /> <span className="sidebar-label">{t("reorder")}</span>
           </button>
         )}
@@ -153,16 +166,16 @@ export function MobileNav({ items }: { items: NavItem[] }) {
   const tab = (item: NavItem) => {
     const active = isActive(pathname, item.href);
     return (
-      <Link
+      <NavEntry
         key={item.href}
-        href={item.href}
+        item={item}
         aria-current={active ? "page" : undefined}
         className={`relative flex flex-1 flex-col items-center gap-0.5 py-2 text-[11px] font-semibold ${active ? "text-accent" : "text-muted"}`}
       >
         {active && <motion.span layoutId="mobile-dot" className="absolute top-0 h-1 w-8 rounded-full bg-accent" />}
         <ModuleIcon name={item.icon} className="size-5" />
         <span className="max-w-full truncate px-1">{item.label}</span>
-      </Link>
+      </NavEntry>
     );
   };
 
@@ -201,16 +214,17 @@ export function MobileNav({ items }: { items: NavItem[] }) {
               </div>
               <div className="grid grid-cols-3 gap-2">
                 {items.map((item) => (
-                  <Link
+                  <NavEntry
                     key={item.href}
-                    href={item.href}
+                    item={item}
+                    onOpen={() => setOpen(false)}
                     className={`flex flex-col items-center gap-1 rounded-2xl p-3 text-xs font-semibold ${
                       isActive(pathname, item.href) ? "bg-accent text-accent-ink" : "bg-surface-2/70"
                     }`}
                   >
                     <ModuleIcon name={item.icon} className="size-6" />
                     {item.label}
-                  </Link>
+                  </NavEntry>
                 ))}
               </div>
             </motion.div>

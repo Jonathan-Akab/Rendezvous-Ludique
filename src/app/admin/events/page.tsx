@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth/guards";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { ilike } from "@/lib/search";
@@ -12,6 +13,7 @@ export async function generateMetadata() {
 }
 
 export default async function AdminEventsPage({ searchParams }: { searchParams: Promise<{ q?: string; when?: string }> }) {
+  await requirePermission("events");
   const [sp, t, te, format] = await Promise.all([searchParams, getTranslations("admin.events"), getTranslations("events"), getFormatter()]);
   const where: Prisma.EventWhereInput = {};
   if (sp.q) where.OR = [{ title: ilike(sp.q) }, { city: ilike(sp.q) }, { host: { displayName: ilike(sp.q) } }];

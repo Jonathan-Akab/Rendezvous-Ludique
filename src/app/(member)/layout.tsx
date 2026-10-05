@@ -1,45 +1,22 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
 import { Megaphone } from "lucide-react";
 import { requireUser, hasRole } from "@/lib/auth/guards";
-import { getModuleStates, getOrderedModules } from "@/lib/modules";
+import { isStaff } from "@/lib/auth/permissions";
+import { getMenuItems } from "@/lib/menu";
+import { getModule } from "@/lib/modules";
 import { getSiteSettings } from "@/lib/settings";
 import { Meeple } from "@/components/Meeple";
-import { AppSidebar, MobileNav, type NavItem } from "@/components/shell/MemberNav";
+import { AppSidebar, MobileNav } from "@/components/shell/MemberNav";
 import { UserMenu } from "@/components/shell/UserMenu";
 import { CommandPalette } from "@/components/shell/CommandPalette";
 import { LocaleSwitch, ThemePicker } from "@/components/PreferenceControls";
 import { DonateLink } from "@/modules/donations/components/DonateLink";
-
-/** Menu items in the admin's default order, then the member's own order if they set one. */
-function applyMemberOrder(items: NavItem[], navOrder: string | null) {
-  let order: string[] = [];
-  try {
-    order = navOrder ? JSON.parse(navOrder) : [];
-  } catch {
-    order = [];
-  }
-  if (!order.length) return items;
-  const rank = (href: string) => {
-    const i = order.indexOf(href);
-    return i === -1 ? order.length + items.findIndex((x) => x.href === href) : i;
-  };
-  return [...items].sort((a, b) => rank(a.href) - rank(b.href));
-}
+import { SuggestionDialog } from "@/modules/suggestions/components/SuggestionDialog";
+import { RulebookOverlay } from "@/modules/games/components/RulebookOverlay";
 
 export default async function MemberLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
-  const [modules, ordered, settings, t] = await Promise.all([getModuleStates(), getOrderedModules(), getSiteSettings(), getTranslations("nav")]);
-
-  const items = applyMemberOrder(
-    [
-      { href: "/home", label: t("home"), icon: "House" },
-      ...ordered
-        .filter((m) => m.href && modules[m.key].enabled)
-        .map((m) => ({ href: m.href!, label: t(m.key), icon: m.icon })),
-    ],
-    user.navOrder,
-  );
+  const [items, settings, suggestions] = await Promise.all([getMenuItems(user.navOrder), getSiteSettings(), getModule("suggestions")]);
 
   return (
     <div className="grain min-h-dvh">
@@ -71,7 +48,7 @@ export default async function MemberLayout({ children }: { children: React.React
             <UserMenu
               user={{ username: user.username, displayName: user.displayName, meepleColor: user.meepleColor }}
               canModerate={hasRole(user.role, "MODERATOR")}
-              canAdmin={hasRole(user.role, "ADMIN")}
+              canAdmin={isStaff(user)}
             />
           </div>
         </header>
@@ -98,6 +75,8 @@ export default async function MemberLayout({ children }: { children: React.React
       </div>
 
       <MobileNav items={items} />
+      <RulebookOverlay />
+      {suggestions.enabled && <SuggestionDialog showList={Boolean(suggestions.settings.showToMembers)} />}
     </div>
   );
 }

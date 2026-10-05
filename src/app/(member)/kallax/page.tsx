@@ -10,7 +10,11 @@ import { FadeIn } from "@/components/Motion";
 import { MeepleAvatar } from "@/components/Meeple";
 import { EmptyState } from "@/components/EmptyState";
 import { ConfirmButton } from "@/components/forms";
-import { getMyLibraries } from "@/modules/kallax/service";
+import { getMyLibraries, kallaxCoverUrl } from "@/modules/kallax/service";
+import { getAiStatus } from "@/modules/ai/policy";
+import { providerChoices } from "@/modules/ai/providerInfo";
+import { enrichAvailable } from "@/modules/games/enrich";
+import { ExpansionTidy } from "@/modules/kallax/components/ExpansionTidy";
 import { getMyRatings, getRatingStats } from "@/modules/games/service";
 import { KallaxShelf } from "@/modules/kallax/components/KallaxShelf";
 import { AddGameForm, InviteForm } from "@/modules/kallax/components/KallaxForms";
@@ -26,34 +30,77 @@ export async function generateMetadata() {
   return { title: (await getTranslations("nav"))("kallax") };
 }
 
+/** AI module turned off: photo reading is unavailable. */
+const NO_AI = {
+  claudeAvailable: false,
+  claudeReason: "disabled",
+  freeAvailable: false,
+  freeName: "",
+  budgetUsedPct: null,
+  ownAllowed: false,
+  ownAvailable: false,
+  ownHint: null,
+  siteName: "",
+};
+
 type Search = { lib?: string; q?: string; status?: string; players?: string; view?: string };
 
 export default async function KallaxPage({ searchParams }: { searchParams: Promise<Search> }) {
   const [user, mod, sp, t] = await Promise.all([requireUser(), requireModule("kallax"), searchParams, getTranslations("kallax")]);
 
-  const [libraries, invites] = await Promise.all([
+  const [libraries, invites, aiMod] = await Promise.all([
     getMyLibraries(user.id),
     db.libraryMember.findMany({
       where: { userId: user.id, status: "PENDING" },
       include: { library: { include: { members: { where: { status: "ACCEPTED" }, include: { user: true } } } } },
     }),
+    getModule("ai"),
   ]);
+  // Reading box/shelf photos: same AI choices as the rules AI.
+  const photoAi = aiMod.enabled ? await providerChoices(await getAiStatus(user.id, aiMod), aiMod) : null;
+  // The free AI completes added games (details + picture).
+  const enrich = await enrichAvailable();
   const library = libraries.find((l) => l.id === sp.lib) ?? libraries[0];
 
-  const where: Prisma.LibraryGameWhereInput = { libraryId: library?.id ?? "-" };
-  if (sp.q) where.game = { name: ilike(sp.q) };
+  // The Kallax's own records (private to the members sharing it).
+  // Expansions are shown on their base game, not as games of their own.
+  const where: Prisma.KallaxGameWhereInput = { libraryId: library?.id ?? "-", parentId: null };
+  if (sp.q) where.OR = [{ name: ilike(sp.q) }, { expansions: { some: { name: ilike(sp.q) } } }];
   if (sp.status && LIBRARY_GAME_STATUSES.includes(sp.status as never)) where.status = sp.status;
   const players = Number(sp.players);
-  if (players > 0) where.game = { ...(where.game as object), minPlayers: { lte: players }, maxPlayers: { gte: players } };
+  if (players > 0) {
+    where.minPlayers = { lte: players };
+    where.maxPlayers = { gte: players };
+  }
 
-  const rows = await db.libraryGame.findMany({
+  const rows = await db.kallaxGame.findMany({
     where,
-    include: { game: true, owner: { select: { displayName: true, meepleColor: true } } },
-    orderBy: { game: { name: "asc" } },
+    include: {
+      game: { select: { coverFileId: true, imageUrl: true } },
+      owner: { select: { displayName: true, meepleColor: true } },
+      expansions: { select: { name: true }, orderBy: { name: "asc" } },
+    },
+    orderBy: { name: "asc" },
+  });
+  // Base games of every Kallax the member shares (to attach expansions when adding/importing).
+  const bases = await db.kallaxGame.findMany({
+    where: { libraryId: { in: libraries.map((l) => l.id) }, parentId: null },
+    select: { id: true, name: true, libraryId: true },
+    orderBy: { name: "asc" },
   });
   const gameIds = rows.map((r) => r.gameId);
   const [stats, mine] = await Promise.all([getRatingStats(gameIds), getMyRatings(user.id, gameIds)]);
-  const games = rows.map((r) => ({ ...r, rating: stats.get(r.gameId) ?? { avg: null, count: 0 }, myRating: mine.get(r.gameId) ?? null }));
+  const games = rows.map((r) => ({
+    id: r.id,
+    status: r.status,
+    notes: r.notes,
+    owner: r.owner,
+    cover: kallaxCoverUrl(r),
+    game: { id: r.gameId, name: r.name, minPlayers: r.minPlayers, maxPlayers: r.maxPlayers, playTimeMin: r.playTimeMin, year: r.year },
+    rating: stats.get(r.gameId) ?? { avg: null, count: 0 },
+    myRating: mine.get(r.gameId) ?? null,
+    expansions: r.expansions.map((e) => e.name),
+  }));
   const view = sp.view === "list" ? "list" : "shelf";
 
   const accepted = library?.members.filter((m) => m.status === "ACCEPTED") ?? [];
@@ -118,6 +165,10 @@ export default async function KallaxPage({ searchParams }: { searchParams: Promi
             <AddGameForm
               libraryId={library.id}
               members={accepted.map((m) => ({ id: m.userId, displayName: m.user.displayName }))}
+              libraries={libraries.map((l) => ({ id: l.id, name: l.name }))}
+              ai={photoAi ?? { info: NO_AI, initial: "free", anyAvailable: false }}
+              enrich={enrich}
+              bases={bases}
             />
             <form className="flex flex-wrap items-end gap-2" role="search">
               <input type="hidden" name="lib" value={library.id} />
@@ -142,7 +193,10 @@ export default async function KallaxPage({ searchParams }: { searchParams: Promi
             ) : (
               <>
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted">{t("count", { count: games.length })}</p>
+                  <div className="flex flex-wrap items-start gap-3">
+                    <p className="pt-1 text-sm text-muted">{t("count", { count: games.length })}</p>
+                    <ExpansionTidy libraryId={library.id} />
+                  </div>
                   <div className="flex rounded-xl border border-line p-0.5 text-xs font-semibold">
                     {(["shelf", "list"] as const).map((v) => (
                       <Link

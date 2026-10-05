@@ -3,7 +3,7 @@
 export const ROLES = ["MEMBER", "MODERATOR", "ADMIN"] as const;
 export type Role = (typeof ROLES)[number];
 
-export const USER_STATUSES = ["ACTIVE", "SUSPENDED"] as const;
+export const USER_STATUSES = ["ACTIVE", "SUSPENDED", "PENDING"] as const;
 export type UserStatus = (typeof USER_STATUSES)[number];
 
 export const VISIBILITIES = ["PUBLIC", "MEMBERS", "FRIENDS", "PRIVATE"] as const;
@@ -60,3 +60,9 @@ export const THEME_KEYS = THEMES.map((t) => t.key) as ThemeKey[];
 export const SESSION_COOKIE = "rl_session";
 export const THEME_COOKIE = "rl_theme";
 export const LOCALE_COOKIE = "NEXT_LOCALE";
+
+export const SUGGESTION_STATUSES = ["OPEN", "PLANNED", "DONE", "DECLINED"] as const;
+export type SuggestionStatus = (typeof SUGGESTION_STATUSES)[number];
+
+export const FAQ_STATUSES = ["AUTO", "VERIFIED", "HIDDEN"] as const;
+export type FaqStatus = (typeof FAQ_STATUSES)[number];

@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { requirePermission } from "@/lib/auth/guards";
 import { ArrowDown, ArrowUp, ExternalLink } from "lucide-react";
 import { db } from "@/lib/db";
 import { ActionForm } from "@/components/ActionForm";
@@ -42,6 +43,7 @@ async function Fields({ group }: { group?: Group }) {
 }
 
 export default async function AdminFacebookPage() {
+  await requirePermission("facebook");
   const t = await getTranslations("admin.facebook");
   const groups = await db.facebookGroup.findMany({ orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] });
   return (

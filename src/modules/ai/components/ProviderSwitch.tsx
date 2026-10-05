@@ -3,8 +3,10 @@
 import { useState, useTransition } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
-import { AlertTriangle, BookOpen, Check, Gift, ShieldCheck, Sparkles } from "lucide-react";
+import { AlertTriangle, BookOpen, Check, Gift, KeyRound, ShieldCheck, Sparkles } from "lucide-react";
 import { setAiProviderAction } from "../actions";
+
+export type Provider = "claude" | "free" | "own";
 
 export type ProviderInfo = {
   claudeAvailable: boolean;
@@ -12,28 +14,34 @@ export type ProviderInfo = {
   freeAvailable: boolean;
   freeName: string;
   budgetUsedPct: number | null;
+  /** admins allow members' own Anthropic keys */
+  ownAllowed: boolean;
+  /** the member saved their own key ("my personal Claude") */
+  ownAvailable: boolean;
+  ownHint: string | null;
+  siteName: string;
 };
 
-/** Claude (precise) vs the free option, with a warning before switching to free. */
+/** The site's Claude (precise), the free option (with a warning first) and the member's personal Claude (greyed out without a key). */
 export function ProviderSwitch({
   value,
   onChange,
   info,
 }: {
-  value: "claude" | "free";
-  onChange: (p: "claude" | "free") => void;
+  value: Provider;
+  onChange: (p: Provider) => void;
   info: ProviderInfo;
 }) {
   const t = useTranslations("ai.provider");
   const [confirming, setConfirming] = useState(false);
   const [, start] = useTransition();
 
-  const choose = (p: "claude" | "free") => {
+  const choose = (p: Provider) => {
     onChange(p);
     start(() => setAiProviderAction(p));
   };
 
-  const option = (p: "claude" | "free", available: boolean, icon: React.ReactNode, title: string, sub: string) => (
+  const option = (p: Provider, available: boolean, icon: React.ReactNode, title: string, sub: string) => (
     <button
       type="button"
       disabled={!available}
@@ -60,9 +68,11 @@ export function ProviderSwitch({
 
   return (
     <>
-      <div className="glass flex gap-1 rounded-3xl p-1">
-        {option("claude", info.claudeAvailable, <Sparkles className="size-5" />, t("claude"), claudeSub)}
+      <div className="glass flex flex-wrap gap-1 rounded-3xl p-1 sm:flex-nowrap">
+        {option("claude", info.claudeAvailable, <Sparkles className="size-5" />, t("claudeSite", { site: info.siteName }), claudeSub)}
         {option("free", info.freeAvailable, <Gift className="size-5" />, t("free", { name: info.freeName }), info.freeAvailable ? t("freeSub") : t("unavailable.free"))}
+        {info.ownAllowed &&
+          option("own", info.ownAvailable, <KeyRound className="size-5" />, t("own"), info.ownAvailable ? t("ownSub", { hint: info.ownHint ?? "" }) : t("ownNone"))}
       </div>
 
       <AnimatePresence>

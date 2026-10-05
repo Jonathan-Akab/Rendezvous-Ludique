@@ -34,4 +34,4 @@ export function oneOf<T extends string>(value: string, allowed: readonly T[], fa
 
 export const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
-export type ActionState = { ok?: boolean; error?: string; message?: string } | undefined;
+export type ActionState = { ok?: boolean; error?: string; message?: string; data?: Record<string, unknown> } | undefined;

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { ImagePlus, X } from "lucide-react";
 import { FormMessage, SubmitButton } from "@/components/forms";
 import { LocationFields } from "@/components/LocationFields";
-import { GamePicker, type PickedGame } from "@/modules/games/components/GamePicker";
+import { MyGameSelect, type MyGameOption } from "@/modules/kallax/components/MyGameSelect";
 import type { ActionState } from "@/lib/forms";
 
 export type ListingValues = {
@@ -27,6 +27,7 @@ export function ListingForm({
   action,
   values = {},
   game,
+  myGames,
   editing = false,
   allowTrades,
   currency,
@@ -34,7 +35,9 @@ export function ListingForm({
 }: {
   action: (prev: ActionState, fd: FormData) => Promise<ActionState>;
   values?: ListingValues;
-  game?: PickedGame | null;
+  /** game id pre-selected (selling from a Kallax game) */
+  game?: string | null;
+  myGames: MyGameOption[];
   editing?: boolean;
   allowTrades: boolean;
   currency: string;
@@ -53,7 +56,7 @@ export function ListingForm({
       {!editing && (
         <div>
           <span className="label">{t("form.game")}</span>
-          <GamePicker initial={game} />
+          <MyGameSelect games={myGames} defaultValue={game ?? undefined} required />
         </div>
       )}
       <div>

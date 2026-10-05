@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requirePermission } from "@/lib/auth/guards";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { ilike } from "@/lib/search";
@@ -12,6 +13,7 @@ export async function generateMetadata() {
 }
 
 export default async function AdminLibrariesPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  await requirePermission("libraries");
   const [sp, t, format] = await Promise.all([searchParams, getTranslations("admin.libraries"), getFormatter()]);
   const libraries = await db.library.findMany({
     where: sp.q ? { OR: [{ name: ilike(sp.q) }, { members: { some: { user: { displayName: ilike(sp.q) } } } }] } : {},
