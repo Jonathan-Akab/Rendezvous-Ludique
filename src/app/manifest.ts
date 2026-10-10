@@ -3,6 +3,10 @@ import { getSiteSettings } from "@/lib/settings";
 
 // Makes the site installable as an app (Android, Windows, ChromeOS, macOS; iPhone/iPad via
 // "Sur l'écran d'accueil"). Served at /manifest.webmanifest.
+
+// Built on request (it reads the site name): there is no database while the Docker image builds.
+export const dynamic = "force-dynamic";
+
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const { siteName } = await getSiteSettings();
   return {
