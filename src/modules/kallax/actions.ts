@@ -15,6 +15,8 @@ import { LIBRARY_VISIBILITIES, addToKallax, attachExpansion, detachExpansion, ex
 import { enrichAvailable, lookUpFacts } from "@/modules/games/enrich";
 import { fillEmptyGameFields } from "@/modules/games/service";
 import { notify } from "@/modules/notifications/emails";
+import { aiGameDetails, ludoDetails, type DetailFields } from "@/modules/games/webDetails";
+import { getLocale } from "next-intl/server";
 
 async function guard() {
   const user = await requireUser();
@@ -140,6 +142,28 @@ export async function updateKallaxGameAction(id: string, _prev: ActionState, fd:
   });
   done();
   return { ok: true, message: t("saved") };
+}
+
+export type DetailsResult = { ok: true; fields: DetailFields; source: string | null; via: "ludo" | "web" | "free" } | { ok: false; error: "notFound" | "unavailable" | "name" };
+
+/** "Copy from the Ludothèque": the Ludothèque's details for this game (by id, or by exact name). Only fills the form. */
+export async function copyFromLudoAction(gameId: string | null, name: string): Promise<DetailsResult> {
+  await guard();
+  const d = await ludoDetails(gameId, name.slice(0, 150));
+  if (!d) return { ok: false, error: "notFound" };
+  const { name: _name, ...fields } = d;
+  void _name;
+  return { ok: true, fields, source: null, via: "ludo" };
+}
+
+/** "Ask the AI to fill": Claude searches the web for each detail (or the free AI answers from memory). Only fills the form. */
+export async function aiFillDetailsAction(name: string): Promise<DetailsResult> {
+  const { user } = await guard();
+  const clean = name.trim().slice(0, 150);
+  if (clean.length < 2) return { ok: false, error: "name" };
+  const found = await aiGameDetails(clean, user.id, await getLocale());
+  if (!found) return { ok: false, error: "unavailable" };
+  return { ok: true, fields: found.fields, source: found.source, via: found.via };
 }
 
 /** Upload the box picture of a Kallax record (replaces the previous uploaded one). */

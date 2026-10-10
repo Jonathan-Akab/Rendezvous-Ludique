@@ -525,6 +525,26 @@
       "readOnly": "You are looking at it — only its owners can change it.",
       "none": "No Kallax to show",
       "noneHint": "This member keeps their Kallax private, or only shows it to friends."
+    },
+    "fill": {
+      "ludo": "Copy from the Ludothèque",
+      "ludoHint": "Fills the fields with what the Ludothèque knows about this game",
+      "ai": "Ask the AI to fill",
+      "aiHint": "The AI searches the internet for each detail",
+      "searching": "Searching the internet for each detail… this can take 10–20 seconds.",
+      "needName": "Type the game’s name first.",
+      "failed": "Something went wrong. Try again.",
+      "filledLudo": "Copied from the Ludothèque: {fields}.",
+      "filledAi": "Filled by the AI: {fields}.",
+      "source": "Source: {source}.",
+      "checkThem": "Check them, then save.",
+      "nothingLudo": "The Ludothèque has no details for this game yet.",
+      "nothingAi": "The AI could not confirm any detail for this game.",
+      "errors": {
+        "notFound": "This game is not in the Ludothèque yet (check the name).",
+        "unavailable": "The AI is not available right now (turned off, or its budget is used up).",
+        "name": "Type the game’s name first."
+      }
     }
   },
   "plays": {

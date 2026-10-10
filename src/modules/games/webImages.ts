@@ -129,13 +129,14 @@ async function pickClaude(userId: string): Promise<{ client: Anthropic; provider
   return null;
 }
 
-/** Web search with Claude: the box art of the game, from pages that show it (BGG, publisher, shops…). */
-export async function claudeWebImages(name: string, userId: string): Promise<ImageResult[]> {
+/**
+ * Runs one question through Claude with web search. Returns its text answer and the pages the search
+ * found, or null when no Claude is available to this member (AI off, budget used up…).
+ * The cost is recorded like the other AI calls: the site's budgets ("claude") or the member's own spending ("own").
+ */
+export async function claudeWebSearch(userId: string, prompt: string, purpose: string): Promise<{ answer: string; results: { url: string; title: string }[] } | null> {
   const claude = await pickClaude(userId);
-  if (!claude) return [];
-
-  const prompt = `Find the official box cover picture of the board game "${name}". Search the web (BoardGameGeek, the publisher's site, board game shops). Prefer the current edition's front cover.
-When done, answer with JSON only, listing the web pages that show this exact game's box, best first: {"pages":[{"url":"https://…","title":"…"}]}. Include direct picture links (.jpg/.png/.webp) too if you saw any. Only the game "${name}" — not a similar title, not an expansion unless that is what was asked.`;
+  if (!claude) return null;
 
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: prompt }];
   const urls: { url: string; title: string }[] = [];
@@ -167,16 +168,15 @@ When done, answer with JSON only, listing the web pages that show this exact gam
       messages.push({ role: "assistant", content: res.content });
     }
   } catch (e) {
-    console.error("[images] Claude web search failed:", e);
+    console.error(`[${purpose}] Claude web search failed:`, e);
   }
 
-  // Counted like the other AI calls: the site's budgets ("claude") or the member's own spending ("own").
   if (inputTokens || outputTokens) {
     await db.aiUsage
       .create({
         data: {
           userId,
-          purpose: "image",
+          purpose,
           provider: claude.provider,
           model,
           inputTokens,
@@ -184,8 +184,18 @@ When done, answer with JSON only, listing the web pages that show this exact gam
           costUsd: claudeCostUsd(model, { input_tokens: inputTokens, output_tokens: outputTokens }) + searches * SEARCH_COST_USD,
         },
       })
-      .catch((e) => console.error("[images] usage not recorded:", e));
+      .catch((e) => console.error(`[${purpose}] usage not recorded:`, e));
   }
+  return { answer, results: urls };
+}
+
+/** Web search with Claude: the box art of the game, from pages that show it (BGG, publisher, shops…). */
+export async function claudeWebImages(name: string, userId: string): Promise<ImageResult[]> {
+  const prompt = `Find the official box cover picture of the board game "${name}". Search the web (BoardGameGeek, the publisher's site, board game shops). Prefer the current edition's front cover.
+When done, answer with JSON only, listing the web pages that show this exact game's box, best first: {"pages":[{"url":"https://…","title":"…"}]}. Include direct picture links (.jpg/.png/.webp) too if you saw any. Only the game "${name}" — not a similar title, not an expansion unless that is what was asked.`;
+  const search = await claudeWebSearch(userId, prompt, "image");
+  if (!search) return [];
+  const { answer, results: urls } = search;
 
   // What Claude chose goes first, then the other pages the search returned.
   const chosen: { url: string; title: string }[] = [];

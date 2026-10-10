@@ -525,6 +525,26 @@
       "readOnly": "Tu la regardes seulement — seuls ses propriétaires peuvent la modifier.",
       "none": "Aucune Kallax à montrer",
       "noneHint": "Ce membre garde sa Kallax privée, ou la montre seulement à ses amis."
+    },
+    "fill": {
+      "ludo": "Copier depuis la Ludothèque",
+      "ludoHint": "Remplit les champs avec ce que la Ludothèque sait de ce jeu",
+      "ai": "Demander à l’IA de remplir",
+      "aiHint": "L’IA cherche chaque détail sur internet",
+      "searching": "Recherche de chaque détail sur internet… ça peut prendre 10 à 20 secondes.",
+      "needName": "Écris d’abord le nom du jeu.",
+      "failed": "Quelque chose n’a pas fonctionné. Réessaie.",
+      "filledLudo": "Copié depuis la Ludothèque : {fields}.",
+      "filledAi": "Rempli par l’IA : {fields}.",
+      "source": "Source : {source}.",
+      "checkThem": "Vérifie-les, puis enregistre.",
+      "nothingLudo": "La Ludothèque n’a pas encore de détails pour ce jeu.",
+      "nothingAi": "L’IA n’a pas pu confirmer de détail pour ce jeu.",
+      "errors": {
+        "notFound": "Ce jeu n’est pas encore dans la Ludothèque (vérifie le nom).",
+        "unavailable": "L’IA n’est pas disponible pour le moment (désactivée, ou son budget est épuisé).",
+        "name": "Écris d’abord le nom du jeu."
+      }
     }
   },
   "plays": {

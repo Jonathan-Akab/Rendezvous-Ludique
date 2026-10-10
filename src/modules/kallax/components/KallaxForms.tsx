@@ -10,6 +10,7 @@ import { addGameAction, inviteToLibraryAction } from "../actions";
 import { GamePicker } from "@/modules/games/components/GamePicker";
 import { GameFields } from "@/modules/games/components/GameFields";
 import { EnrichProgress } from "@/modules/games/components/EnrichProgress";
+import { FillDetails } from "./FillDetails";
 import { ImportWizard, type ImportSource, type PhotoAi } from "./ImportWizard";
 import type { KallaxBase } from "./ImportReview";
 
@@ -104,6 +105,7 @@ export function AddGameForm({
                   {mode === "manual" ? (
                     <div className="space-y-2">
                       <p className="text-xs text-muted">{t("form.manualHint")}</p>
+                      <FillDetails />
                       <GameFields compact />
                     </div>
                   ) : (

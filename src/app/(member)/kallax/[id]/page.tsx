@@ -12,6 +12,7 @@ import { ActionForm } from "@/components/ActionForm";
 import { ConfirmButton } from "@/components/forms";
 import { GameCover } from "@/modules/games/components/GameCover";
 import { GameFields } from "@/modules/games/components/GameFields";
+import { FillDetails } from "@/modules/kallax/components/FillDetails";
 import { MeepleRating } from "@/modules/games/components/MeepleRating";
 import { RatingInput } from "@/modules/games/components/RatingInput";
 import { FindImage, UploadBoxArt } from "@/modules/games/components/ImageSuggestions";
@@ -275,6 +276,7 @@ export default async function KallaxGamePage({ params }: { params: Promise<{ id:
           </h2>
           <p className="text-xs text-muted">{t("editLead")}</p>
           <ActionForm action={updateKallaxGameAction.bind(null, kg.id)} submitLabel={t("save")}>
+            <FillDetails gameId={kg.gameId} />
             <GameFields values={kg} compact />
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
