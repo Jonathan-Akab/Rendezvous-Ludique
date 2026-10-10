@@ -9,7 +9,7 @@ export async function getMenuItems(navOrder: string | null): Promise<NavItem[]> 
   const items: NavItem[] = [
     { href: "/home", label: t("home"), icon: "House" },
     ...ordered.filter((m) => m.href && modules[m.key].enabled)// The suggestion box opens a popup rather than a page.
-      .map((m) => ({ href: m.href!, label: t(m.key), icon: m.icon, ...(m.key === "suggestions" ? { dialog: "suggestions" as const } : {}) })),
+      .map((m) => ({ href: m.href!, label: t(m.key === "ai" ? "aiMenu" : m.key), icon: m.icon, ...(m.key === "suggestions" ? { dialog: "suggestions" as const } : {}) })),
   ];
 
   let order: string[] = [];

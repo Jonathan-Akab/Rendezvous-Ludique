@@ -159,7 +159,8 @@
     "animationsOn": "Animations activées (cliquer pour les couper)",
     "animationsOff": "Animations désactivées (cliquer pour les remettre)",
     "picker": "Coup de dé",
-    "support": "Soutenir le projet"
+    "support": "Soutenir le projet",
+    "aiMenu": "IA des règles / FAQ"
   },
   "donations": {
     "support": "Soutenir le projet",

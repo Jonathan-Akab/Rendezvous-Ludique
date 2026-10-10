@@ -159,7 +159,8 @@
     "animationsOn": "Animations on (click to turn off)",
     "animationsOff": "Animations off (click to turn on)",
     "picker": "Roll the dice",
-    "support": "Support the project"
+    "support": "Support the project",
+    "aiMenu": "Rules AI / FAQ"
   },
   "donations": {
     "support": "Support the project",
