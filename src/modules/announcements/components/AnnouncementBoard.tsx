@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { getFormatter, getTranslations } from "next-intl/server";
-import { Megaphone, Pin, PinOff, Trash2 } from "lucide-react";
+import { Pin, PinOff, Trash2 } from "lucide-react";
 import { db } from "@/lib/db";
 import { can } from "@/lib/auth/permissions";
 import { Meeple } from "@/components/Meeple";
@@ -8,9 +8,11 @@ import { ConfirmButton } from "@/components/forms";
 import { deleteAnnouncementAction, toggleAnnouncementPinAction } from "../actions";
 import { NewAnnouncement } from "./NewAnnouncement";
 import { EditableAnnouncement } from "./EditAnnouncement";
+import { AnnouncementPopup } from "./AnnouncementPopup";
 
-// "Babillard" on the home page: messages from the team. Pinned ones stay on top; the latest
-// others follow, older ones fold away.
+// "Babillard" on the home page: messages from the team. On the page it is one slim banner (the newest
+// message, cut short); clicking it opens the whole board in a popup. Pinned messages stay on top there,
+// the latest others follow, older ones fold away.
 
 const SHOWN = 3; // unpinned messages shown before "older messages"
 const URL_RE = /(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g;
@@ -87,14 +89,25 @@ export async function AnnouncementBoard({ user }: { user: { id: string; role: st
     </li>
   );
 
+  // The banner shows the newest message, whether pinned or not.
+  const newest = rows.reduce<(typeof rows)[number] | null>((best, r) => (!best || r.createdAt > best.createdAt ? r : best), null);
+  const latest = newest
+    ? {
+        at: newest.createdAt.toISOString(),
+        preview: newest.body.replace(/\s+/g, " ").trim().slice(0, 160),
+        author: newest.author?.displayName ?? t("team"),
+        color: newest.author?.meepleColor ?? "#868e96",
+        pinned: newest.pinned,
+      }
+    : null;
+
   return (
-    <section className="card card-pad space-y-4">
-      <div className="flex items-center gap-2">
-        <h2 className="section-title flex items-center gap-2">
-          <Megaphone className="size-5 text-accent" /> {t("title")}
-        </h2>
-        {canWrite && <NewAnnouncement />}
-      </div>
+    <AnnouncementPopup latest={latest} total={rows.length}>
+      {canWrite && (
+        <div className="mb-4">
+          <NewAnnouncement />
+        </div>
+      )}
 
       {rows.length === 0 ? (
         <p className="text-sm text-muted">{t("empty")}</p>
@@ -112,6 +125,6 @@ export async function AnnouncementBoard({ user }: { user: { id: string; role: st
           )}
         </ul>
       )}
-    </section>
+    </AnnouncementPopup>
   );
 }

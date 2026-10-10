@@ -1,7 +1,7 @@
 import "server-only";
 import { db } from "@/lib/db";
 import { distanceKm } from "@/lib/geo";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { getFriendIds, PUBLIC_USER } from "@/modules/friends/service";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -43,8 +43,8 @@ export async function listEvents(viewerId: string, f: EventFilters) {
 
   if (f.mine) and.push({ OR: [{ hostId: viewerId }, { attendees: { some: { userId: viewerId, status: { not: "DECLINED" } } } }] });
   if (f.kind) and.push({ kind: f.kind });
-  if (f.city) and.push({ city: ilike(f.city) });
-  if (f.q) and.push({ OR: [{ title: ilike(f.q) }, { description: ilike(f.q) }] });
+  if (f.city) and.push({ id: { in: await matchIds("Event", ["city"], f.city) } });
+  if (f.q) and.push({ id: { in: await matchIds("Event", ["title", "description"], f.q) } });
 
   const day = 24 * 60 * 60 * 1000;
   if (f.range) and.push({ startsAt: { gte: f.range.from, lt: f.range.to } });

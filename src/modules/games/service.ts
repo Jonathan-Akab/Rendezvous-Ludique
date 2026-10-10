@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "@/lib/db";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import type { Prisma } from "@/generated/prisma/client";
 
 // The Ludothèque: the site-wide game reference. It is never edited by members — it
@@ -140,7 +140,7 @@ export type GameCard = Prisma.GameGetPayload<{ select: typeof CARD_SELECT }> & {
 export async function searchGames(q: string, take = 8) {
   const query = q.trim();
   if (!query) return [];
-  const rows = await db.game.findMany({ where: { OR: [{ name: ilike(query) }, { normalizedName: ilike(normalizeName(query)) }] }, select: CARD_SELECT, take: 40 });
+  const rows = await db.game.findMany({ where: { id: { in: await matchIds("Game", ["name", "normalizedName"], query) } }, select: CARD_SELECT, take: 40 });
   const lower = normalizeName(query);
   const rank = (n: string) => (normalizeName(n) === lower ? 0 : normalizeName(n).startsWith(lower) ? 1 : 2);
   rows.sort((a, b) => rank(a.name) - rank(b.name) || b._count.kallaxGames - a._count.kallaxGames || a.name.localeCompare(b.name));
@@ -153,7 +153,7 @@ export type CatalogueSort = "popular" | "rating" | "name" | "recent";
 
 export async function listCatalogue(opts: { q?: string; players?: number; maxTime?: number; sort?: CatalogueSort; take?: number }) {
   const and: Prisma.GameWhereInput[] = [];
-  if (opts.q) and.push({ OR: [{ name: ilike(opts.q) }, { designer: ilike(opts.q) }, { publisher: ilike(opts.q) }] });
+  if (opts.q) and.push({ id: { in: await matchIds("Game", ["name", "designer", "publisher"], opts.q) } });
   if (opts.players) and.push({ minPlayers: { lte: opts.players } }, { maxPlayers: { gte: opts.players } });
   if (opts.maxTime) and.push({ playTimeMin: { lte: opts.maxTime } });
 

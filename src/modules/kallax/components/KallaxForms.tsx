@@ -11,6 +11,7 @@ import { GamePicker } from "@/modules/games/components/GamePicker";
 import { GameFields } from "@/modules/games/components/GameFields";
 import { EnrichProgress } from "@/modules/games/components/EnrichProgress";
 import { FillDetails } from "./FillDetails";
+import { LanguageSelect } from "./LanguageSelect";
 import { ImportWizard, type ImportSource, type PhotoAi } from "./ImportWizard";
 import type { KallaxBase } from "./ImportReview";
 
@@ -115,7 +116,7 @@ export function AddGameForm({
                       <p className="mt-1 text-xs text-muted">{t("form.pickerHint")}</p>
                     </div>
                   )}
-                  <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     <div>
                       <label className="label" htmlFor="kg-status">
                         {t("form.status")}
@@ -154,6 +155,7 @@ export function AddGameForm({
                       </select>
                     </div>
                   </div>
+                  <LanguageSelect />
                   <div className="grid gap-4 sm:grid-cols-3">
                     <div>
                       <label className="label" htmlFor="kg-plays">

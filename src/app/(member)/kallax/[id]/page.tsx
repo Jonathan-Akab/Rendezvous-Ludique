@@ -13,6 +13,7 @@ import { ConfirmButton } from "@/components/forms";
 import { GameCover } from "@/modules/games/components/GameCover";
 import { GameFields } from "@/modules/games/components/GameFields";
 import { FillDetails } from "@/modules/kallax/components/FillDetails";
+import { LanguageSelect } from "@/modules/kallax/components/LanguageSelect";
 import { MeepleRating } from "@/modules/games/components/MeepleRating";
 import { RatingInput } from "@/modules/games/components/RatingInput";
 import { FindImage, UploadBoxArt } from "@/modules/games/components/ImageSuggestions";
@@ -306,6 +307,7 @@ export default async function KallaxGamePage({ params }: { params: Promise<{ id:
                 </div>
               )}
             </div>
+            <LanguageSelect defaultValue={kg.language} />
             <div>
               <label className="label" htmlFor="kg-plays">
                 {t("form.timesPlayed")}

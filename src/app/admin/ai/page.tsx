@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Gift, Settings2, Sparkles } from "lucide-react";
 import { db } from "@/lib/db";
 import { getModule } from "@/lib/modules";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { ActionForm } from "@/components/ActionForm";
 import { MeepleAvatar } from "@/components/Meeple";
 import { AdminHeader, AdminTable, SearchBar, Td } from "@/modules/admin/components/AdminUi";
@@ -32,7 +32,7 @@ export default async function AdminAiPage({ searchParams }: { searchParams: Prom
       select: { provider: true, costUsd: true, chat: { select: { userId: true } } },
     }),
     db.user.findMany({
-      where: q ? { OR: [{ displayName: ilike(q) }, { username: ilike(q) }, { email: ilike(q) }] } : {},
+      where: q ? { id: { in: await matchIds("User", ["displayName", "username", "email"], q) } } : {},
       select: { id: true, displayName: true, username: true, meepleColor: true, aiSetting: true },
       orderBy: { displayName: "asc" },
       take: 300,

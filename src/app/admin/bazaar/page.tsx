@@ -3,7 +3,7 @@ import { requirePermission } from "@/lib/auth/guards";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
 import { getModule } from "@/lib/modules";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { ConfirmButton } from "@/components/forms";
 import { AdminHeader, AdminTable, SearchBar, Td } from "@/modules/admin/components/AdminUi";
 import { deleteListingAction, setListingStatusAction } from "@/modules/bazaar/actions";
@@ -24,7 +24,7 @@ export default async function AdminBazaarPage({ searchParams }: { searchParams: 
     getLocale(),
   ]);
   const listings = await db.bazaarListing.findMany({
-    where: q ? { OR: [{ title: ilike(q) }, { seller: { displayName: ilike(q) } }] } : {},
+    where: q ? { OR: [{ id: { in: await matchIds("BazaarListing", ["title"], q) } }, { sellerId: { in: await matchIds("User", ["displayName"], q) } }] } : {},
     include: { seller: { select: { id: true, displayName: true } }, _count: { select: { messages: true, photos: true } } },
     orderBy: { createdAt: "desc" },
     take: 300,

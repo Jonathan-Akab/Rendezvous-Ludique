@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Check, LibraryBig, Search, X } from "lucide-react";
 import { GameCover } from "@/modules/games/components/GameCover";
+import { foldText } from "@/lib/fold";
 
 export type MyGameOption = { gameId: string; name: string; cover: string | null };
 
@@ -37,8 +38,8 @@ export function MyGameSelect({
   const [open, setOpen] = useState(!initial.length);
 
   const filtered = useMemo(() => {
-    const s = q.trim().toLowerCase();
-    return s ? games.filter((g) => g.name.toLowerCase().includes(s)) : games;
+    const s = foldText(q.trim());
+    return s ? games.filter((g) => foldText(g.name).includes(s)) : games;
   }, [games, q]);
 
   const update = (ids: string[]) => {

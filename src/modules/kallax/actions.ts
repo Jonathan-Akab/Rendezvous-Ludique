@@ -9,7 +9,7 @@ import { requireUser } from "@/lib/auth/guards";
 import { getModule } from "@/lib/modules";
 import { deleteStored, UploadError } from "@/lib/storage";
 import { oneOf, optInt, optStr, str, type ActionState } from "@/lib/forms";
-import { LIBRARY_GAME_STATUSES } from "@/lib/constants";
+import { LIBRARY_GAME_STATUSES, asKallaxLanguage } from "@/lib/constants";
 import { readGameFields, storeCoverFromForm } from "@/modules/games/mutations";
 import { LIBRARY_VISIBILITIES, addToKallax, attachExpansion, detachExpansion, extraPlaysFor, findBaseInLibrary, getLoggedPlayCounts, isLibraryMember } from "./service";
 import { enrichAvailable, lookUpFacts } from "@/modules/games/enrich";
@@ -67,6 +67,7 @@ export async function addGameAction(_prev: ActionState, fd: FormData): Promise<A
       ownerId,
       gameId: pickedId,
       status: oneOf(str(fd, "status"), LIBRARY_GAME_STATUSES, "OWNED"),
+      language: asKallaxLanguage(str(fd, "language")),
       notes: optStr(fd, "notes"),
       // "this is an expansion of…" (a game of the same Kallax)
       parentId: optStr(fd, "parentId"),
@@ -136,6 +137,7 @@ export async function updateKallaxGameAction(id: string, _prev: ActionState, fd:
       imageUrl: info.imageUrl ?? (fd.get("removeImageUrl") === "on" ? null : kg.imageUrl),
       coverFileId,
       status: oneOf(str(fd, "status"), LIBRARY_GAME_STATUSES, kg.status as (typeof LIBRARY_GAME_STATUSES)[number]),
+      language: asKallaxLanguage(str(fd, "language")),
       notes: optStr(fd, "notes")?.slice(0, 1000) ?? null,
       ownerId: (str(fd, "ownerId") && (await isLibraryMember(kg.libraryId, str(fd, "ownerId"))) ? str(fd, "ownerId") : kg.ownerId),
     },

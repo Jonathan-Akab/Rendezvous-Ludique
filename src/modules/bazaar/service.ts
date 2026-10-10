@@ -1,6 +1,6 @@
 import "server-only";
 import { db } from "@/lib/db";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { distanceKm } from "@/lib/geo";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -31,11 +31,11 @@ export async function listListings(opts: {
   const and: Prisma.BazaarListingWhereInput[] = [];
   if (!opts.includeSold) and.push({ status: { not: "SOLD" } });
   if (opts.sellerId) and.push({ sellerId: opts.sellerId });
-  if (opts.q) and.push({ OR: [{ title: ilike(opts.q) }, { description: ilike(opts.q) }, { game: { name: ilike(opts.q) } }] });
+  if (opts.q) and.push({ OR: [{ id: { in: await matchIds("BazaarListing", ["title", "description"], opts.q) } }, { gameId: { in: await matchIds("Game", ["name"], opts.q) } }] });
   if (opts.kind === "SALE") and.push({ kind: { in: ["SALE", "BOTH"] } });
   if (opts.kind === "TRADE") and.push({ kind: { in: ["TRADE", "BOTH"] } });
   if (opts.maxPrice != null) and.push({ price: { lte: opts.maxPrice } });
-  if (opts.city) and.push({ city: ilike(opts.city) });
+  if (opts.city) and.push({ id: { in: await matchIds("BazaarListing", ["city"], opts.city) } });
 
   const rows = await db.bazaarListing.findMany({ where: { AND: and }, include: LISTING_CARD, orderBy: { createdAt: "desc" }, take: 200 });
   const withDistance: ListingCard[] = rows.map((r) => ({

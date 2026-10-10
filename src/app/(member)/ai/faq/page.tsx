@@ -8,8 +8,8 @@ import { db } from "@/lib/db";
 import { normalizeText } from "@/lib/similarity";
 import { EmptyState } from "@/components/EmptyState";
 import { GameCover } from "@/modules/games/components/GameCover";
-import { coverUrl, normalizeName } from "@/modules/games/service";
-import { ilike } from "@/lib/search";
+import { coverUrl } from "@/modules/games/service";
+import { matchIds } from "@/lib/search";
 import { getMyKallaxGames } from "@/modules/kallax/service";
 import { faqCounts, faqEnabled } from "@/modules/ai/faq";
 import { AiGameSelect } from "@/modules/ai/components/AiGameSelect";
@@ -34,7 +34,7 @@ export default async function FaqIndexPage({ searchParams }: { searchParams: Pro
   const others =
     src === "ludo"
       ? await db.game.findMany({
-          where: q ? { OR: [{ name: ilike(sp.q ?? "") }, { normalizedName: ilike(normalizeName(sp.q ?? "")) }] } : {},
+          where: q ? { id: { in: await matchIds("Game", ["name", "normalizedName"], sp.q ?? "") } } : {},
           select: { id: true, name: true, coverFileId: true, imageUrl: true },
           orderBy: { name: "asc" },
           take: LUDO_LIMIT + 1,

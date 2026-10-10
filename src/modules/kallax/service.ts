@@ -127,7 +127,7 @@ export async function getMyExpansions(userId: string): Promise<MyExpansions> {
 export async function addToKallax(
   libraryId: string,
   info: GameInfo,
-  opts: { userId: string; ownerId?: string; status?: string; notes?: string | null; coverFileId?: string | null; gameId?: string; parentId?: string | null },
+  opts: { userId: string; ownerId?: string; status?: string; language?: string | null; notes?: string | null; coverFileId?: string | null; gameId?: string; parentId?: string | null },
 ) {
   const game = opts.gameId ? await db.game.findUnique({ where: { id: opts.gameId } }) : await ensureGame(info, opts.userId);
   if (!game) return null;
@@ -152,6 +152,7 @@ export async function addToKallax(
       imageUrl: info.imageUrl ?? null,
       coverFileId: opts.coverFileId ?? null,
       status: opts.status ?? "OWNED",
+      language: opts.language ?? null,
       notes: opts.notes ?? null,
     },
   });

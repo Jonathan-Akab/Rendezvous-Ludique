@@ -11,6 +11,8 @@ export type ShelfGame = {
   id: string;
   status: string;
   notes: string | null;
+  /** language of this copy (fr, en…), when the Kallax owner filled it in */
+  language?: string | null;
   cover: string | null;
   game: {
     id: string;
@@ -35,6 +37,8 @@ const STATUS_STYLE: Record<string, string> = {
   FOR_TRADE: "",
   PREORDERED: "opacity-80",
 };
+
+const langShort = (code: string) => (code === "other" ? "…" : code.toUpperCase());
 
 function players(g: ShelfGame["game"]) {
   if (!g.minPlayers || !g.maxPlayers) return null;
@@ -88,6 +92,7 @@ export async function KallaxShelf({
                   </span>
                 )}
                 {g.status !== "OWNED" && <span className="chip">{t(`status.${g.status}`)}</span>}
+                {g.language && <span className="chip" title={t(`language.codes.${g.language}`)}>{langShort(g.language)}</span>}
                 {g.expansions && g.expansions.length > 0 && (
                   <span className="chip border-transparent bg-[#1c5fbf]/15 text-[#3b82f6]" title={g.expansions.join(", ")}>
                     <Puzzle className="size-3" /> {t("expansionsCount", { count: g.expansions.length })}
@@ -128,6 +133,7 @@ export async function KallaxShelf({
             </div>
             <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
               {g.status !== "OWNED" && <span className="chip bg-surface/90 px-1.5 text-[10px] backdrop-blur">{t(`status.${g.status}`)}</span>}
+              {g.language && <span className="chip bg-surface/90 px-1.5 text-[10px] font-bold backdrop-blur" title={t(`language.codes.${g.language}`)}>{langShort(g.language)}</span>}
               {g.expansions && g.expansions.length > 0 && (
                 <span className="chip gap-0.5 bg-[#1c5fbf]/85 px-1.5 text-[10px] text-white backdrop-blur" title={g.expansions.join(", ")}>
                   <Puzzle className="size-3" /> +{g.expansions.length}

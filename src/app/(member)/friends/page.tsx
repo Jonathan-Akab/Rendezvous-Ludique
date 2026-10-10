@@ -4,7 +4,7 @@ import { Check, Search, UserMinus, UserPlus, X } from "lucide-react";
 import { requireUser } from "@/lib/auth/guards";
 import { requireModule } from "@/lib/modules";
 import { db } from "@/lib/db";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { MeepleAvatar } from "@/components/Meeple";
 import { Stagger, StaggerItem } from "@/components/Motion";
 import { EmptyState } from "@/components/EmptyState";
@@ -36,7 +36,7 @@ export default async function FriendsPage({ searchParams }: { searchParams: Prom
           status: "ACTIVE",
           OR: [
             { username: query.toLowerCase() },
-            { profileVisibility: { not: "PRIVATE" }, OR: [{ displayName: ilike(query) }, { username: ilike(query) }, { city: ilike(query) }] },
+            { profileVisibility: { not: "PRIVATE" }, id: { in: await matchIds("User", ["displayName", "username", "city"], query) } },
           ],
         },
         select: PUBLIC_USER,

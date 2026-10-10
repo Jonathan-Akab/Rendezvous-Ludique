@@ -4,8 +4,8 @@ import { Check, LayoutGrid, List, LogOut, Search, X } from "lucide-react";
 import { requireUser } from "@/lib/auth/guards";
 import { getModule, requireModule } from "@/lib/modules";
 import { db } from "@/lib/db";
-import { ilike } from "@/lib/search";
-import { LIBRARY_GAME_STATUSES } from "@/lib/constants";
+import { matchIds } from "@/lib/search";
+import { KALLAX_LANGUAGES, LIBRARY_GAME_STATUSES, asKallaxLanguage } from "@/lib/constants";
 import { FadeIn } from "@/components/Motion";
 import { MeepleAvatar } from "@/components/Meeple";
 import { EmptyState } from "@/components/EmptyState";
@@ -44,7 +44,7 @@ const NO_AI = {
   siteName: "",
 };
 
-type Search = { lib?: string; q?: string; status?: string; players?: string; view?: string };
+type Search = { lib?: string; q?: string; status?: string; players?: string; view?: string; lang?: string };
 
 export default async function KallaxPage({ searchParams }: { searchParams: Promise<Search> }) {
   const [user, mod, sp, t] = await Promise.all([requireUser(), requireModule("kallax"), searchParams, getTranslations("kallax")]);
@@ -66,8 +66,13 @@ export default async function KallaxPage({ searchParams }: { searchParams: Promi
   // The Kallax's own records (private to the members sharing it).
   // Expansions are shown on their base game, not as games of their own.
   const where: Prisma.KallaxGameWhereInput = { libraryId: library?.id ?? "-", parentId: null };
-  if (sp.q) where.OR = [{ name: ilike(sp.q) }, { expansions: { some: { name: ilike(sp.q) } } }];
+  if (sp.q) {
+    const ids = await matchIds("KallaxGame", ["name"], sp.q, { column: "libraryId", value: library?.id ?? "-" });
+    where.OR = [{ id: { in: ids } }, { expansions: { some: { id: { in: ids } } } }];
+  }
   if (sp.status && LIBRARY_GAME_STATUSES.includes(sp.status as never)) where.status = sp.status;
+  const lang = asKallaxLanguage(sp.lang);
+  if (lang) where.language = lang;
   const players = Number(sp.players);
   if (players > 0) {
     where.minPlayers = { lte: players };
@@ -94,6 +99,7 @@ export default async function KallaxPage({ searchParams }: { searchParams: Promi
   const games = rows.map((r) => ({
     id: r.id,
     status: r.status,
+    language: r.language,
     notes: r.notes,
     owner: r.owner,
     cover: kallaxCoverUrl(r),
@@ -187,11 +193,19 @@ export default async function KallaxPage({ searchParams }: { searchParams: Promi
                   </option>
                 ))}
               </select>
+              <select name="lang" defaultValue={sp.lang ?? ""} className="select w-auto" aria-label={t("language.label")}>
+                <option value="">{t("language.all")}</option>
+                {KALLAX_LANGUAGES.map((l) => (
+                  <option key={l} value={l}>
+                    {t(`language.codes.${l}`)}
+                  </option>
+                ))}
+              </select>
               <input name="players" type="number" min={1} defaultValue={sp.players} placeholder={t("playersFilter")} className="input w-28" aria-label={t("playersFilter")} />
               <button className="btn btn-secondary">{t("filter")}</button>
             </form>
             {games.length === 0 ? (
-              <EmptyState title={sp.q || sp.status || sp.players ? t("noMatch") : t("emptyShelf")} text={t("emptyShelfHint")} />
+              <EmptyState title={sp.q || sp.status || sp.players || sp.lang ? t("noMatch") : t("emptyShelf")} text={t("emptyShelfHint")} />
             ) : (
               <>
                 <div className="flex items-center justify-between">

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requirePermission } from "@/lib/auth/guards";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { ConfirmButton } from "@/components/forms";
 import { AdminHeader, AdminTable, SearchBar, Td } from "@/modules/admin/components/AdminUi";
 import { adminDeletePlayAction } from "@/modules/admin/actions";
@@ -15,7 +15,7 @@ export default async function AdminPlaysPage({ searchParams }: { searchParams: P
   await requirePermission("plays");
   const [sp, t, format] = await Promise.all([searchParams, getTranslations("admin.plays"), getFormatter()]);
   const plays = await db.play.findMany({
-    where: sp.q ? { OR: [{ game: { name: ilike(sp.q) } }, { createdBy: { displayName: ilike(sp.q) } }] } : {},
+    where: sp.q ? { OR: [{ gameId: { in: await matchIds("Game", ["name"], sp.q) } }, { createdById: { in: await matchIds("User", ["displayName"], sp.q) } }] } : {},
     include: {
       game: { select: { name: true } },
       createdBy: { select: { id: true, displayName: true } },

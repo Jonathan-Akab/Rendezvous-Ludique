@@ -69,6 +69,14 @@ export async function sendPasswordResetEmail(user: Recipient) {
  * and email is set up. Never fails the action that triggered it.
  */
 export async function notify(userId: string, type: NotifyType, params: Record<string, string>, path: string) {
+  // The bell in the top bar always gets it; the email only if the member asked for it.
+  try {
+    await db.notification.create({ data: { userId, type, params: JSON.stringify(params), path } });
+    // keep the list short: nothing older than 90 days
+    await db.notification.deleteMany({ where: { userId, createdAt: { lt: new Date(Date.now() - 90 * 86_400_000) } } });
+  } catch (e) {
+    console.error(`[notify] bell ${type} for ${userId} failed:`, e);
+  }
   try {
     if (!mailConfigured()) return;
     const user = await db.user.findUnique({ where: { id: userId } });

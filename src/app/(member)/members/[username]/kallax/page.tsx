@@ -5,7 +5,7 @@ import { ArrowLeft, LayoutGrid, List, Search } from "lucide-react";
 import { requireUser } from "@/lib/auth/guards";
 import { requireModule } from "@/lib/modules";
 import { db } from "@/lib/db";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { EmptyState } from "@/components/EmptyState";
 import { canViewProfile, getProfileData } from "@/modules/profiles/service";
 import { getMyRatings, getRatingStats } from "@/modules/games/service";
@@ -41,7 +41,10 @@ export default async function MemberKallaxPage({ params, searchParams }: { param
   }
 
   const where: Prisma.KallaxGameWhereInput = { libraryId: library.id, parentId: null };
-  if (sp.q) where.OR = [{ name: ilike(sp.q) }, { expansions: { some: { name: ilike(sp.q) } } }];
+  if (sp.q) {
+    const ids = await matchIds("KallaxGame", ["name"], sp.q, { column: "libraryId", value: library.id });
+    where.OR = [{ id: { in: ids } }, { expansions: { some: { id: { in: ids } } } }];
+  }
   const rows = await db.kallaxGame.findMany({
     where,
     include: {

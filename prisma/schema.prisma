@@ -64,6 +64,7 @@ model User {
   lastSeenAt DateTime?
 
   sessions          Session[]
+  notifications     Notification[]
   sentFriendships   Friendship[]      @relation("FriendshipRequester")
   recvFriendships   Friendship[]      @relation("FriendshipAddressee")
   libraryMembers    LibraryMember[]
@@ -213,6 +214,7 @@ model KallaxGame {
   coverFileId String?
   status      String   @default("OWNED") // OWNED | WISHLIST | FOR_TRADE | PREORDERED
   condition   String?
+  language    String? // language of this copy (fr | en | es…) — only in the Kallax, never in the Ludothèque
   notes       String?
   parentId    String? // expansion: the Kallax record of its base game
   // plays not logged on the site (before joining, forgotten…); the counter shown adds the logged ones
@@ -621,6 +623,23 @@ model SuggestionVote {
 
   @@id([suggestionId, userId])
   @@index([userId])
+}
+
+// What the notification bell shows: one line per event that concerns a member (a friend request, an
+// answer to their suggestion…), with the page it leads to. `params` is JSON for the sentence's blanks.
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String
+  params    String    @default("{}")
+  path      String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, readAt])
 }
 
 // AI calls outside the rules chat (e.g. reading game titles from Kallax photos), so their

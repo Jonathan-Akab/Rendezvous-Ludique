@@ -20,6 +20,11 @@ export type AttendeeStatus = (typeof ATTENDEE_STATUSES)[number];
 export const LIBRARY_GAME_STATUSES = ["OWNED", "WISHLIST", "FOR_TRADE", "PREORDERED"] as const;
 export type LibraryGameStatus = (typeof LIBRARY_GAME_STATUSES)[number];
 
+/** Language of a member's own copy of a game (private to the Kallax; a filter when searching it). */
+export const KALLAX_LANGUAGES = ["fr", "en", "es", "de", "it", "pt", "nl", "multi", "other"] as const;
+export type KallaxLanguage = (typeof KALLAX_LANGUAGES)[number];
+export const asKallaxLanguage = (v: string | null | undefined): KallaxLanguage | null => ((KALLAX_LANGUAGES as readonly string[]).includes(v ?? "") ? (v as KallaxLanguage) : null);
+
 export const LOCALES = ["fr", "en"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "fr";

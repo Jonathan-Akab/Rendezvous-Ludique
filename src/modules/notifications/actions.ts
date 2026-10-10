@@ -7,6 +7,17 @@ import { requireUser } from "@/lib/auth/guards";
 import type { ActionState } from "@/lib/forms";
 import { NOTIFY_TYPES } from "./emails";
 
+/** Opening a notification marks it as read. */
+export async function markNotificationReadAction(id: string) {
+  const user = await requireUser();
+  await db.notification.updateMany({ where: { id, userId: user.id, readAt: null }, data: { readAt: new Date() } });
+}
+
+export async function markAllNotificationsReadAction() {
+  const user = await requireUser();
+  await db.notification.updateMany({ where: { userId: user.id, readAt: null }, data: { readAt: new Date() } });
+}
+
 /** The email notifications the member wants (all off by default). */
 export async function saveNotifyPrefsAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const user = await requireUser();

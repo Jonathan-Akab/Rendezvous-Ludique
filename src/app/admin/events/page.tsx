@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requirePermission } from "@/lib/auth/guards";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { ConfirmButton } from "@/components/forms";
 import { AdminHeader, AdminTable, SearchBar, Td } from "@/modules/admin/components/AdminUi";
 import { adminDeleteEventAction, adminEventStatusAction } from "@/modules/admin/actions";
@@ -16,7 +16,7 @@ export default async function AdminEventsPage({ searchParams }: { searchParams: 
   await requirePermission("events");
   const [sp, t, te, format] = await Promise.all([searchParams, getTranslations("admin.events"), getTranslations("events"), getFormatter()]);
   const where: Prisma.EventWhereInput = {};
-  if (sp.q) where.OR = [{ title: ilike(sp.q) }, { city: ilike(sp.q) }, { host: { displayName: ilike(sp.q) } }];
+  if (sp.q) where.OR = [{ id: { in: await matchIds("Event", ["title", "city"], sp.q) } }, { hostId: { in: await matchIds("User", ["displayName"], sp.q) } }];
   if (sp.when === "past") where.startsAt = { lt: new Date() };
   else if (sp.when !== "all") where.startsAt = { gte: new Date() };
 

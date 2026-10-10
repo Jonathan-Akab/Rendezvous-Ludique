@@ -2,6 +2,7 @@ import "server-only";
 import { getModule } from "@/lib/modules";
 import { bggConfigured, bggImages } from "@/lib/bgg";
 import { textSimilarity } from "@/lib/similarity";
+import { foldText } from "@/lib/fold";
 
 // Picture suggestions for a game box, from free sources only. The member picks one;
 // we store only its link (the image usually belongs to the publisher, so we don't copy it).
@@ -36,7 +37,7 @@ async function wikimedia(query: string): Promise<ImageResult[]> {
   // Commons is general-purpose: show pictures that look like the game first.
   const name = query.toLowerCase();
   const gameLike = (t: string) => /game|jeu|board|box|bo[iî]te|dice|card|tile|meeple|spiel/i.test(t);
-  const score = (r: ImageResult) => (r.title.toLowerCase().includes(name) ? 2 : 0) + (gameLike(r.title) ? 1 : 0);
+  const score = (r: ImageResult) => (foldText(r.title).includes(foldText(name)) ? 2 : 0) + (gameLike(r.title) ? 1 : 0);
   return results.filter((r) => score(r) > 0).sort((a, b) => score(b) - score(a));
 }
 

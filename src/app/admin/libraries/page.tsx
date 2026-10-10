@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requirePermission } from "@/lib/auth/guards";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { ConfirmButton } from "@/components/forms";
 import { Meeple } from "@/components/Meeple";
 import { AdminHeader, AdminTable, SearchBar, Td } from "@/modules/admin/components/AdminUi";
@@ -16,7 +16,7 @@ export default async function AdminLibrariesPage({ searchParams }: { searchParam
   await requirePermission("libraries");
   const [sp, t, format] = await Promise.all([searchParams, getTranslations("admin.libraries"), getFormatter()]);
   const libraries = await db.library.findMany({
-    where: sp.q ? { OR: [{ name: ilike(sp.q) }, { members: { some: { user: { displayName: ilike(sp.q) } } } }] } : {},
+    where: sp.q ? { OR: [{ id: { in: await matchIds("Library", ["name"], sp.q) } }, { members: { some: { userId: { in: await matchIds("User", ["displayName"], sp.q) } } } }] } : {},
     include: {
       members: { include: { user: { select: { id: true, displayName: true, meepleColor: true } } } },
       _count: { select: { games: true } },

@@ -11,6 +11,7 @@ import { UserMenu } from "@/components/shell/UserMenu";
 import { CommandPalette } from "@/components/shell/CommandPalette";
 import { LocaleSwitch, ThemePicker } from "@/components/PreferenceControls";
 import { DonateLink, DonatePopupHost } from "@/modules/donations/components/DonateLink";
+import { NotificationBell } from "@/components/shell/NotificationBell";
 import { AnimationToggle } from "@/components/AnimationToggle";
 import { InstallApp } from "@/components/InstallApp";
 import { SiteGuide } from "@/modules/guide/components/SiteGuide";
@@ -47,6 +48,7 @@ export default async function MemberLayout({ children }: { children: React.React
               <CommandPalette compact />
             </div>
             <InstallApp />
+            <NotificationBell />
             <DonateLink placement="top" />
             <div className="flex items-center gap-1" data-guide="prefs">
               <LocaleSwitch />

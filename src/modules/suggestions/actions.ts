@@ -101,7 +101,7 @@ export async function updateSuggestionAction(suggestionId: string, _prev: Action
   });
   await audit(me.id, "admin.suggestion.update", s.title, { status: s.status });
   if (s.authorId && before && (before.status !== s.status || before.adminNote !== s.adminNote)) {
-    void notify(s.authorId, "suggestionUpdate", { title: s.title }, "/suggestions");
+    void notify(s.authorId, "suggestionUpdate", { title: s.title }, `/suggestions?focus=${s.id}#s-${s.id}`);
   }
   refresh();
   return { ok: true, message: t("saved") };

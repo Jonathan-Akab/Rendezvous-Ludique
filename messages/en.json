@@ -124,7 +124,7 @@
     "carcassonne": "Carcassonne"
   },
   "nav": {
-    "home": "Home",
+    "home": "Playboard",
     "events": "Games",
     "kallax": "My Kallax",
     "plays": "Plays",
@@ -544,6 +544,22 @@
         "notFound": "This game is not in the Ludothèque yet (check the name).",
         "unavailable": "The AI is not available right now (turned off, or its budget is used up).",
         "name": "Type the game’s name first."
+      }
+    },
+    "language": {
+      "label": "Language of my copy",
+      "all": "All languages",
+      "hint": "Only for you (and whoever shares this Kallax) — the Ludothèque doesn't change. Handy to filter your games.",
+      "codes": {
+        "fr": "Français",
+        "en": "English",
+        "es": "Español",
+        "de": "Deutsch",
+        "it": "Italiano",
+        "pt": "Português",
+        "nl": "Nederlands",
+        "multi": "Multilingual",
+        "other": "Other"
       }
     }
   },
@@ -2198,6 +2214,26 @@
     "edit": "Edit",
     "cancel": "Cancel",
     "save": "Save",
-    "saved": "Message updated."
+    "saved": "Message updated.",
+    "newBadge": "New",
+    "more": "+{count} more",
+    "close": "Close"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "titleUnread": "Notifications ({count} new)",
+    "markAll": "Mark all as read",
+    "empty": "Nothing new for now.",
+    "items": {
+      "friendRequest": "{name} sent you a friend request",
+      "playToConfirm": "{name} logged a play of {game} for you to confirm",
+      "eventJoinRequest": "{name} wants to join “{event}”",
+      "eventJoinAccepted": "Your request to join “{event}” was accepted",
+      "eventCancelled": "“{event}” was cancelled",
+      "kallaxInvite": "{name} invited you to share a Kallax",
+      "bazaarMessage": "{name} wrote to you about “{listing}”",
+      "suggestionUpdate": "The team answered your suggestion “{title}”",
+      "other": "New notification"
+    }
   }
 }

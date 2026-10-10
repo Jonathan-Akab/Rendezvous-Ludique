@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getModuleStates } from "@/lib/modules";
 import { coverUrl } from "@/modules/games/service";
@@ -15,14 +15,14 @@ export async function GET(req: Request) {
 
   const [games, events, members] = await Promise.all([
     modules.games.enabled
-      ? db.game.findMany({ where: { name: ilike(q) }, select: { id: true, name: true, year: true, coverFileId: true, imageUrl: true }, take: 6 })
+      ? db.game.findMany({ where: { id: { in: await matchIds("Game", ["name"], q) } }, select: { id: true, name: true, year: true, coverFileId: true, imageUrl: true }, take: 6 })
       : [],
     modules.events.enabled ? listEvents(user.id, { q }).then((e) => e.slice(0, 5)) : [],
     db.user.findMany({
       where: {
         status: "ACTIVE",
         profileVisibility: { not: "PRIVATE" },
-        OR: [{ displayName: ilike(q) }, { username: ilike(q) }],
+        id: { in: await matchIds("User", ["displayName", "username"], q) },
       },
       select: { username: true, displayName: true, meepleColor: true, city: true },
       take: 5,

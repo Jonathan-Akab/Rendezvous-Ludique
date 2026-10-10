@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { FileUp, LibraryBig, Search } from "lucide-react";
+import { foldText } from "@/lib/fold";
 import type { MyGameOption } from "@/modules/kallax/components/MyGameSelect";
 import { GamePicker } from "@/modules/games/components/GamePicker";
 import { ActionForm } from "@/components/ActionForm";
@@ -99,7 +100,7 @@ export function AiGameSelect({
 function KallaxSearch({ games, onPick }: { games: MyGameOption[]; onPick: (id: string) => void }) {
   const t = useTranslations("kallax.pick");
   const [q, setQ] = useState("");
-  const norm = (x: string) => x.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const norm = foldText;
   const needle = norm(q.trim());
   const results = needle ? games.filter((g) => norm(g.name).includes(needle)).slice(0, 8) : [];
   return (

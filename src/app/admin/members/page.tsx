@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { requirePermission } from "@/lib/auth/guards";
 import { isFullAdmin } from "@/lib/auth/permissions";
 import { ROLES, USER_STATUSES } from "@/lib/constants";
@@ -19,7 +19,7 @@ export default async function AdminMembersPage({ searchParams }: { searchParams:
   // roles and staff accounts: full admins only
   const full = isFullAdmin(me);
   const where: Prisma.UserWhereInput = {};
-  if (sp.q) where.OR = [{ displayName: ilike(sp.q) }, { username: ilike(sp.q) }, { email: ilike(sp.q) }, { city: ilike(sp.q) }];
+  if (sp.q) where.id = { in: await matchIds("User", ["displayName", "username", "email", "city"], sp.q) };
   if (ROLES.includes(sp.role as never)) where.role = sp.role;
   if (USER_STATUSES.includes(sp.status as never)) where.status = sp.status;
 

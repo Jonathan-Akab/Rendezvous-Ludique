@@ -3,7 +3,7 @@ import { requirePermission } from "@/lib/auth/guards";
 import { enrichAvailable, INCOMPLETE_GAME_WHERE } from "@/modules/games/enrich";
 import { LudoEnrich } from "@/modules/games/components/LudoEnrich";
 import { db } from "@/lib/db";
-import { ilike } from "@/lib/search";
+import { matchIds } from "@/lib/search";
 import { ActionForm } from "@/components/ActionForm";
 import { ConfirmButton } from "@/components/forms";
 import { AdminHeader, SearchBar } from "@/modules/admin/components/AdminUi";
@@ -21,7 +21,7 @@ export default async function AdminGamesPage({ searchParams }: { searchParams: P
   const [sp, t] = await Promise.all([searchParams, getTranslations("admin.games")]);
   const [games, all] = await Promise.all([
     db.game.findMany({
-      where: sp.q ? { name: ilike(sp.q) } : {},
+      where: sp.q ? { id: { in: await matchIds("Game", ["name"], sp.q) } } : {},
       include: { _count: { select: { kallaxGames: true, plays: true, eventGames: true } } },
       orderBy: { name: "asc" },
       take: 200,

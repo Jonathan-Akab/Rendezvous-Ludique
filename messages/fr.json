@@ -124,7 +124,7 @@
     "carcassonne": "Carcassonne"
   },
   "nav": {
-    "home": "Accueil",
+    "home": "Plateau du joueur",
     "events": "Parties",
     "kallax": "Ma Kallax",
     "plays": "Parties jouées",
@@ -544,6 +544,22 @@
         "notFound": "Ce jeu n’est pas encore dans la Ludothèque (vérifie le nom).",
         "unavailable": "L’IA n’est pas disponible pour le moment (désactivée, ou son budget est épuisé).",
         "name": "Écris d’abord le nom du jeu."
+      }
+    },
+    "language": {
+      "label": "Langue de mon exemplaire",
+      "all": "Toutes les langues",
+      "hint": "Seulement pour toi (et ceux qui partagent cette Kallax) — la Ludothèque ne change pas. Pratique pour filtrer tes jeux.",
+      "codes": {
+        "fr": "Français",
+        "en": "English",
+        "es": "Español",
+        "de": "Deutsch",
+        "it": "Italiano",
+        "pt": "Português",
+        "nl": "Nederlands",
+        "multi": "Multilingue",
+        "other": "Autre"
       }
     }
   },
@@ -2198,6 +2214,26 @@
     "edit": "Modifier",
     "cancel": "Annuler",
     "save": "Enregistrer",
-    "saved": "Message modifié."
+    "saved": "Message modifié.",
+    "newBadge": "Nouveau",
+    "more": "+{count} de plus",
+    "close": "Fermer"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "titleUnread": "Notifications ({count} nouvelle(s))",
+    "markAll": "Tout marquer comme lu",
+    "empty": "Rien de nouveau pour le moment.",
+    "items": {
+      "friendRequest": "{name} t’a envoyé une demande d’ami",
+      "playToConfirm": "{name} a ajouté une partie de {game} à confirmer",
+      "eventJoinRequest": "{name} veut se joindre à « {event} »",
+      "eventJoinAccepted": "Ta demande pour « {event} » a été acceptée",
+      "eventCancelled": "« {event} » a été annulée",
+      "kallaxInvite": "{name} t’invite à partager une Kallax",
+      "bazaarMessage": "{name} t’a écrit au sujet de « {listing} »",
+      "suggestionUpdate": "L’équipe a répondu à ta suggestion « {title} »",
+      "other": "Nouvelle notification"
+    }
   }
 }

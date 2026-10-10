@@ -17,7 +17,7 @@ export async function generateMetadata() {
   return { title: (await getTranslations("suggestions"))("title") };
 }
 
-type Search = { sort?: string; status?: string };
+type Search = { sort?: string; status?: string; focus?: string };
 
 const STATUS_STYLE: Record<string, string> = {
   OPEN: "",
@@ -32,7 +32,10 @@ export default async function SuggestionsPage({ searchParams }: { searchParams: 
 
   const sort = sp.sort === "recent" ? "recent" : "popular";
   const status = SUGGESTION_STATUSES.includes(sp.status as never) ? sp.status : undefined;
-  const where: Prisma.SuggestionWhereInput = status ? { status } : { status: { not: "DECLINED" } };
+  // A notification can point at one suggestion (even a declined one): it always shows, highlighted.
+  const focus = sp.focus ?? null;
+  const base: Prisma.SuggestionWhereInput = status ? { status } : { status: { not: "DECLINED" } };
+  const where: Prisma.SuggestionWhereInput = focus ? { OR: [base, { id: focus }] } : base;
   const suggestions = await db.suggestion.findMany({
     where,
     include: { _count: { select: { votes: true } }, votes: { where: { userId: user.id }, select: { userId: true } } },
@@ -84,7 +87,7 @@ export default async function SuggestionsPage({ searchParams }: { searchParams: 
       ) : (
         <ul className="space-y-3">
           {suggestions.map((s) => (
-            <li key={s.id} className="card flex gap-4 p-4">
+            <li key={s.id} id={`s-${s.id}`} className={`card flex scroll-mt-24 gap-4 p-4 ${s.id === focus ? "ring-2 ring-accent" : ""}`}>
               <VoteButton suggestionId={s.id} votes={s._count.votes} voted={s.votes.length > 0} />
               <div className="min-w-0 flex-1 space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2">
