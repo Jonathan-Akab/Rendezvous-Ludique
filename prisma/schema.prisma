@@ -39,6 +39,8 @@ model User {
   aiNoticeViews   Int       @default(0)
   // "Coup de dé": the member's saved filter sets (JSON [{name, filters}])
   pickerPresets   String?
+  // "Groupes Facebook": the tiles the member pinned on top (JSON list: "featured" or a group id)
+  facebookPins    String?
 
   // Personalisation
   meepleColor String @default("#d9480f")
@@ -78,6 +80,7 @@ model User {
   rulebooks         Rulebook[]
   aiChats           AiChat[]
   suggestions       Suggestion[]
+  announcements     Announcement[]
   suggestionVotes   SuggestionVote[]
   aiSetting         AiMemberSetting?
   playDraft         PlayDraft?
@@ -575,6 +578,20 @@ model RuleFaq {
 }
 
 // Suggestion box: members propose ideas and vote; duplicates become votes.
+// "Babillard" on the home page: messages from the team, pinned ones first.
+model Announcement {
+  id        String   @id @default(cuid())
+  body      String
+  pinned    Boolean  @default(false)
+  authorId  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author User? @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([pinned, createdAt])
+}
+
 model Suggestion {
   id        String   @id @default(cuid())
   title     String

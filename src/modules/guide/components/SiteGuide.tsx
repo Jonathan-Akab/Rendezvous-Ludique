@@ -31,7 +31,7 @@ const STEPS: Step[] = [
   { key: "ai", target: "nav-ai", module: "/ai", bullets: 4 },
   { key: "more", target: "menu", bullets: 4 },
   { key: "search", target: "search", bullets: 2 },
-  { key: "prefs", target: "prefs", bullets: 3 },
+  { key: "prefs", target: "prefs", bullets: 4 },
   { key: "account", target: "account", bullets: 2 },
   { key: "suggestions", target: "nav-suggestions", module: "/suggestions", bullets: 2 },
   { key: "donate", target: "donate", donate: true, bullets: 3 },

@@ -77,8 +77,8 @@ export function GamePicker({
 
   useEffect(() => {
     const close = (e: MouseEvent) => !boxRef.current?.contains(e.target as Node) && setOpen(false);
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
   }, []);
 
   const exact = results.some((r) => r.name.toLowerCase() === q.trim().toLowerCase());

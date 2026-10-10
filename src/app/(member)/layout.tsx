@@ -12,6 +12,7 @@ import { CommandPalette } from "@/components/shell/CommandPalette";
 import { LocaleSwitch, ThemePicker } from "@/components/PreferenceControls";
 import { DonateLink, DonatePopupHost } from "@/modules/donations/components/DonateLink";
 import { AnimationToggle } from "@/components/AnimationToggle";
+import { InstallApp } from "@/components/InstallApp";
 import { SiteGuide } from "@/modules/guide/components/SiteGuide";
 import { SuggestionDialog } from "@/modules/suggestions/components/SuggestionDialog";
 import { RulebookOverlay } from "@/modules/games/components/RulebookOverlay";
@@ -45,6 +46,7 @@ export default async function MemberLayout({ children }: { children: React.React
             <div className="lg:hidden" data-guide="search">
               <CommandPalette compact />
             </div>
+            <InstallApp />
             <DonateLink placement="top" />
             <div className="flex items-center gap-1" data-guide="prefs">
               <LocaleSwitch />

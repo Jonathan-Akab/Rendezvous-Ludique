@@ -158,7 +158,8 @@
     "suggestions": "Suggestion box",
     "animationsOn": "Animations on (click to turn off)",
     "animationsOff": "Animations off (click to turn on)",
-    "picker": "Roll the dice"
+    "picker": "Roll the dice",
+    "support": "Support the project"
   },
   "donations": {
     "support": "Support the project",
@@ -1012,6 +1013,11 @@
         },
         "suggestions": {
           "showToMembers": "Members see the suggestions and can vote"
+        },
+        "facebook": {
+          "featuredUrl": "Featured Facebook page (address)",
+          "featuredName": "Name shown on the tile",
+          "showFeatured": "Show the tile at the top of Facebook groups"
         }
       },
       "aiKeyOk": "API key detected — the assistant is ready.",
@@ -1278,6 +1284,10 @@
         "audit": {
           "title": "Audit log",
           "text": "See the history of the team's actions."
+        },
+        "announcements": {
+          "title": "Message board",
+          "text": "Post, pin and delete messages on the home page board."
         }
       }
     }
@@ -1623,6 +1633,23 @@
       "name": "Enter the group's name.",
       "url": "Enter a facebook.com link (https://www.facebook.com/groups/…).",
       "saved": "Saved."
+    },
+    "featured": {
+      "kicker": "The community on Facebook",
+      "lead": "News, discoveries and game nights: come chat with us!",
+      "open": "See the page",
+      "close": "Close",
+      "blocked": "Page not showing? An ad blocker or tracking protection may hide it.",
+      "onFacebook": "Open on Facebook"
+    },
+    "openShort": "Open",
+    "board": {
+      "display": "Display",
+      "tiles": "Tiles",
+      "list": "List",
+      "pinHint": "Pin your favourites: they stay on top.",
+      "pin": "Pin on top",
+      "unpin": "Unpin"
     }
   },
   "bazaar": {
@@ -1881,7 +1908,8 @@
         "title": "Your way",
         "b1": "Language: French or English.",
         "b2": "✨ Animations: turn them on or off.",
-        "b3": "Themes inspired by games (Catan, Anachrony…)."
+        "b3": "Themes inspired by games (Catan, Anachrony…).",
+        "b4": "📦 Install the app: the site on your phone or computer, like a real app."
       },
       "account": {
         "title": "Your account",
@@ -2049,6 +2077,49 @@
         "forgotten": "Forgotten on the shelf",
         "never": "Never played"
       }
+    }
+  },
+  "install": {
+    "button": "Install the app",
+    "close": "Got it",
+    "lead": "The site installs like a real app, no app store needed: an icon on your screen, and it opens full screen.",
+    "ios": {
+      "title": "Install on iPhone or iPad",
+      "b1": "Open the site in Safari.",
+      "b2": "Tap the Share button (the square with an arrow pointing up).",
+      "b3": "Choose “Add to Home Screen”, then “Add”."
+    },
+    "android": {
+      "title": "Install on Android",
+      "b1": "Open the site in Chrome (or Samsung Internet).",
+      "b2": "Tap the ⋮ menu at the top right.",
+      "b3": "Choose “Install app” (or “Add to Home screen”)."
+    },
+    "desktop": {
+      "title": "Install on your computer",
+      "b1": "Open the site in Edge or Chrome (Windows, Mac or Linux).",
+      "b2": "Click the install icon at the end of the address bar, or open the menu (⋯ or ⋮).",
+      "b3": "Choose “Install Rendezvous Ludique” (or “Create shortcut”, tick “Open as window”): it shows up in the Start menu and the taskbar."
+    }
+  },
+  "announcements": {
+    "title": "Message board",
+    "team": "The team",
+    "pinned": "Pinned",
+    "pin": "Pin on top",
+    "unpin": "Unpin",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this message from the board?",
+    "new": "New message",
+    "publish": "Post",
+    "placeholder": "News, a reminder, an event… (links become clickable)",
+    "pinOnTop": "Pin at the top of the board",
+    "empty": "No messages yet. Members will see what you post here.",
+    "older": "{count, plural, one {See # older message} other {See the # older messages}}",
+    "posted": "Posted.",
+    "errors": {
+      "empty": "Write a message.",
+      "tooLong": "The message is too long (2000 characters max)."
     }
   }
 }

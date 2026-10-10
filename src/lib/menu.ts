@@ -18,10 +18,12 @@ export async function getMenuItems(navOrder: string | null): Promise<NavItem[]> 
   } catch {
     order = [];
   }
-  if (!order.length) return items;
+  // "Soutenir le projet" closes the menu (a popup, like the suggestion box)
+  const support: NavItem[] = modules.donations.enabled ? [{ href: "/support", label: t("support"), icon: "Heart", dialog: "donate" }] : [];
+  if (!order.length) return [...items, ...support];
   const rank = (href: string) => {
     const i = order.indexOf(href);
     return i === -1 ? order.length + items.findIndex((x) => x.href === href) : i;
   };
-  return [...items].sort((a, b) => rank(a.href) - rank(b.href));
+  return [...[...items].sort((a, b) => rank(a.href) - rank(b.href)), ...support];
 }

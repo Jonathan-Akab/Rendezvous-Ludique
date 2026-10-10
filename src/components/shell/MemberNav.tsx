@@ -10,10 +10,11 @@ import { ModuleIcon } from "@/components/icons";
 import { Meeple } from "@/components/Meeple";
 import { saveNavOrderAction } from "@/modules/preferences/actions";
 import { openSuggestionBox } from "@/modules/suggestions/components/SuggestionDialog";
+import { openDonate } from "@/modules/donations/components/DonatePopup";
 import { MenuOrderEditor } from "./MenuOrderEditor";
 
 /** A menu entry. `dialog` entries open a popup instead of navigating. */
-export type NavItem = { href: string; label: string; icon: string; dialog?: "suggestions" };
+export type NavItem = { href: string; label: string; icon: string; dialog?: "suggestions" | "donate" };
 
 /** A menu link, or a button for entries that open a popup. */
 function NavEntry({ item, onOpen, ...props }: { item: NavItem; onOpen?: () => void } & Omit<React.ComponentProps<"a">, "href">) {
@@ -27,7 +28,8 @@ function NavEntry({ item, onOpen, ...props }: { item: NavItem; onOpen?: () => vo
         data-guide={(props as Record<string, unknown>)["data-guide"] as string | undefined}
         onClick={() => {
           onOpen?.();
-          openSuggestionBox();
+          if (item.dialog === "donate") openDonate();
+          else openSuggestionBox();
         }}
       >
         {children}

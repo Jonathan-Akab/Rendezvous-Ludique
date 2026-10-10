@@ -30,8 +30,9 @@ services:
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD}
       SEED_DEMO_DATA: "false"
-      # Set to "false" only if you serve the site over plain HTTP (no TLS).
-      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      # Session cookies are marked Secure automatically when the site is reached over HTTPS.
+      # "false" turns that off; "true" can no longer break sign-in on plain HTTP.
+      COOKIE_SECURE: ${COOKIE_SECURE:-auto}
       UPLOAD_DIR: /app/storage
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       FREE_AI_API_KEY: ${FREE_AI_API_KEY:-}

@@ -4,6 +4,7 @@ import { getSiteSettings } from "@/lib/settings";
 import { TableScene } from "@/components/TableScene";
 import { ThemePicture } from "@/components/ThemePicture";
 import { LocaleSwitch, ThemePicker } from "@/components/PreferenceControls";
+import { InstallApp } from "@/components/InstallApp";
 import { cookies } from "next/headers";
 import { THEME_COOKIE } from "@/lib/constants";
 
@@ -30,6 +31,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
       )}
       <TableScene />
       <div className="absolute right-3 top-3 z-20 flex items-center gap-1">
+        <InstallApp />
         <LocaleSwitch />
         <ThemePicker current={theme} enabled={settings.enabledThemes} images={settings.themeImages} />
       </div>

@@ -9,6 +9,21 @@ const SESSION_DAYS = 30;
 
 const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
 
+/**
+ * "Secure" cookies only travel over HTTPS. Marking one Secure on a site reached over plain HTTP
+ * signs people out after their first page (Chrome refuses the cookie; Safari and every iPhone /
+ * iPad browser keep it but never send it back). So it follows the request's actual protocol;
+ * COOKIE_SECURE="false" can still turn it off, but "true" can't force it on plain HTTP.
+ */
+async function secureCookies() {
+  if (process.env.COOKIE_SECURE === "false") return false;
+  const h = await headers();
+  // set by Next's server, or by a reverse proxy (Caddy, nginx…) that terminates HTTPS
+  const proto = h.get("x-forwarded-proto")?.split(",")[0]?.trim().toLowerCase();
+  if (proto) return proto === "https";
+  return (h.get("origin") ?? process.env.APP_URL ?? "").startsWith("https://");
+}
+
 export async function createSession(userId: string) {
   const token = randomBytes(32).toString("base64url");
   const expiresAt = new Date(Date.now() + SESSION_DAYS * 24 * 60 * 60 * 1000);
@@ -18,8 +33,7 @@ export async function createSession(userId: string) {
   (await cookies()).set(SESSION_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    // COOKIE_SECURE=false allows sign-in on a production server reached over plain HTTP.
-    secure: process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE === "true" : process.env.NODE_ENV === "production",
+    secure: await secureCookies(),
     path: "/",
     expires: expiresAt,
   });

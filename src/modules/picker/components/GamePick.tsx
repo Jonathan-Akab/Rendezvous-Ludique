@@ -151,8 +151,8 @@ export function GamePick({ games, playsEnabled, now, presets: initialPresets }: 
   useEffect(() => {
     if (!menuOpen) return;
     const close = (e: MouseEvent) => menuRef.current && !menuRef.current.contains(e.target as Node) && setMenuOpen(false);
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
   }, [menuOpen]);
 
   if (!games.length) return <p className="card card-pad text-sm text-muted">{t("empty")}</p>;

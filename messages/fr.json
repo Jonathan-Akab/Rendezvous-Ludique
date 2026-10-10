@@ -158,7 +158,8 @@
     "suggestions": "Boîte à suggestions",
     "animationsOn": "Animations activées (cliquer pour les couper)",
     "animationsOff": "Animations désactivées (cliquer pour les remettre)",
-    "picker": "Coup de dé"
+    "picker": "Coup de dé",
+    "support": "Soutenir le projet"
   },
   "donations": {
     "support": "Soutenir le projet",
@@ -1012,6 +1013,11 @@
         },
         "suggestions": {
           "showToMembers": "Les membres voient les suggestions et peuvent voter"
+        },
+        "facebook": {
+          "featuredUrl": "Page Facebook mise en avant (adresse)",
+          "featuredName": "Nom affiché sur la tuile",
+          "showFeatured": "Afficher la tuile en haut de Groupes Facebook"
         }
       },
       "aiKeyOk": "Clé API détectée — l'assistant est prêt.",
@@ -1278,6 +1284,10 @@
         "audit": {
           "title": "Journal d'audit",
           "text": "Voir l'historique des actions de l'équipe."
+        },
+        "announcements": {
+          "title": "Babillard",
+          "text": "Publier, épingler et supprimer les messages du babillard de l'Accueil."
         }
       }
     }
@@ -1623,6 +1633,23 @@
       "name": "Entre le nom du groupe.",
       "url": "Entre un lien facebook.com (https://www.facebook.com/groups/…).",
       "saved": "Enregistré."
+    },
+    "featured": {
+      "kicker": "La communauté sur Facebook",
+      "lead": "Nouvelles, découvertes et soirées de jeux : viens jaser avec nous!",
+      "open": "Voir la page",
+      "close": "Fermer",
+      "blocked": "La page ne s'affiche pas? Un bloqueur de pub ou la protection contre le pistage peut la cacher.",
+      "onFacebook": "Ouvrir sur Facebook"
+    },
+    "openShort": "Ouvrir",
+    "board": {
+      "display": "Affichage",
+      "tiles": "Tuiles",
+      "list": "Liste",
+      "pinHint": "Épingle tes préférés : ils restent en haut.",
+      "pin": "Épingler en haut",
+      "unpin": "Désépingler"
     }
   },
   "bazaar": {
@@ -1881,7 +1908,8 @@
         "title": "À ta façon",
         "b1": "Langue : français ou anglais.",
         "b2": "✨ Animations : active-les ou coupe-les.",
-        "b3": "Thèmes inspirés de jeux (Catan, Anachrony…)."
+        "b3": "Thèmes inspirés de jeux (Catan, Anachrony…).",
+        "b4": "📦 Installer l'application : le site sur ton téléphone ou ton ordi, comme une vraie app."
       },
       "account": {
         "title": "Ton compte",
@@ -2049,6 +2077,49 @@
         "forgotten": "Oublié sur la tablette",
         "never": "Jamais joué"
       }
+    }
+  },
+  "install": {
+    "button": "Installer l'application",
+    "close": "Compris",
+    "lead": "Le site s'installe comme une vraie application, sans passer par un magasin d'applications : une icône sur ton écran, et il s'ouvre en plein écran.",
+    "ios": {
+      "title": "Installer sur iPhone ou iPad",
+      "b1": "Ouvre le site dans Safari.",
+      "b2": "Touche le bouton Partager (le carré avec une flèche vers le haut).",
+      "b3": "Choisis « Sur l'écran d'accueil », puis « Ajouter »."
+    },
+    "android": {
+      "title": "Installer sur Android",
+      "b1": "Ouvre le site dans Chrome (ou Samsung Internet).",
+      "b2": "Touche le menu ⋮ en haut à droite.",
+      "b3": "Choisis « Installer l'application » (ou « Ajouter à l'écran d'accueil »)."
+    },
+    "desktop": {
+      "title": "Installer sur l'ordinateur",
+      "b1": "Ouvre le site dans Edge ou Chrome (Windows, Mac ou Linux).",
+      "b2": "Clique l'icône d'installation au bout de la barre d'adresse, ou ouvre le menu (⋯ ou ⋮).",
+      "b3": "Choisis « Installer Rendezvous Ludique » (ou « Créer un raccourci », coche « Ouvrir dans une fenêtre ») : il apparaît dans le menu Démarrer et la barre des tâches."
+    }
+  },
+  "announcements": {
+    "title": "Babillard",
+    "team": "L'équipe",
+    "pinned": "Épinglé",
+    "pin": "Épingler en haut",
+    "unpin": "Désépingler",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer ce message du babillard?",
+    "new": "Nouveau message",
+    "publish": "Publier",
+    "placeholder": "Une nouvelle, un rappel, un événement… (les liens deviennent cliquables)",
+    "pinOnTop": "Épingler en haut du babillard",
+    "empty": "Aucun message pour l'instant. Les membres verront ici ce que tu publies.",
+    "older": "{count, plural, one {Voir # message plus ancien} other {Voir les # messages plus anciens}}",
+    "posted": "Publié.",
+    "errors": {
+      "empty": "Écris un message.",
+      "tooLong": "Le message est trop long (2000 caractères maximum)."
     }
   }
 }

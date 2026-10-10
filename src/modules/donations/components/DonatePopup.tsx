@@ -18,11 +18,23 @@ export function DonateDialog({ url, transferEmail }: { url: string; transferEmai
   const t = useTranslations("donations");
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const copy = () => {
-    void navigator.clipboard?.writeText(transferEmail).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(transferEmail);
+    } catch {
+      // no clipboard API on a site served over plain HTTP: the old way still works
+      const field = document.createElement("textarea");
+      field.value = transferEmail;
+      field.setAttribute("readonly", "");
+      field.style.position = "fixed";
+      field.style.opacity = "0";
+      document.body.appendChild(field);
+      field.select();
+      document.execCommand("copy");
+      field.remove();
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
   const close = useCallback(() => setOpen(false), []);
   useEffect(() => {
@@ -39,7 +51,7 @@ export function DonateDialog({ url, transferEmail }: { url: string; transferEmai
           <p className="font-semibold">{t("popup.transfer")}</p>
           <div className="flex items-center gap-2">
             <code className="min-w-0 flex-1 truncate font-semibold text-accent">{transferEmail}</code>
-            <button type="button" onClick={copy} className="btn btn-ghost btn-sm" title={t("popup.copy")}>
+            <button type="button" onClick={() => void copy()} className="btn btn-ghost btn-sm" title={t("popup.copy")}>
               {copied ? <Check className="size-4 text-success" /> : <Copy className="size-4" />}
               <span className="sr-only">{t("popup.copy")}</span>
             </button>
@@ -81,7 +93,7 @@ export function DonateTrigger({ placement, label }: { placement: "top" | "footer
       className="inline-flex items-center gap-1.5 rounded-xl border border-line/70 px-2 py-1.5 text-xs font-semibold text-muted transition hover:border-accent hover:text-accent sm:px-3"
     >
       <HeartHandshake className="size-4" aria-hidden />
-      <span className="hidden sm:inline">{label}</span>
+      <span className="hidden whitespace-nowrap xl:inline">{label}</span>
     </button>
   );
 }

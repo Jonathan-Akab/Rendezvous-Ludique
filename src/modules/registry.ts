@@ -118,7 +118,12 @@ export const MODULES: ModuleManifest[] = [
     key: "facebook",
     icon: "Facebook",
     href: "/facebook",
-    settings: [],
+    settings: [
+      // a Facebook page promoted at the top of the section (a tile opening the page in a popup)
+      { key: "featuredUrl", type: "url", default: "https://www.facebook.com/p/BoardBuzz-61593533364081/" },
+      { key: "featuredName", type: "string", default: "BoardBuzz" },
+      { key: "showFeatured", type: "boolean", default: true },
+    ],
   },
   {
     key: "suggestions",

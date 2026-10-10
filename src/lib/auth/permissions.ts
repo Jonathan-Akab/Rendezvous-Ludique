@@ -13,6 +13,7 @@ export const PERMISSIONS = [
   "facebook",
   "faq",
   "suggestions",
+  "announcements", // post and pin messages on the home page's board
   "ai",
   "modules",
   "appearance",

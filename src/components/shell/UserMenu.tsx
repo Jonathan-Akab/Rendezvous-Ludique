@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
+import { TapAway } from "@/components/TapAway";
 import { useTranslations } from "next-intl";
 import { LogOut, Settings, ShieldCheck, ShieldHalf, UserRound } from "lucide-react";
 import { MeepleAvatar } from "@/components/Meeple";
@@ -22,14 +24,18 @@ export function UserMenu({ user, canModerate, canAdmin, placement = "down" }: Pr
   const t = useTranslations("nav");
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // another page: the menu closes (taps on phones don't always reach the outside-click listener)
+  useEffect(() => setOpen(false), [pathname]);
 
   useEffect(() => {
     const close = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
     const esc = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("mousedown", close);
+    document.addEventListener("pointerdown", close);
     document.addEventListener("keydown", esc);
     return () => {
-      document.removeEventListener("mousedown", close);
+      document.removeEventListener("pointerdown", close);
       document.removeEventListener("keydown", esc);
     };
   }, []);
@@ -51,6 +57,7 @@ export function UserMenu({ user, canModerate, canAdmin, placement = "down" }: Pr
           {placement === "up" && <span className="block truncate text-xs text-muted">@{user.username}</span>}
         </span>
       </button>
+      {open && <TapAway onClose={() => setOpen(false)} />}
       <AnimatePresence>
         {open && (
           <motion.div

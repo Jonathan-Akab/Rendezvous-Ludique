@@ -6,7 +6,24 @@ import { AnimatePresence, motion } from "motion/react";
 import { X } from "lucide-react";
 
 /** Small centered overlay: a card over a dimmed page. Esc / click outside closes it. */
-export function Popup({ open, onClose, title, icon, closeLabel, children }: { open: boolean; onClose: () => void; title: string; icon?: ReactNode; closeLabel: string; children: ReactNode }) {
+export function Popup({
+  open,
+  onClose,
+  title,
+  icon,
+  closeLabel,
+  wide = false,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  icon?: ReactNode;
+  closeLabel: string;
+  /** room for an embedded page */
+  wide?: boolean;
+  children: ReactNode;
+}) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -29,7 +46,7 @@ export function Popup({ open, onClose, title, icon, closeLabel, children }: { op
           aria-labelledby="popup-title"
         >
           <motion.div
-            className="card card-pad relative w-full max-w-md space-y-4 shadow-2xl"
+            className={`card card-pad relative w-full space-y-4 shadow-2xl ${wide ? "max-w-[560px]" : "max-w-md"}`}
             initial={{ opacity: 0, scale: 0.92, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}

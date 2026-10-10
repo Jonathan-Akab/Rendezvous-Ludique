@@ -84,6 +84,14 @@ body {
   .textarea {
     @apply min-h-24;
   }
+  /* iPhone / iPad zoom into any field whose text is under 16px: keep 16px on touch screens */
+  @media (pointer: coarse) {
+    .input,
+    .select,
+    .textarea {
+      font-size: 16px;
+    }
+  }
   .label {
     @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-muted;
   }
@@ -200,3 +208,7 @@ html[data-sidebar="collapsed"] .sidebar-label {
 .prose-chat table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
 .prose-chat th, .prose-chat td { border: 1px solid var(--line); padding: 0.3em 0.5em; text-align: left; }
 .prose-chat blockquote { border-left: 3px solid var(--accent); padding-left: 0.75em; color: var(--muted); }
+/* Safari draws its own triangle on <summary> even with list-style: none */
+summary::-webkit-details-marker {
+  display: none;
+}

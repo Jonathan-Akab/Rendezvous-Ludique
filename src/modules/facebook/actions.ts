@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { db } from "@/lib/db";
-import { requirePermission } from "@/lib/auth/guards";
+import { requirePermission, requireUser } from "@/lib/auth/guards";
 import { audit } from "@/lib/audit";
 import { bool, optStr, str, type ActionState } from "@/lib/forms";
 
@@ -58,4 +58,11 @@ export async function deleteFacebookGroupAction(groupId: string) {
   const g = await db.facebookGroup.delete({ where: { id: groupId } });
   await audit(me.id, "admin.facebook.delete", g.name);
   refresh();
+}
+
+/** The member's pinned tiles in "Groupes Facebook", in order ("featured" = the promoted page). */
+export async function setFacebookPinsAction(keys: string[]) {
+  const user = await requireUser();
+  const pins = [...new Set((Array.isArray(keys) ? keys : []).filter((k) => typeof k === "string" && k.length <= 40))].slice(0, 50);
+  await db.user.update({ where: { id: user.id }, data: { facebookPins: JSON.stringify(pins) } });
 }

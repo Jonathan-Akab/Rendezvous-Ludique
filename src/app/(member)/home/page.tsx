@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { ArrowRight, Bell, CalendarPlus, Dices, LibraryBig, Sparkles, UserPlus } from "lucide-react";
 import { requireUser } from "@/lib/auth/guards";
 import { PlayInProgress } from "@/modules/plays/components/PlayInProgress";
+import { AnnouncementBoard } from "@/modules/announcements/components/AnnouncementBoard";
 import { getModuleStates } from "@/lib/modules";
 import { db } from "@/lib/db";
 import { FadeIn, Stagger, StaggerItem } from "@/components/Motion";
@@ -75,6 +76,9 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           </div>
         </div>
       </FadeIn>
+
+      {/* messages from the team */}
+      <AnnouncementBoard user={user} />
 
       {/* a play started and not saved yet */}
       {modules.plays.enabled && <PlayInProgress userId={user.id} />}

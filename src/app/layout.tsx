@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { Fraunces, Nunito } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
@@ -16,9 +16,13 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: { default: siteName, template: `%s · ${siteName}` },
     description: "Board game events, home games, libraries and play logs.",
-    icons: { icon: "/meeple.svg" },
+    icons: { icon: "/meeple.svg", apple: "/app-icon/180" },
+    // installed on an iPhone / iPad: full screen, with its own name
+    appleWebApp: { capable: true, title: siteName, statusBarStyle: "black-translucent" },
   };
 }
+
+export const viewport: Viewport = { themeColor: "#1b1410" };
 
 /** Theme priority: member preference → cookie (visitors) → site default. */
 async function resolveTheme() {

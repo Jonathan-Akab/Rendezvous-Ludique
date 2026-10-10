@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
+import { TapAway } from "@/components/TapAway";
 import { Languages, Palette } from "lucide-react";
 import { setLocaleAction, setThemeAction } from "@/modules/preferences/actions";
 import { THEMES, type ThemeKey } from "@/lib/constants";
@@ -27,8 +28,8 @@ export function ThemePicker({
 
   useEffect(() => {
     const close = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false);
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
   }, []);
 
   const pick = (key: string) => {
@@ -51,6 +52,7 @@ export function ThemePicker({
         <Palette className="size-4" aria-hidden />
         <span className="sr-only">{t("pick")}</span>
       </button>
+      {open && <TapAway onClose={() => setOpen(false)} />}
       <AnimatePresence>
         {open && (
           <motion.div
