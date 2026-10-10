@@ -27,11 +27,11 @@ export default async function GameFaqPage({ params, searchParams }: { params: Pr
   if (!game) notFound();
 
   const [entries, mine] = await Promise.all([searchFaq(game.id, sp.q ?? "", mod), inMemberKallax(user.id, game.id)]);
-  const askAi = mine ? (
+  const askAi = (
     <Link href={`/ai?game=${game.id}`} className="btn btn-primary">
       <Sparkles className="size-4" /> {t("faq.askAi")}
     </Link>
-  ) : null;
+  );
 
   return (
     <div className="space-y-6">

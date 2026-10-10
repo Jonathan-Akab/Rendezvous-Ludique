@@ -31,6 +31,7 @@ export function GamePicker({
   fieldName = "gameId",
   createHref,
   initial,
+  showCovers = true,
 }: {
   allowCreate?: boolean;
   onPick?: (g: PickedGame | null) => void;
@@ -39,6 +40,8 @@ export function GamePicker({
   createHref?: (name: string) => string;
   /** game already chosen (e.g. selling a game from your kallax) */
   initial?: PickedGame | null;
+  /** false: names only, without the box pictures */
+  showCovers?: boolean;
 }) {
   const t = useTranslations("games.picker");
   const listId = useId();
@@ -108,7 +111,7 @@ export function GamePicker({
     return (
       <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="flex items-center gap-4 rounded-2xl border border-accent/50 bg-accent/5 p-3">
         <input type="hidden" name={fieldName} value={picked.id} />
-        <GameCover name={picked.name} src={picked.cover} size="sm" />
+        {showCovers && <GameCover name={picked.name} src={picked.cover} size="sm" />}
         <div className="min-w-0 flex-1">
           <p className="truncate font-display text-lg font-bold">
             {picked.name} {picked.year && <span className="text-sm font-normal text-muted">({picked.year})</span>}
@@ -211,7 +214,7 @@ export function GamePicker({
               >
                 {o.kind === "game" ? (
                   <>
-                    <GameCover name={o.game.name} src={o.game.cover} size="xs" />
+                    {showCovers && <GameCover name={o.game.name} src={o.game.cover} size="xs" />}
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold">
                         {o.game.name} {o.game.year && <span className="font-normal text-muted">({o.game.year})</span>}

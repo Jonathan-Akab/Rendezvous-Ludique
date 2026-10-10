@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getFormatter, getTranslations } from "next-intl/server";
-import { BookOpen, Brain, ChevronRight, FileUp, MessageCircleQuestion, MessageSquarePlus, Trash2 } from "lucide-react";
+import { BookOpen, Brain, ChevronRight, FileUp, MessageCircleQuestion, Dices, Trash2 } from "lucide-react";
 import { requireUser } from "@/lib/auth/guards";
 import { getModule, requireModule } from "@/lib/modules";
 import { db } from "@/lib/db";
@@ -86,13 +86,10 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<S
   const uploadForm = game && (
     <ActionForm action={uploadRulebookAction.bind(null, game.id)} submitLabel={t("uploadAndAsk")} className="mt-4 space-y-3">
       <input type="hidden" name="then" value="ai" />
-      <div className="grid gap-3 sm:grid-cols-[1fr_130px]">
-        <input name="title" className="input" placeholder={tg("rulebooks.titlePlaceholder")} maxLength={120} />
-        <select name="language" className="select" defaultValue="fr">
-          <option value="fr">Français</option>
-          <option value="en">English</option>
-        </select>
-      </div>
+      <select name="language" className="select" defaultValue="fr" aria-label={t("source.language")}>
+        <option value="fr">Français</option>
+        <option value="en">English</option>
+      </select>
       <input name="file" type="file" accept="application/pdf" required className="input" />
       <p className="text-xs text-muted">{tg("rulebooks.hint")}</p>
     </ActionForm>
@@ -122,7 +119,7 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<S
       <AiNotice ownAllowed={providerInfo.ownAllowed} donate={donationsMod.enabled} />
       <aside className="space-y-3 lg:sticky lg:top-6 lg:self-start">
         <Link href="/ai" className="btn btn-primary w-full">
-          <MessageSquarePlus className="size-4" /> {t("newChat")}
+          <Dices className="size-4" /> {t("newChat")}
         </Link>
         {faqOn && (
           <Link href="/ai/faq" className="btn btn-secondary w-full">

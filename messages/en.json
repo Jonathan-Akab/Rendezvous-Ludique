@@ -1423,7 +1423,8 @@
         "size": "This file is too large.",
         "empty": "Choose a file."
       },
-      "notInKallax": "This game must be in your Kallax."
+      "notInKallax": "This game must be in your Kallax.",
+      "rulebookSimilar": "A similar rulebook is already there, so this one wasn’t added."
     },
     "images": {
       "find": "Find a picture",
@@ -1476,7 +1477,7 @@
   "ai": {
     "title": "Rules AI",
     "lead": "Pick the game you're playing, choose its rulebook, and ask anything — the assistant answers from the rules and cites the pages.",
-    "newChat": "New conversation",
+    "newChat": "New rules question",
     "usage": "{used} / {limit} questions today",
     "history": "Conversations",
     "noGame": "No game",
@@ -1601,7 +1602,8 @@
       "noGames": "No FAQ yet",
       "noGamesHint": "Questions asked to the rules AI build each game's FAQ.",
       "onlyFaq": "Ask your question: we'll look in the FAQ…",
-      "onlyFaqNotice": "{reason} You can still ask: we'll look for the answer in this game's FAQ."
+      "onlyFaqNotice": "{reason} You can still ask: we'll look for the answer in this game's FAQ.",
+      "pickGame": "Find a game’s questions — from your Kallax or the whole Ludothèque"
     },
     "flow": "Every question goes to the FAQ first, then {who} answers{count, plural, =0 {.} one { by reading the game's rulebook.} other { by reading the game's # rulebooks.}}",
     "stage": {
@@ -1623,7 +1625,7 @@
       "donate": "Donate",
       "ok": "Got it!"
     },
-    "alreadyKnown": "“{name}” is already in the Ludothèque with a rulebook — no need to upload it again.",
+    "alreadyKnown": "A rulebook similar to this one is already available for “{name}” — it wasn’t added again.",
     "source": {
       "kallax": "My Kallax",
       "ludo": "Search the Ludothèque",
@@ -1631,9 +1633,9 @@
       "kallaxHint": "Games from your Kallax.",
       "ludoHint": "Any game of the Ludothèque, even if you don’t own it.",
       "gameName": "Game name",
-      "rulebookTitle": "Rulebook title (optional)",
-      "uploadHint": "If the game is already in the Ludothèque we use it (and skip the upload if it already has a rulebook); otherwise it is created for you.",
-      "uploadSubmit": "Upload and start asking"
+      "uploadHint": "The rulebook is named after the game and its language. If the game is already in the Ludothèque we use it, otherwise it is created; a rulebook that is the same as one already there isn’t added again.",
+      "uploadSubmit": "Upload and start asking",
+      "language": "Rulebook language"
     },
     "addImage": "Add a photo (board, cards, a tricky situation…)",
     "removeImage": "Remove photo",

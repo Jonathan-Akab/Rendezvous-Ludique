@@ -19,6 +19,7 @@ export function MyGameSelect({
   multiple = false,
   required = false,
   onChange,
+  showCovers = true,
 }: {
   games: MyGameOption[];
   name?: string;
@@ -26,6 +27,8 @@ export function MyGameSelect({
   multiple?: boolean;
   required?: boolean;
   onChange?: (ids: string[]) => void;
+  /** false: names only, without the box pictures */
+  showCovers?: boolean;
 }) {
   const t = useTranslations("kallax.pick");
   const initial = Array.isArray(defaultValue) ? defaultValue : defaultValue ? [defaultValue] : [];
@@ -74,7 +77,7 @@ export function MyGameSelect({
         <div className="flex flex-wrap gap-2">
           {chosen.map((g) => (
             <span key={g.gameId} className="flex items-center gap-2 rounded-xl border border-accent/50 bg-accent/10 py-1 pl-1 pr-2 text-sm font-semibold">
-              <GameCover name={g.name} src={g.cover} size="xs" />
+              {showCovers && <GameCover name={g.name} src={g.cover} size="xs" />}
               {g.name}
               <button type="button" onClick={() => (multiple ? toggle(g.gameId) : (update([]), setOpen(true)))} className="text-muted hover:text-danger" aria-label={t("remove", { name: g.name })}>
                 <X className="size-3.5" />
@@ -107,7 +110,7 @@ export function MyGameSelect({
                     onClick={() => toggle(g.gameId)}
                     className={`flex w-full items-center gap-2 rounded-xl p-1.5 text-left text-sm transition ${on ? "bg-accent/15 font-semibold" : "hover:bg-surface-2"}`}
                   >
-                    <GameCover name={g.name} src={g.cover} size="xs" />
+                    {showCovers && <GameCover name={g.name} src={g.cover} size="xs" />}
                     <span className="min-w-0 flex-1 truncate">{g.name}</span>
                     {on && <Check className="size-4 text-accent" />}
                   </button>

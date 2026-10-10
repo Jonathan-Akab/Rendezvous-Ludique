@@ -11,6 +11,7 @@ import { deleteStored, saveUpload, UploadError } from "@/lib/storage";
 import { oneOf, str, type ActionState } from "@/lib/forms";
 import { LOCALES } from "@/lib/constants";
 import { ensureGame, findGameByName, inMemberKallax } from "./service";
+import { addRulebook } from "./rulebooks";
 
 const refreshGame = (gameId: string) => {
   revalidatePath("/kallax", "layout");
@@ -41,33 +42,26 @@ export async function uploadRulebookAction(gameId: string, _prev: ActionState, f
   const mod = await getModule("games");
   const t = await getTranslations("games.errors");
   if (!mod.settings.allowRulebookUploads && user.role !== "ADMIN") return { error: t("rulebooksLocked") };
-  if (!(await db.game.findUnique({ where: { id: gameId }, select: { id: true } }))) return { error: t("notInKallax") };
+  const game = await db.game.findUnique({ where: { id: gameId }, select: { id: true, name: true } });
+  if (!game) return { error: t("notInKallax") };
   const file = fd.get("file");
   if (!(file instanceof File)) return { error: t("upload.empty") };
+  let added: boolean;
   try {
-    const stored = await saveUpload(file, "RULEBOOK", user.id);
-    await db.rulebook.create({
-      data: {
-        gameId,
-        fileId: stored.id,
-        uploadedById: user.id,
-        title: str(fd, "title").slice(0, 120) || file.name.replace(/\.pdf$/i, ""),
-        language: oneOf(str(fd, "language"), LOCALES, "fr"),
-      },
-    });
+    ({ added } = await addRulebook({ game, file, userId: user.id, language: oneOf(str(fd, "language"), LOCALES, "fr"), title: str(fd, "title").slice(0, 120) || undefined }));
   } catch (e) {
     if (e instanceof UploadError) return { error: t(`upload.${e.code}`) };
     throw e;
   }
   refreshGame(gameId);
   // Uploaded from the AI assistant: back to the chat, which reads every rulebook of the game.
-  if (str(fd, "then") === "ai") redirect(`/ai?game=${gameId}`);
-  return { ok: true, message: t("rulebookAdded") };
+  if (str(fd, "then") === "ai") redirect(`/ai?game=${gameId}${added ? "" : "&known=1"}`);
+  return { ok: true, message: t(added ? "rulebookAdded" : "rulebookSimilar") };
 }
 
 /**
- * Upload from the rules AI with only a game name: reuse the Ludothèque entry if it exists
- * (and skip the upload when it already has a rulebook), otherwise create the entry and attach the file.
+ * Upload from the rules AI with only a game name and a language: reuse the Ludothèque entry
+ * if it exists, otherwise create it, then attach the rulebook (unless a similar one is there).
  */
 export async function uploadRulebookByNameAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const user = await requireUser();
@@ -79,30 +73,18 @@ export async function uploadRulebookByNameAction(_prev: ActionState, fd: FormDat
   if (!name || !(file instanceof File) || file.size === 0) return { error: t("upload.empty") };
 
   const existing = await findGameByName(name);
-  if (existing && (await db.rulebook.count({ where: { gameId: existing.id } })) > 0) {
-    // Already in the Ludothèque with a rulebook: nothing to upload, go and ask questions.
-    redirect(`/ai?game=${existing.id}&known=1`);
-  }
   let gameId: string;
+  let added: boolean;
   try {
-    const stored = await saveUpload(file, "RULEBOOK", user.id);
     const game = existing ?? (await ensureGame({ name }, user.id));
     gameId = game.id;
-    await db.rulebook.create({
-      data: {
-        gameId,
-        fileId: stored.id,
-        uploadedById: user.id,
-        title: str(fd, "title").slice(0, 120) || file.name.replace(/\.pdf$/i, ""),
-        language: oneOf(str(fd, "language"), LOCALES, "fr"),
-      },
-    });
+    ({ added } = await addRulebook({ game, file, userId: user.id, language: oneOf(str(fd, "language"), LOCALES, "fr") }));
   } catch (e) {
     if (e instanceof UploadError) return { error: t(`upload.${e.code}`) };
     throw e;
   }
   refreshGame(gameId);
-  redirect(`/ai?game=${gameId}`);
+  redirect(`/ai?game=${gameId}${added ? "" : "&known=1"}`);
 }
 
 export async function deleteRulebookAction(rulebookId: string) {

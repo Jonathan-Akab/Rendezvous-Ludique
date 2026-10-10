@@ -11,6 +11,7 @@ import { GameCover } from "@/modules/games/components/GameCover";
 import { coverUrl } from "@/modules/games/service";
 import { getMyKallaxGames } from "@/modules/kallax/service";
 import { faqCounts, faqEnabled } from "@/modules/ai/faq";
+import { AiGameSelect } from "@/modules/ai/components/AiGameSelect";
 
 export async function generateMetadata() {
   return { title: (await getTranslations("ai.faq"))("title") };
@@ -65,6 +66,11 @@ export default async function FaqIndexPage({ searchParams }: { searchParams: Pro
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" aria-hidden />
           <input name="q" defaultValue={sp.q} placeholder={t("searchGames")} className="input pl-9" aria-label={t("searchGames")} />
         </form>
+      </div>
+
+      <div className="glass space-y-3 rounded-3xl p-5">
+        <p className="font-semibold">{t("pickGame")}</p>
+        <AiGameSelect games={mine} canUpload={false} hrefBase="/ai/faq/" />
       </div>
 
       {myCards.length === 0 && otherCards.length === 0 ? (
