@@ -169,6 +169,8 @@ model Game {
 model Library {
   id        String   @id @default(cuid())
   name      String
+  // Who besides the members sharing it can see it (read-only): PRIVATE | FRIENDS | MEMBERS
+  visibility String  @default("PRIVATE")
   createdAt DateTime @default(now())
 
   members LibraryMember[]

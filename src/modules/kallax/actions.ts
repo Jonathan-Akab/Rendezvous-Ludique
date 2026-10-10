@@ -11,7 +11,7 @@ import { deleteStored, UploadError } from "@/lib/storage";
 import { oneOf, optInt, optStr, str, type ActionState } from "@/lib/forms";
 import { LIBRARY_GAME_STATUSES } from "@/lib/constants";
 import { readGameFields, storeCoverFromForm } from "@/modules/games/mutations";
-import { addToKallax, attachExpansion, detachExpansion, extraPlaysFor, findBaseInLibrary, getLoggedPlayCounts, isLibraryMember } from "./service";
+import { LIBRARY_VISIBILITIES, addToKallax, attachExpansion, detachExpansion, extraPlaysFor, findBaseInLibrary, getLoggedPlayCounts, isLibraryMember } from "./service";
 import { enrichAvailable, lookUpFacts } from "@/modules/games/enrich";
 import { fillEmptyGameFields } from "@/modules/games/service";
 import { notify } from "@/modules/notifications/emails";
@@ -142,6 +142,25 @@ export async function updateKallaxGameAction(id: string, _prev: ActionState, fd:
   return { ok: true, message: t("saved") };
 }
 
+/** Upload the box picture of a Kallax record (replaces the previous uploaded one). */
+export async function uploadKallaxCoverAction(id: string, fd: FormData): Promise<ActionState> {
+  const { user } = await guard();
+  const t = await getTranslations("kallax.errors");
+  const kg = await myKallaxGame(id, user.id);
+  if (!kg) return { error: t("notMember") };
+  let uploaded: string | null;
+  try {
+    uploaded = await storeCoverFromForm(fd, user.id);
+  } catch (e) {
+    return { error: await uploadMessage(e) };
+  }
+  if (!uploaded) return { error: await uploadMessage(new UploadError("empty")) };
+  if (kg.coverFileId) await deleteStored(kg.coverFileId);
+  await db.kallaxGame.update({ where: { id }, data: { coverFileId: uploaded } });
+  done();
+  return { ok: true };
+}
+
 /** Use a suggested picture (a link) for the Kallax record; fills the Ludothèque's picture if it has none. */
 export async function setKallaxImageAction(id: string, url: string) {
   const { user } = await guard();
@@ -191,6 +210,17 @@ export async function renameLibraryAction(libraryId: string, fd: FormData) {
   if (!m || m.role !== "OWNER" || !name) return;
   await db.library.update({ where: { id: libraryId }, data: { name } });
   done();
+}
+
+/** Who can look at this Kallax besides the members sharing it (read-only): nobody, friends, or every member. */
+export async function setLibraryVisibilityAction(libraryId: string, fd: FormData) {
+  const { user } = await guard();
+  const m = await isLibraryMember(libraryId, user.id);
+  if (!m || m.role !== "OWNER") return;
+  const visibility = oneOf(str(fd, "visibility"), LIBRARY_VISIBILITIES, "PRIVATE");
+  await db.library.update({ where: { id: libraryId }, data: { visibility } });
+  done();
+  revalidatePath("/members", "layout");
 }
 
 /** Invite another member to share this Kallax (e.g. a partner or roommate). */

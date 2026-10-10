@@ -510,7 +510,21 @@
       "close": "Fermer"
     },
     "playedTimes": "{count, plural, one {Joué # fois} other {Joué # fois}}",
-    "neverPlayed": "Jamais joué"
+    "neverPlayed": "Jamais joué",
+    "visibility": {
+      "title": "Qui peut voir cette Kallax?",
+      "PRIVATE": "Privée — seulement les personnes qui la partagent",
+      "FRIENDS": "Mes amis (lecture seule)",
+      "MEMBERS": "Tous les membres (lecture seule)",
+      "save": "Enregistrer",
+      "hint": "Les personnes avec qui tu la partages peuvent ajouter, modifier et retirer des jeux. Les amis et les membres peuvent seulement regarder."
+    },
+    "theirs": {
+      "title": "Kallax de {name}",
+      "readOnly": "Tu la regardes seulement — seuls ses propriétaires peuvent la modifier.",
+      "none": "Aucune Kallax à montrer",
+      "noneHint": "Ce membre garde sa Kallax privée, ou la montre seulement à ses amis."
+    }
   },
   "plays": {
     "title": "Suivi des parties",
@@ -636,7 +650,8 @@
       "FRIENDS": "Amis seulement",
       "PRIVATE": "Moi seulement"
     },
-    "joinCta": "S'inscrire"
+    "joinCta": "S'inscrire",
+    "seeKallax": "Voir sa Kallax"
   },
   "settings": {
     "title": "Paramètres",
@@ -1431,8 +1446,15 @@
       "searching": "Recherche d'images pour {name}…",
       "none": "Aucune image trouvée. Tu peux téléverser une photo de ta boîte depuis la page du jeu.",
       "chosen": "Image enregistrée — merci!",
-      "pick": "Choisis une image pour {name} :",
-      "note": "Images de {source}. Seul un lien est enregistré; les images appartiennent à leurs auteurs."
+      "pick": "Choisis la boîte de {name}, puis confirme :",
+      "note": "Images de {source}. Seul un lien est enregistré; les images appartiennent à leurs auteurs.",
+      "upload": "Téléverser la boîte",
+      "uploadFailed": "L’image n’a pas pu être téléversée.",
+      "use": "Utiliser cette image",
+      "cancel": "Annuler",
+      "deepSearching": "Claude cherche d’autres images sur le web…",
+      "saveFailed": "L’image n’a pas pu être enregistrée. Essaie-en une autre.",
+      "noteShort": "Seul un lien est enregistré; les images appartiennent à leurs auteurs."
     },
     "ludo": "Ludothèque",
     "firstAdded": "Dans la Ludothèque depuis le {date}.",
@@ -1603,7 +1625,10 @@
       "noGamesHint": "Les questions posées à l'IA des règles construisent la FAQ de chaque jeu.",
       "onlyFaq": "Pose ta question : on cherche dans la FAQ…",
       "onlyFaqNotice": "{reason} Tu peux quand même poser ta question : on cherchera la réponse dans la FAQ de ce jeu.",
-      "pickGame": "Trouver les questions d’un jeu — de ta Kallax ou de toute la Ludothèque"
+      "pickGame": "Trouver les questions d’un jeu — de ta Kallax ou de toute la Ludothèque",
+      "ludoGames": "Jeux de la Ludothèque",
+      "noKallaxGames": "Aucun jeu de ta Kallax ne correspond",
+      "noKallaxGamesHint": "Ajoute des jeux à ta Kallax, ou cherche dans la Ludothèque."
     },
     "flow": "Chaque question passe d'abord par la FAQ, puis {who} répond{count, plural, =0 {.} one { en lisant le livret du jeu.} other { en lisant les # livrets du jeu.}}",
     "stage": {

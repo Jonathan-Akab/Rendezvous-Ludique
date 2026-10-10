@@ -14,7 +14,7 @@ import { GameCover } from "@/modules/games/components/GameCover";
 import { GameFields } from "@/modules/games/components/GameFields";
 import { MeepleRating } from "@/modules/games/components/MeepleRating";
 import { RatingInput } from "@/modules/games/components/RatingInput";
-import { FindImage } from "@/modules/games/components/ImageSuggestions";
+import { FindImage, UploadBoxArt } from "@/modules/games/components/ImageSuggestions";
 import { getMyRatings, getRatingStats } from "@/modules/games/service";
 import { deleteRulebookAction, uploadRulebookAction } from "@/modules/games/actions";
 import { getLoggedPlayCounts, isLibraryMember, kallaxCoverUrl } from "@/modules/kallax/service";
@@ -211,7 +211,8 @@ export default async function KallaxGamePage({ params }: { params: Promise<{ id:
                   {t("seeInLudo")}
                 </Link>
               )}
-              {!cover && <FindImage kallaxGameId={kg.id} name={kg.name} label={tg("images.find")} />}
+              <UploadBoxArt kallaxGameId={kg.id} label={tg("images.upload")} />
+              <FindImage kallaxGameId={kg.id} name={kg.name} label={tg("images.find")} />
             </div>
           </div>
         </div>

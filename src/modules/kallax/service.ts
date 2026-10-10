@@ -2,6 +2,7 @@ import "server-only";
 import { db } from "@/lib/db";
 import { ensureGame, normalizeName, type GameInfo } from "@/modules/games/service";
 import { textSimilarity } from "@/lib/similarity";
+import { areFriends } from "@/modules/friends/service";
 
 /** Every member starts with their own Kallax. */
 export async function createPersonalLibrary(userId: string, displayName: string) {
@@ -24,6 +25,26 @@ export async function getMyLibraries(userId: string) {
       },
       _count: { select: { games: { where: { parentId: null } } } }, // expansions aren't games of their own
     },
+    orderBy: { createdAt: "asc" },
+  });
+}
+
+/** Who besides its members may look at a Kallax (read-only). */
+export const LIBRARY_VISIBILITIES = ["PRIVATE", "FRIENDS", "MEMBERS"] as const;
+
+/** The Kallax of `ownerId` that `viewerId` may look at: shared with the viewer, or visible to friends / to every member. */
+export async function getVisibleLibraries(ownerId: string, viewerId: string) {
+  const friends = ownerId === viewerId ? false : await areFriends(ownerId, viewerId);
+  return db.library.findMany({
+    where: {
+      members: { some: { userId: ownerId, role: "OWNER", status: "ACCEPTED" } },
+      OR: [
+        { visibility: "MEMBERS" },
+        ...(friends ? [{ visibility: "FRIENDS" }] : []),
+        { members: { some: { userId: viewerId, status: "ACCEPTED" } } },
+      ],
+    },
+    include: { _count: { select: { games: { where: { parentId: null } } } } },
     orderBy: { createdAt: "asc" },
   });
 }

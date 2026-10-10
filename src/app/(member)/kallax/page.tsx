@@ -10,7 +10,7 @@ import { FadeIn } from "@/components/Motion";
 import { MeepleAvatar } from "@/components/Meeple";
 import { EmptyState } from "@/components/EmptyState";
 import { ConfirmButton } from "@/components/forms";
-import { getMyLibraries, kallaxCoverUrl, getLoggedPlayCounts } from "@/modules/kallax/service";
+import { getMyLibraries, kallaxCoverUrl, getLoggedPlayCounts, LIBRARY_VISIBILITIES } from "@/modules/kallax/service";
 import { getAiStatus } from "@/modules/ai/policy";
 import { providerChoices } from "@/modules/ai/providerInfo";
 import { enrichAvailable } from "@/modules/games/enrich";
@@ -22,6 +22,7 @@ import {
   createLibraryAction,
   removeLibraryMemberAction,
   renameLibraryAction,
+  setLibraryVisibilityAction,
   respondLibraryInviteAction,
 } from "@/modules/kallax/actions";
 import type { Prisma } from "@/generated/prisma/client";
@@ -251,6 +252,24 @@ export default async function KallaxPage({ searchParams }: { searchParams: Promi
                   </li>
                 ))}
               </ul>
+              {me?.role === "OWNER" && (
+                <form action={setLibraryVisibilityAction.bind(null, library.id)} className="space-y-2 border-t border-line/60 pt-3">
+                  <label className="block text-sm font-semibold" htmlFor="library-visibility">
+                    {t("visibility.title")}
+                  </label>
+                  <div className="flex gap-2">
+                    <select id="library-visibility" name="visibility" defaultValue={library.visibility} className="select">
+                      {LIBRARY_VISIBILITIES.map((v) => (
+                        <option key={v} value={v}>
+                          {t(`visibility.${v}`)}
+                        </option>
+                      ))}
+                    </select>
+                    <button className="btn btn-secondary btn-sm">{t("visibility.save")}</button>
+                  </div>
+                  <p className="text-xs text-muted">{t("visibility.hint")}</p>
+                </form>
+              )}
               {mod.settings.allowSharing && (
                 <>
                   <p className="text-xs text-muted">{t("sharing.hint")}</p>

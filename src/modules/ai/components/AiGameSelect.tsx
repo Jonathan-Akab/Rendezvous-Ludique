@@ -15,10 +15,32 @@ type Source = "kallax" | "ludo" | "upload";
  * Choose the game to ask about: from your Kallax, from the whole Ludothèque, or by
  * uploading a rulebook (which reuses or creates the Ludothèque entry).
  */
-export function AiGameSelect({ games, canUpload, hrefBase = "/ai?game=" }: { games: MyGameOption[]; canUpload: boolean; /** where a picked game leads: this prefix + the game id */ hrefBase?: string }) {
+export function AiGameSelect({
+  games,
+  canUpload,
+  hrefBase = "/ai?game=",
+  initialSource = "kallax",
+  syncUrl = false,
+}: {
+  games: MyGameOption[];
+  canUpload: boolean;
+  /** where a picked game leads: this prefix + the game id */
+  hrefBase?: string;
+  initialSource?: Source;
+  /** keep the chosen tab in the page address (?src=), so the page can list the matching games */
+  syncUrl?: boolean;
+}) {
   const t = useTranslations("ai.source");
   const router = useRouter();
-  const [source, setSource] = useState<Source>("kallax");
+  const [source, setSource] = useState<Source>(initialSource);
+  const choose = (id: Source) => {
+    setSource(id);
+    if (syncUrl) {
+      const params = new URLSearchParams(window.location.search);
+      params.set("src", id);
+      router.replace(`?${params}`, { scroll: false });
+    }
+  };
   const go = (id?: string) => id && router.push(`${hrefBase}${id}`);
 
   const tabs: { id: Source; label: string; icon: typeof Search }[] = [
@@ -36,7 +58,7 @@ export function AiGameSelect({ games, canUpload, hrefBase = "/ai?game=" }: { gam
             type="button"
             role="tab"
             aria-selected={source === id}
-            onClick={() => setSource(id)}
+            onClick={() => choose(id)}
             className={`btn btn-sm ${source === id ? "btn-primary" : "btn-secondary"}`}
           >
             <Icon className="size-4" /> {label}

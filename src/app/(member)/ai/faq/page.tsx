@@ -18,8 +18,9 @@ export async function generateMetadata() {
 }
 
 type Card = { id: string; name: string; cover: string | null; count: number };
+type Query = { q?: string; src?: string };
 
-export default async function FaqIndexPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+export default async function FaqIndexPage({ searchParams }: { searchParams: Promise<Query> }) {
   const [user, mod, sp, t] = await Promise.all([requireUser(), requireModule("ai"), searchParams, getTranslations("ai.faq")]);
   if (!(await faqEnabled(mod))) notFound();
 
@@ -31,6 +32,8 @@ export default async function FaqIndexPage({ searchParams }: { searchParams: Pro
     orderBy: { name: "asc" },
   });
 
+  // The tab chosen above decides which games are listed below.
+  const src = sp.src === "ludo" ? "ludo" : "kallax";
   const q = normalizeText(sp.q ?? "");
   const keep = (c: Card) => !q || normalizeText(c.name).includes(q);
   const myCards: Card[] = mine.map((g) => ({ id: g.gameId, name: g.name, cover: g.cover, count: counts.get(g.gameId) ?? 0 })).filter(keep);
@@ -64,32 +67,23 @@ export default async function FaqIndexPage({ searchParams }: { searchParams: Pro
         </div>
         <form className="relative w-full max-w-xs" role="search">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" aria-hidden />
+          <input type="hidden" name="src" value={src} />
           <input name="q" defaultValue={sp.q} placeholder={t("searchGames")} className="input pl-9" aria-label={t("searchGames")} />
         </form>
       </div>
 
       <div className="glass space-y-3 rounded-3xl p-5">
         <p className="font-semibold">{t("pickGame")}</p>
-        <AiGameSelect games={mine} canUpload={false} hrefBase="/ai/faq/" />
+        <AiGameSelect games={mine} canUpload={false} hrefBase="/ai/faq/" initialSource={src} syncUrl />
       </div>
 
-      {myCards.length === 0 && otherCards.length === 0 ? (
-        <EmptyState title={t("noGames")} text={t("noGamesHint")} />
+      {(src === "kallax" ? myCards : otherCards).length === 0 ? (
+        <EmptyState title={t(src === "kallax" ? "noKallaxGames" : "noGames")} text={t(src === "kallax" ? "noKallaxGamesHint" : "noGamesHint")} />
       ) : (
-        <>
-          {myCards.length > 0 && (
-            <section className="space-y-3">
-              <h2 className="section-title">{t("myGames")}</h2>
-              {grid(myCards)}
-            </section>
-          )}
-          {otherCards.length > 0 && (
-            <section className="space-y-3">
-              <h2 className="section-title">{t("otherGames")}</h2>
-              {grid(otherCards)}
-            </section>
-          )}
-        </>
+        <section className="space-y-3">
+          <h2 className="section-title">{t(src === "kallax" ? "myGames" : "ludoGames")}</h2>
+          {grid(src === "kallax" ? myCards : otherCards)}
+        </section>
       )}
     </div>
   );

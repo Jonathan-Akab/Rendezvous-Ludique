@@ -510,7 +510,21 @@
       "close": "Close"
     },
     "playedTimes": "{count, plural, one {Played once} other {Played # times}}",
-    "neverPlayed": "Never played"
+    "neverPlayed": "Never played",
+    "visibility": {
+      "title": "Who can see this kallax?",
+      "PRIVATE": "Private — only the people sharing it",
+      "FRIENDS": "My friends (read-only)",
+      "MEMBERS": "Every member (read-only)",
+      "save": "Save",
+      "hint": "People you share it with can add, edit and remove games. Friends and members can only look."
+    },
+    "theirs": {
+      "title": "{name}’s Kallax",
+      "readOnly": "You are looking at it — only its owners can change it.",
+      "none": "No Kallax to show",
+      "noneHint": "This member keeps their Kallax private, or only shows it to friends."
+    }
   },
   "plays": {
     "title": "Play tracker",
@@ -636,7 +650,8 @@
       "FRIENDS": "Friends only",
       "PRIVATE": "Only me"
     },
-    "joinCta": "Join"
+    "joinCta": "Join",
+    "seeKallax": "See their Kallax"
   },
   "settings": {
     "title": "Settings",
@@ -1431,8 +1446,15 @@
       "searching": "Looking for pictures of {name}…",
       "none": "No picture found. You can upload a photo of your box from the game's page.",
       "chosen": "Picture saved — thanks!",
-      "pick": "Pick a picture for {name}:",
-      "note": "Pictures from {source}. Only a link is saved; pictures belong to their owners."
+      "pick": "Pick the box of {name}, then confirm:",
+      "note": "Pictures from {source}. Only a link is saved; pictures belong to their owners.",
+      "upload": "Upload box art",
+      "uploadFailed": "The picture could not be uploaded.",
+      "use": "Use this picture",
+      "cancel": "Cancel",
+      "deepSearching": "Claude is searching the web for more pictures…",
+      "saveFailed": "The picture could not be saved. Try another one.",
+      "noteShort": "Only a link is saved; pictures belong to their owners."
     },
     "ludo": "Ludothèque",
     "firstAdded": "In the Ludothèque since {date}.",
@@ -1603,7 +1625,10 @@
       "noGamesHint": "Questions asked to the rules AI build each game's FAQ.",
       "onlyFaq": "Ask your question: we'll look in the FAQ…",
       "onlyFaqNotice": "{reason} You can still ask: we'll look for the answer in this game's FAQ.",
-      "pickGame": "Find a game’s questions — from your Kallax or the whole Ludothèque"
+      "pickGame": "Find a game’s questions — from your Kallax or the whole Ludothèque",
+      "ludoGames": "Ludothèque games",
+      "noKallaxGames": "No game in your Kallax matches",
+      "noKallaxGamesHint": "Add games to your Kallax, or search the Ludothèque."
     },
     "flow": "Every question goes to the FAQ first, then {who} answers{count, plural, =0 {.} one { by reading the game's rulebook.} other { by reading the game's # rulebooks.}}",
     "stage": {

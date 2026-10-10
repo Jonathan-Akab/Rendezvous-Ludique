@@ -4,6 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { Check, Lock, Pencil, Share2, UserPlus } from "lucide-react";
 import { requireUser } from "@/lib/auth/guards";
 import { isModuleEnabled } from "@/lib/modules";
+import { LibraryBig } from "lucide-react";
+import { getVisibleLibraries } from "@/modules/kallax/service";
 import { EmptyState } from "@/components/EmptyState";
 import { canViewProfile, getProfileData } from "@/modules/profiles/service";
 import { ProfileView } from "@/modules/profiles/components/ProfileView";
@@ -62,8 +64,16 @@ export default async function MemberProfilePage({ params }: { params: Promise<{ 
       );
   }
 
+  // Their Kallax, when they let the viewer see it.
+  const theirKallax = !isMe && (await isModuleEnabled("kallax")) ? await getVisibleLibraries(data.user.id, viewer.id) : [];
+
   return (
     <div className="space-y-4">
+      {theirKallax.length > 0 && (
+        <Link href={`/members/${data.user.username}/kallax`} className="btn btn-secondary">
+          <LibraryBig className="size-4" /> {t("seeKallax")}
+        </Link>
+      )}
       {isMe && (
         <p className="flex items-center gap-2 text-xs text-muted">
           <Lock className="size-3.5" /> {t("visibilityNote", { visibility: t(`visibility.${data.user.profileVisibility}`) })}

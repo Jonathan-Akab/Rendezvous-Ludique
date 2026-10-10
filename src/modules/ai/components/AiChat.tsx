@@ -11,24 +11,11 @@ import { ProviderSwitch, type Provider, type ProviderInfo } from "./ProviderSwit
 
 const MAX_IMAGES = 3;
 
-/** Shrinks a photo to at most 1568 px and re-encodes it as JPEG (small upload, and the format Claude and Gemini accept). */
-async function shrinkImage(file: File): Promise<File> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, 1568 / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/jpeg", 0.85));
-  if (!blob) throw new Error("image");
-  return new File([blob], file.name.replace(/.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
-}
-
 const KNOWN_ERRORS = ["imageError", "limit", "notConfigured", "refusal", "busy", "disabled", "rulebookRequired", "blocked", "budget", "freeUnavailable", "claudeUnavailable", "freeBusy", "freeError", "api", "noFaqMatch", "freeIncomplete", "ownUnavailable", "ownKeyInvalid", "ownKeyCredit"];
 /** Errors meaning "the AI cannot answer right now" (the FAQ may still have). */
 const AI_DOWN = ["limit", "notConfigured", "budget", "claudeUnavailable", "freeUnavailable", "disabled"];
 import { Meeple } from "@/components/Meeple";
+import { shrinkImage } from "@/lib/shrinkImage";
 import { RulebookLink } from "@/modules/games/components/RulebookOverlay";
 
 export type ChatMessage = {
