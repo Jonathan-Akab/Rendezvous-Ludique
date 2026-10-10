@@ -3,7 +3,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth/session";
 import { getModule } from "@/lib/modules";
-import { buildMessages, getClient, SYSTEM_PROMPT, type Citation } from "@/modules/ai/service";
+import { buildMessages, getClient, loadChatImages, SYSTEM_PROMPT, type Citation } from "@/modules/ai/service";
 import { getAiStatus, resolveProvider } from "@/modules/ai/policy";
 import { claudeCostUsd, supportsEffort } from "@/modules/ai/pricing";
 import { FreeProviderError, rulebookPages, selectPages, streamFree, type FreeMessage } from "@/modules/ai/free";
@@ -25,6 +25,7 @@ const bodySchema = z.object({
   provider: z.enum(["claude", "free", "own"]).default("claude"),
   question: z.string().trim().min(1).max(4000),
   skipFaq: z.boolean().optional(),
+  imageIds: z.array(z.string()).max(3).optional(),
 });
 
 const ndjson = (stream: ReadableStream) =>
@@ -48,6 +49,11 @@ export async function POST(req: Request) {
   const parsed = bodySchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: "invalid" }, { status: 400 });
   const { question } = parsed.data;
+  // Photos attached to this question: only the member's own uploads count.
+  const imageIds = parsed.data.imageIds?.length
+    ? (await db.storedFile.findMany({ where: { id: { in: parsed.data.imageIds }, kind: "AI_IMAGE", ownerId: user.id }, select: { id: true } })).map((f) => f.id)
+    : [];
+  const images = await loadChatImages(imageIds);
 
   const status = await getAiStatus(user.id, mod);
   if (status.access === "NONE") return Response.json({ error: "blocked" }, { status: 403 });
@@ -69,7 +75,8 @@ export async function POST(req: Request) {
   if (!chat && !rulebooks.length && !mod.settings.allowGeneralKnowledge) return Response.json({ error: "rulebookRequired" }, { status: 400 });
   const ensureChat = async () =>
     (chat ??= await db.aiChat.create({ data: { userId: user.id, gameId: newGameId, title: question.slice(0, 80) }, include }));
-  const useFaq = Boolean(gameId) && (await faqEnabled(mod));
+  // A photo makes the question specific to that photo: no FAQ lookup, nothing saved to the FAQ.
+  const useFaq = Boolean(gameId) && !images.length && (await faqEnabled(mod));
 
   // 1. Always the game's FAQ first: same question already answered → instant, free answer.
   if (useFaq && gameId && !parsed.data.skipFaq) {
@@ -164,7 +171,7 @@ export async function POST(req: Request) {
       };
 
       try {
-        if (!retryAfterFaq) await db.aiMessage.create({ data: { chatId: conversation.id, role: "user", content: question } });
+        if (!retryAfterFaq) await db.aiMessage.create({ data: { chatId: conversation.id, role: "user", content: question, imageIds: imageIds.length ? JSON.stringify(imageIds) : null } });
 
         if (provider === "claude" || provider === "own") {
           try {
@@ -172,7 +179,7 @@ export async function POST(req: Request) {
             const own = provider === "own" ? await getOwnKey(user.id) : null;
             if (provider === "own" && !own) throw new OwnKeyError();
             const model = own?.model ?? (String(mod.settings.model) || "claude-opus-5-5");
-            const messages = await buildMessages({ ...conversation, rulebooks }, question, { inlinePdfs: Boolean(own) });
+            const messages = await buildMessages({ ...conversation, rulebooks }, question, { inlinePdfs: Boolean(own), questionImages: images });
             const advanced = supportsEffort(model);
             const client = own ? new Anthropic({ apiKey: own.apiKey }) : getClient();
             const response = client.beta.messages.stream(

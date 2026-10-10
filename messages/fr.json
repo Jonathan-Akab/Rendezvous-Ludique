@@ -1522,7 +1522,8 @@
       "freeIncomplete": "La réponse de l'option gratuite a été coupée en cours de route (service surchargé). Repose ta question ou utilise Claude.",
       "ownUnavailable": "Ta clé Claude n'est plus disponible. Vérifie-la dans tes paramètres.",
       "ownKeyInvalid": "Anthropic a refusé ta clé Claude. Vérifie-la dans tes paramètres.",
-      "ownKeyCredit": "Ton compte Anthropic n'a plus de crédit. Ajoutes-en sur console.anthropic.com ou choisis une autre option."
+      "ownKeyCredit": "Ton compte Anthropic n'a plus de crédit. Ajoutes-en sur console.anthropic.com ou choisis une autre option.",
+      "imageError": "La photo n’a pas pu être téléversée. Essaie une autre image (JPEG, PNG ou WebP)."
     },
     "pickGameHint": "Seuls les jeux de ta Kallax sont proposés.",
     "uploadRulebook": "Téléverser le livret de règles (PDF)",
@@ -1633,7 +1634,10 @@
       "rulebookTitle": "Titre du livret (facultatif)",
       "uploadHint": "Si le jeu est déjà dans la Ludothèque, on l’utilise (sans téléverser si un livret existe déjà); sinon il est créé pour toi.",
       "uploadSubmit": "Téléverser et poser des questions"
-    }
+    },
+    "addImage": "Ajouter une photo (plateau, cartes, situation de jeu…)",
+    "removeImage": "Retirer la photo",
+    "imageDefault": "Analyse cette photo et dis-moi ce que les règles en disent."
   },
   "facebook": {
     "title": "Groupes Facebook",

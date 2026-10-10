@@ -37,6 +37,24 @@ async function rulebookFileId(rulebook: { id: string; aiFileId: string | null; f
   return uploaded.id;
 }
 
+export type ChatImage = { mediaType: "image/jpeg" | "image/png" | "image/webp"; data: string };
+
+/** Photos attached to questions (JSON list of StoredFile ids), as base64, in the order given. */
+export async function loadChatImages(idsJson: string | string[] | null | undefined): Promise<ChatImage[]> {
+  const ids: string[] = Array.isArray(idsJson) ? idsJson : idsJson ? JSON.parse(idsJson) : [];
+  if (!ids.length) return [];
+  const files = await db.storedFile.findMany({ where: { id: { in: ids }, kind: "AI_IMAGE" } });
+  const out: ChatImage[] = [];
+  for (const id of ids) {
+    const f = files.find((x) => x.id === id);
+    if (f) out.push({ mediaType: f.mimeType as ChatImage["mediaType"], data: (await readStored(f.storageKey)).toString("base64") });
+  }
+  return out;
+}
+
+const imageBlocks = (images: ChatImage[]): Anthropic.Beta.BetaContentBlockParam[] =>
+  images.map((img) => ({ type: "image", source: { type: "base64", media_type: img.mediaType, data: img.data } }));
+
 /** A page citation; `fileId`/`title` say which rulebook it comes from. */
 export type Citation = { page: number; endPage: number; text: string; fileId?: string; title?: string };
 
@@ -50,9 +68,11 @@ export type AiRulebook = { id: string; title: string; fileId: string; aiFileId: 
 export async function buildMessages(chat: {
   game: { name: string; year: number | null } | null;
   rulebooks: AiRulebook[];
-  messages: { role: string; content: string }[];
-}, question: string, { inlinePdfs = false } = {}) {
-  const turns = [...chat.messages, { role: "user", content: question }];
+  messages: { role: string; content: string; imageIds?: string | null }[];
+}, question: string, { inlinePdfs = false, questionImages = [] as ChatImage[] } = {}) {
+  const turns: { role: string; content: string; imageIds?: string | null; images?: ChatImage[] }[] = [...chat.messages, { role: "user", content: question, images: questionImages }];
+  // photos from earlier questions stay in the conversation, so follow-ups can still refer to them
+  for (const turn of turns) if (!turn.images && turn.imageIds) turn.images = await loadChatImages(turn.imageIds);
   const books = chat.rulebooks.length ? `\nAttached rulebooks: ${chat.rulebooks.map((r) => r.title).join(", ")}` : "\nNo rulebook attached.";
   const context = chat.game ? `Game: ${chat.game.name}${chat.game.year ? ` (${chat.game.year})` : ""}${books}` : "No specific game selected.";
 
@@ -78,10 +98,14 @@ export async function buildMessages(chat: {
           ...(n === chat.rulebooks.length - 1 ? { cache_control: { type: "ephemeral" as const } } : {}),
         });
       });
+      content.push(...imageBlocks(turn.images ?? []));
       content.push({ type: "text", text: `${context}\n\n${turn.content}` });
       messages.push({ role: "user", content });
     } else {
-      messages.push({ role: turn.role === "assistant" ? "assistant" : "user", content: turn.content });
+      messages.push({
+        role: turn.role === "assistant" ? "assistant" : "user",
+        content: turn.images?.length ? [...imageBlocks(turn.images), { type: "text", text: turn.content }] : turn.content,
+      });
     }
   }
   return messages;

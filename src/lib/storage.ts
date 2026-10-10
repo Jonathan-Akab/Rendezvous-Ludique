@@ -13,6 +13,7 @@ export const FILE_LIMITS = {
   COVER: { maxBytes: 5 * 1024 * 1024, types: ["image/jpeg", "image/png", "image/webp", "image/avif", "image/gif"] },
   RULEBOOK: { maxBytes: 30 * 1024 * 1024, types: ["application/pdf"] },
   IMAGE: { maxBytes: 8 * 1024 * 1024, types: ["image/jpeg", "image/png", "image/webp", "image/avif"] },
+  AI_IMAGE: { maxBytes: 5 * 1024 * 1024, types: ["image/jpeg", "image/png", "image/webp"] },
 } as const;
 
 export type FileKind = keyof typeof FILE_LIMITS;

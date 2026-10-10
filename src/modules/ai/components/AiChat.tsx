@@ -6,10 +6,26 @@ import { AnimatePresence, motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { ArrowUp, BadgeCheck, BookOpen, Gift, KeyRound, MessageCircleQuestion, Sparkles, Square } from "lucide-react";
+import { ArrowUp, BadgeCheck, BookOpen, Gift, ImagePlus, KeyRound, LoaderCircle, MessageCircleQuestion, Sparkles, Square, X } from "lucide-react";
 import { ProviderSwitch, type Provider, type ProviderInfo } from "./ProviderSwitch";
 
-const KNOWN_ERRORS = ["limit", "notConfigured", "refusal", "busy", "disabled", "rulebookRequired", "blocked", "budget", "freeUnavailable", "claudeUnavailable", "freeBusy", "freeError", "api", "noFaqMatch", "freeIncomplete", "ownUnavailable", "ownKeyInvalid", "ownKeyCredit"];
+const MAX_IMAGES = 3;
+
+/** Shrinks a photo to at most 1568 px and re-encodes it as JPEG (small upload, and the format Claude and Gemini accept). */
+async function shrinkImage(file: File): Promise<File> {
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, 1568 / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close();
+  const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/jpeg", 0.85));
+  if (!blob) throw new Error("image");
+  return new File([blob], file.name.replace(/.[^.]+$/, "") + ".jpg", { type: "image/jpeg" });
+}
+
+const KNOWN_ERRORS = ["imageError", "limit", "notConfigured", "refusal", "busy", "disabled", "rulebookRequired", "blocked", "budget", "freeUnavailable", "claudeUnavailable", "freeBusy", "freeError", "api", "noFaqMatch", "freeIncomplete", "ownUnavailable", "ownKeyInvalid", "ownKeyCredit"];
 /** Errors meaning "the AI cannot answer right now" (the FAQ may still have). */
 const AI_DOWN = ["limit", "notConfigured", "budget", "claudeUnavailable", "freeUnavailable", "disabled"];
 import { Meeple } from "@/components/Meeple";
@@ -21,6 +37,8 @@ export type ChatMessage = {
   content: string;
   citations: { page: number; endPage: number; text: string; fileId?: string; title?: string }[];
   provider?: string | null;
+  /** photos attached to a question (file ids) */
+  images?: string[];
   /** set when the answer comes from the game's FAQ */
   faq?: { question: string; verified: boolean } | null;
 };
@@ -62,6 +80,9 @@ export function AiChat({
     initialProvider === "claude" && !providerInfo.claudeAvailable && providerInfo.freeAvailable ? "free" : initialProvider,
   );
   const [notice, setNotice] = useState<string | null>(null);
+  const [attached, setAttached] = useState<{ id: string; url: string }[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<"faq" | Provider>("faq");
   const abortRef = useRef<AbortController | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -72,18 +93,42 @@ export function AiChat({
 
   const suggestions = [t("suggest.explain"), t("suggest.turn"), t("suggest.win"), t("suggest.setup")];
 
+  async function addImages(list: FileList | null) {
+    const files = Array.from(list ?? []).filter((f) => f.type.startsWith("image/")).slice(0, MAX_IMAGES - attached.length);
+    if (!files.length) return;
+    setUploading(true);
+    setError(null);
+    try {
+      const body = new FormData();
+      for (const f of files) body.append("files", await shrinkImage(f));
+      const res = await fetch("/api/ai/images", { method: "POST", body });
+      if (!res.ok) throw new Error("imageError");
+      const { ids } = (await res.json()) as { ids: string[] };
+      setAttached((a) => [...a, ...ids.map((id) => ({ id, url: `/files/${id}` }))].slice(0, MAX_IMAGES));
+    } catch {
+      setError("imageError");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
   /** `skipFaq`: the FAQ answer didn't help — ask the AI the same question. */
   async function ask(question: string, skipFaq = false) {
-    const q = question.trim();
-    if (!q || busy) return;
+    const imageIds = skipFaq ? [] : attached.map((a) => a.id);
+    const q = question.trim() || (imageIds.length ? t("imageDefault") : "");
+    if (!q || busy || uploading) return;
     setError(null);
     setNotice(null);
-    if (!skipFaq) setInput("");
+    if (!skipFaq) {
+      setInput("");
+      setAttached([]);
+    }
     setBusy(true);
     setStage(skipFaq ? provider : "faq");
     const assistantId = `a-${Date.now()}`;
     const assistant: ChatMessage = { id: assistantId, role: "assistant", content: "", citations: [] };
-    setMessages((m) => (skipFaq ? [...m, assistant] : [...m, { id: `u-${Date.now()}`, role: "user", content: q, citations: [] }, assistant]));
+    setMessages((m) => (skipFaq ? [...m, assistant] : [...m, { id: `u-${Date.now()}`, role: "user", content: q, citations: [], images: imageIds }, assistant]));
     const update = (fn: (msg: ChatMessage) => ChatMessage) => setMessages((all) => all.map((m) => (m.id === assistantId ? fn(m) : m)));
 
     const ctrl = new AbortController();
@@ -93,7 +138,7 @@ export function AiChat({
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chatId: currentChat, gameId, question: q, provider, skipFaq }),
+        body: JSON.stringify({ chatId: currentChat, gameId, question: q, provider, skipFaq, imageIds }),
         signal: ctrl.signal,
       });
       if (!res.ok || !res.body) {
@@ -218,7 +263,17 @@ export function AiChat({
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
                   </div>
                 ) : (
-                  <p className="whitespace-pre-line text-sm">{m.content}</p>
+                  <>
+                    {m.images && m.images.length > 0 && (
+                      <div className="mb-2 flex flex-wrap gap-2">
+                        {m.images.map((id) => (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img key={id} src={`/files/${id}`} alt="" className="max-h-40 rounded-xl object-cover" />
+                        ))}
+                      </div>
+                    )}
+                    <p className="whitespace-pre-line text-sm">{m.content}</p>
+                  </>
                 )}
                 {m.role === "assistant" && m.provider === "faq" && m.content && (
                   <div className="mt-3 space-y-2 border-t border-line/50 pt-2">
@@ -274,8 +329,30 @@ export function AiChat({
           e.preventDefault();
           ask(input);
         }}
-        className="glass sticky bottom-24 flex items-end gap-2 rounded-3xl p-2 lg:bottom-4"
+        className="glass sticky bottom-24 flex flex-wrap items-end gap-2 rounded-3xl p-2 lg:bottom-4"
       >
+        {(attached.length > 0 || uploading) && (
+          <div className="flex w-full flex-wrap gap-2 px-2 pt-1">
+            {attached.map((a) => (
+              <span key={a.id} className="relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={a.url} alt="" className="size-16 rounded-xl object-cover" />
+                <button type="button" onClick={() => setAttached((all) => all.filter((x) => x.id !== a.id))} className="absolute -right-1.5 -top-1.5 grid size-5 place-items-center rounded-full bg-surface-2 text-ink shadow" title={t("removeImage")}>
+                  <X className="size-3" />
+                </button>
+              </span>
+            ))}
+            {uploading && (
+              <span className="grid size-16 place-items-center rounded-xl border border-dashed border-line">
+                <LoaderCircle className="size-5 animate-spin text-muted" />
+              </span>
+            )}
+          </div>
+        )}
+        <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => addImages(e.target.files)} />
+        <button type="button" onClick={() => fileRef.current?.click()} disabled={!!disabledReason || busy || uploading || attached.length >= MAX_IMAGES} className="btn btn-secondary size-11 rounded-2xl p-0" title={t("addImage")}>
+          <ImagePlus className="size-5" />
+        </button>
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -295,7 +372,7 @@ export function AiChat({
             <Square className="size-4" />
           </button>
         ) : (
-          <button type="submit" disabled={!input.trim() || !!disabledReason} className="btn btn-primary size-11 rounded-2xl p-0" title={t("send")}>
+          <button type="submit" disabled={(!input.trim() && !attached.length) || uploading || !!disabledReason} className="btn btn-primary size-11 rounded-2xl p-0" title={t("send")}>
             <ArrowUp className="size-5" />
           </button>
         )}

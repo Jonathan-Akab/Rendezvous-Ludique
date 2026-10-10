@@ -400,7 +400,7 @@ model GameRating {
 model StoredFile {
   id         String   @id @default(cuid())
   ownerId    String?
-  kind       String // COVER | RULEBOOK
+  kind       String // COVER | RULEBOOK | IMAGE | AI_IMAGE
   fileName   String
   mimeType   String
   size       Int
@@ -460,6 +460,7 @@ model AiMessage {
   role         String // user | assistant
   content      String
   citations    String? // JSON: [{ page, text }]
+  imageIds     String? // JSON: ids of photos attached to a question (StoredFile, kind AI_IMAGE)
   provider     String? // claude | free (assistant messages)
   model        String?
   inputTokens  Int?

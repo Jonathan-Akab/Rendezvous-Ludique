@@ -50,7 +50,8 @@ export function selectPages<T extends { page: number; text: string }>(all: T[], 
   return picked.sort((a, b) => a.index - b.index).map((s) => s.p);
 }
 
-export type FreeMessage = { role: "system" | "user" | "assistant"; content: string };
+export type FreeContent = string | ({ type: "text"; text: string } | { type: "image_url"; image_url: { url: string } })[];
+export type FreeMessage = { role: "system" | "user" | "assistant"; content: FreeContent };
 
 /** Streams an answer from the OpenAI-compatible endpoint; yields text chunks. */
 export async function* streamFree(opts: { baseUrl: string; model: string; messages: FreeMessage[]; signal?: AbortSignal }) {

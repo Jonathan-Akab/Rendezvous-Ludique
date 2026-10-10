@@ -1522,7 +1522,8 @@
       "freeIncomplete": "The free option's answer was cut off (service overloaded). Ask again or use Claude.",
       "ownUnavailable": "Your Claude key is no longer available. Check it in your settings.",
       "ownKeyInvalid": "Anthropic rejected your Claude key. Check it in your settings.",
-      "ownKeyCredit": "Your Anthropic account is out of credit. Add some at console.anthropic.com or pick another option."
+      "ownKeyCredit": "Your Anthropic account is out of credit. Add some at console.anthropic.com or pick another option.",
+      "imageError": "The photo could not be uploaded. Try another image (JPEG, PNG or WebP)."
     },
     "pickGameHint": "Only games from your Kallax are listed.",
     "uploadRulebook": "Upload the rulebook (PDF)",
@@ -1633,7 +1634,10 @@
       "rulebookTitle": "Rulebook title (optional)",
       "uploadHint": "If the game is already in the Ludothèque we use it (and skip the upload if it already has a rulebook); otherwise it is created for you.",
       "uploadSubmit": "Upload and start asking"
-    }
+    },
+    "addImage": "Add a photo (board, cards, a tricky situation…)",
+    "removeImage": "Remove photo",
+    "imageDefault": "Analyse this photo and tell me what the rules say about it."
   },
   "facebook": {
     "title": "Facebook groups",

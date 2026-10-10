@@ -112,6 +112,7 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<S
       content: m.content,
       citations: m.citations ? JSON.parse(m.citations) : [],
       provider: m.provider,
+      images: m.imageIds ? (JSON.parse(m.imageIds) as string[]) : [],
       faq: faq ? { question: faq.question, verified: faq.status === "VERIFIED" } : null,
     };
   });
