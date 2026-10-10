@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getFormatter, getTranslations } from "next-intl/server";
-import { MessageSquareReply, Trash2 } from "lucide-react";
+import { Lock, MessageSquareReply, Trash2 } from "lucide-react";
 import { requireUser } from "@/lib/auth/guards";
 import { requireModule } from "@/lib/modules";
 import { db } from "@/lib/db";
@@ -17,7 +17,7 @@ export async function generateMetadata() {
   return { title: (await getTranslations("suggestions"))("title") };
 }
 
-type Search = { sort?: string; status?: string; focus?: string };
+type Search = { status?: string; focus?: string };
 
 const STATUS_STYLE: Record<string, string> = {
   OPEN: "",
@@ -30,26 +30,28 @@ export default async function SuggestionsPage({ searchParams }: { searchParams: 
   const [user, mod, sp, t, format] = await Promise.all([requireUser(), requireModule("suggestions"), searchParams, getTranslations("suggestions"), getFormatter()]);
   if (!mod.settings.showToMembers) notFound();
 
-  const sort = sp.sort === "recent" ? "recent" : "popular";
   const status = SUGGESTION_STATUSES.includes(sp.status as never) ? sp.status : undefined;
   // A notification can point at one suggestion (even a declined one): it always shows, highlighted.
   const focus = sp.focus ?? null;
-  const base: Prisma.SuggestionWhereInput = status ? { status } : { status: { not: "DECLINED" } };
+  // The default list only has the active suggestions: finished and declined ones appear under their own filter.
+  const base: Prisma.SuggestionWhereInput = status ? { status } : { status: { notIn: ["DONE", "DECLINED"] } };
   const where: Prisma.SuggestionWhereInput = focus ? { OR: [base, { id: focus }] } : base;
   const suggestions = await db.suggestion.findMany({
     where,
-    include: { _count: { select: { votes: true } }, votes: { where: { userId: user.id }, select: { userId: true } } },
-    orderBy: sort === "recent" ? { createdAt: "desc" } : [{ votes: { _count: "desc" } }, { createdAt: "desc" }],
+    include: {
+      _count: { select: { votes: true } },
+      votes: { where: { userId: user.id }, select: { userId: true } },
+      // private messages from the team: only the member who posted the suggestion gets them
+      messages: { where: { suggestion: { authorId: user.id } }, orderBy: { createdAt: "asc" } },
+    },
+    // always the most voted first; with the same number of votes, the most recent first
+    orderBy: [{ votes: { _count: "desc" } }, { createdAt: "desc" }],
     take: 200,
   });
 
   const href = (next: Search) => {
-    const q = new URLSearchParams();
-    const merged = { sort, status, ...next };
-    if (merged.sort === "recent") q.set("sort", "recent");
-    if (merged.status) q.set("status", merged.status);
-    const s = q.toString();
-    return s ? `/suggestions?${s}` : "/suggestions";
+    const merged = { status, ...next };
+    return merged.status ? `/suggestions?status=${merged.status}` : "/suggestions";
   };
 
   return (
@@ -63,13 +65,6 @@ export default async function SuggestionsPage({ searchParams }: { searchParams: 
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex rounded-xl border border-line p-0.5 text-xs font-semibold">
-          {(["popular", "recent"] as const).map((s) => (
-            <Link key={s} href={href({ sort: s })} className={`rounded-lg px-3 py-1.5 ${sort === s ? "bg-accent text-accent-ink" : "text-muted"}`}>
-              {t(`sort.${s}`)}
-            </Link>
-          ))}
-        </div>
         <Link href={href({ status: undefined })} className={`chip px-3 py-1 text-xs ${!status ? "chip-accent" : ""}`}>
           {t("filterAll")}
         </Link>
@@ -105,6 +100,14 @@ export default async function SuggestionsPage({ searchParams }: { searchParams: 
                     </p>
                   </div>
                 )}
+                {s.messages.map((m) => (
+                  <div key={m.id} className="rounded-xl border border-accent/40 bg-surface-2/60 px-3 py-2 text-sm">
+                    <p className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-accent">
+                      <Lock className="size-3" /> {t("privateFromTeam")} · <span className="font-normal text-muted">{format.relativeTime(m.createdAt)}</span>
+                    </p>
+                    <p className="whitespace-pre-line">{m.body}</p>
+                  </div>
+                ))}
                 <div className="flex items-center gap-3 text-xs text-muted">
                   <span>{format.relativeTime(s.createdAt)}</span>
                   {s.authorId === user.id && s._count.votes <= 1 && (

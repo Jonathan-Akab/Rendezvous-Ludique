@@ -19,17 +19,19 @@ export default async function AdminSuggestionsPage({ searchParams }: { searchPar
   const status = SUGGESTION_STATUSES.includes(sp.status as never) ? sp.status : undefined;
   const [suggestions, counts] = await Promise.all([
     db.suggestion.findMany({
-      where: status ? { status } : {},
+      // "All" leaves out the finished suggestions; pick "Done" to see them
+      where: status ? { status } : { status: { not: "DONE" } },
       include: {
         author: { select: { displayName: true, username: true } },
         votes: { include: { user: { select: { displayName: true } } }, orderBy: { createdAt: "asc" } },
+        messages: { orderBy: { createdAt: "desc" } },
       },
       orderBy: [{ votes: { _count: "desc" } }, { createdAt: "desc" }],
       take: 300,
     }),
     db.suggestion.groupBy({ by: ["status"], _count: { _all: true } }),
   ]);
-  const count = (s?: string) => counts.filter((c) => !s || c.status === s).reduce((n, c) => n + c._count._all, 0);
+  const count = (s?: string) => counts.filter((c) => (s ? c.status === s : c.status !== "DONE")).reduce((n, c) => n + c._count._all, 0);
   const all = await db.suggestion.findMany({ select: { id: true, title: true }, orderBy: { title: "asc" } });
 
   return (
@@ -91,7 +93,31 @@ export default async function AdminSuggestionsPage({ searchParams }: { searchPar
                   <div>
                     <label className="label">{t("note")}</label>
                     <textarea name="adminNote" defaultValue={s.adminNote ?? ""} className="textarea min-h-16" maxLength={2000} placeholder={t("notePlaceholder")} />
+                    <p className="mt-1 text-xs text-muted">{t("noteHint")}</p>
                   </div>
+                  {s.authorId ? (
+                    <>
+                      <div>
+                        <label className="label">{t("privateLabel", { name: s.author?.displayName ?? "" })}</label>
+                        <textarea name="privateMessage" className="textarea min-h-16" maxLength={1000} placeholder={t("privatePlaceholder")} />
+                        <p className="mt-1 text-xs text-muted">{t("privateHint")}</p>
+                        {s.messages.length > 0 && (
+                          <ul className="mt-2 space-y-1 text-xs text-muted">
+                            {s.messages.map((m) => (
+                              <li key={m.id} className="rounded-lg bg-surface-2/60 px-2 py-1">
+                                <span className="font-semibold">{t("sentPrivate")}</span> · {format.relativeTime(m.createdAt)} — {m.body}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      <label className="flex items-center gap-2 text-sm">
+                        <input type="checkbox" name="notifyAuthor" defaultChecked className="accent-[var(--accent)]" /> {t("notifyAuthor", { name: s.author?.displayName ?? "" })}
+                      </label>
+                    </>
+                  ) : (
+                    <p className="text-xs text-muted">{t("noAuthor")}</p>
+                  )}
                 </ActionForm>
                 <div className="flex flex-wrap items-end justify-between gap-3 border-t border-line pt-4">
                   {all.length > 1 && (

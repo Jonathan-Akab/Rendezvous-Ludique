@@ -1218,7 +1218,7 @@
       "voters": "Votes",
       "titleLabel": "Suggestion",
       "status": "Statut",
-      "note": "Réponse aux membres (visible par tous)",
+      "note": "Réponse publique (affichée sur la suggestion, tout le monde la voit)",
       "notePlaceholder": "Ex. : Bonne idée, c'est prévu pour cet été!",
       "save": "Enregistrer",
       "saved": "Enregistré.",
@@ -1227,7 +1227,14 @@
       "mergedInto": "Fusionnée dans « {title} » : les votes ont suivi.",
       "pickTarget": "Choisis une autre suggestion.",
       "delete": "Supprimer",
-      "deleteConfirm": "Supprimer cette suggestion et ses votes?"
+      "deleteConfirm": "Supprimer cette suggestion et ses votes?",
+      "noteHint": "Avec le statut, elle montre à tout le monde que l’idée est en cours de travail.",
+      "privateLabel": "Message privé à {name} seulement",
+      "privatePlaceholder": "Une question, un détail, un merci…",
+      "privateHint": "Seule la personne qui l’a publiée le voit, avec une notification près de sa cloche. Personne d’autre.",
+      "sentPrivate": "Envoyé en privé",
+      "notifyAuthor": "Prévenir {name} du changement de statut / de la réponse publique",
+      "noAuthor": "Le membre qui l’a publiée a été supprimé : personne à prévenir."
     },
     "faq": {
       "title": "FAQ des règles",
@@ -1865,7 +1872,8 @@
     "close": "Fermer",
     "errors": {
       "title": "Décris ton idée en quelques mots (au moins 5 caractères)."
-    }
+    },
+    "privateFromTeam": "Message privé de l’équipe — toi seul(e) le vois"
   },
   "email": {
     "verify": {
@@ -2217,7 +2225,9 @@
     "saved": "Message modifié.",
     "newBadge": "Nouveau",
     "more": "+{count} de plus",
-    "close": "Fermer"
+    "close": "Fermer",
+    "readMe": "Lis-moi!",
+    "emptyMember": "Aucun message pour le moment."
   },
   "notifications": {
     "title": "Notifications",
@@ -2233,7 +2243,10 @@
       "kallaxInvite": "{name} t’invite à partager une Kallax",
       "bazaarMessage": "{name} t’a écrit au sujet de « {listing} »",
       "suggestionUpdate": "L’équipe a répondu à ta suggestion « {title} »",
-      "other": "Nouvelle notification"
+      "other": "Nouvelle notification",
+      "suggestionUpdate_reply": "L’équipe a répondu à ta suggestion « {title} »",
+      "suggestionUpdate_status": "Ta suggestion « {title} » est maintenant : {statusLabel}",
+      "suggestionUpdate_message": "Message de l’équipe au sujet de « {title} » : {preview}"
     }
   }
 }

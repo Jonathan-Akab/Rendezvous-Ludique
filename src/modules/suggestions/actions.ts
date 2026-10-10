@@ -91,6 +91,8 @@ export async function updateSuggestionAction(suggestionId: string, _prev: Action
   const me = await requirePermission("suggestions");
   const t = await getTranslations("admin.suggestions");
   const before = await db.suggestion.findUnique({ where: { id: suggestionId }, select: { status: true, adminNote: true } });
+  const privateMessage = optStr(fd, "privateMessage")?.slice(0, 1000) ?? null;
+  const notifyAuthor = bool(fd, "notifyAuthor");
   const s = await db.suggestion.update({
     where: { id: suggestionId },
     data: {
@@ -100,8 +102,19 @@ export async function updateSuggestionAction(suggestionId: string, _prev: Action
     },
   });
   await audit(me.id, "admin.suggestion.update", s.title, { status: s.status });
-  if (s.authorId && before && (before.status !== s.status || before.adminNote !== s.adminNote)) {
-    void notify(s.authorId, "suggestionUpdate", { title: s.title }, `/suggestions?focus=${s.id}#s-${s.id}`);
+  const link = `/suggestions?focus=${s.id}#s-${s.id}`;
+  if (privateMessage && !s.authorId) return { error: t("noAuthor") };
+  if (s.authorId && before) {
+    // Only the member who posted the suggestion hears about it, on their bell (and by email if they asked for it).
+    const replied = Boolean(s.adminNote) && before.adminNote !== s.adminNote;
+    const statusChanged = before.status !== s.status;
+    if (notifyAuthor && (replied || statusChanged)) {
+      void notify(s.authorId, "suggestionUpdate", { title: s.title, kind: replied ? "reply" : "status", status: s.status }, link);
+    }
+    if (privateMessage) {
+      await db.suggestionMessage.create({ data: { suggestionId: s.id, body: privateMessage, createdById: me.id } });
+      void notify(s.authorId, "suggestionUpdate", { title: s.title, kind: "message", preview: privateMessage.replace(/\s+/g, " ").slice(0, 90) }, link);
+    }
   }
   refresh();
   return { ok: true, message: t("saved") };

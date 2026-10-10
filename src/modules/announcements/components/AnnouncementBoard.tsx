@@ -10,11 +10,12 @@ import { NewAnnouncement } from "./NewAnnouncement";
 import { EditableAnnouncement } from "./EditAnnouncement";
 import { AnnouncementPopup } from "./AnnouncementPopup";
 
-// "Babillard" on the home page: messages from the team. On the page it is one slim banner (the newest
-// message, cut short); clicking it opens the whole board in a popup. Pinned messages stay on top there,
+// "Babillard" on the home page: messages from the team. On the page it is a compact card (up to three
+// one-line messages, pinned first); clicking it opens the whole board in a popup. Pinned messages stay on top there,
 // the latest others follow, older ones fold away.
 
-const SHOWN = 3; // unpinned messages shown before "older messages"
+const SHOWN = 3; // unpinned messages shown before "older messages" (in the popup)
+const BANNER_SHOWN = 3; // messages on the home page card
 const URL_RE = /(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g;
 
 /** Plain text with its links made clickable. */
@@ -45,7 +46,8 @@ export async function AnnouncementBoard({ user }: { user: { id: string; role: st
     getTranslations("announcements"),
     getFormatter(),
   ]);
-  if (!rows.length && !canWrite) return null;
+  // Always on the page: with no message yet, members see a short "nothing yet" line.
+  const emptyText = canWrite ? t("empty") : t("emptyMember");
 
   const pinned = rows.filter((r) => r.pinned);
   const others = rows.filter((r) => !r.pinned);
@@ -89,20 +91,19 @@ export async function AnnouncementBoard({ user }: { user: { id: string; role: st
     </li>
   );
 
-  // The banner shows the newest message, whether pinned or not.
-  const newest = rows.reduce<(typeof rows)[number] | null>((best, r) => (!best || r.createdAt > best.createdAt ? r : best), null);
-  const latest = newest
-    ? {
-        at: newest.createdAt.toISOString(),
-        preview: newest.body.replace(/\s+/g, " ").trim().slice(0, 160),
-        author: newest.author?.displayName ?? t("team"),
-        color: newest.author?.meepleColor ?? "#868e96",
-        pinned: newest.pinned,
-      }
-    : null;
+  // The card shows the first three messages — `rows` already has the pinned ones first, then the newest —
+  // each cut to one line. "New" follows the newest message of the whole board.
+  const items = rows.slice(0, BANNER_SHOWN).map((r) => ({
+    at: r.createdAt.toISOString(),
+    preview: r.body.replace(/\s+/g, " ").trim().slice(0, 140),
+    author: r.author?.displayName ?? t("team"),
+    color: r.author?.meepleColor ?? "#868e96",
+    pinned: r.pinned,
+  }));
+  const latestAt = rows.reduce<Date | null>((best, r) => (!best || r.createdAt > best ? r.createdAt : best), null)?.toISOString() ?? null;
 
   return (
-    <AnnouncementPopup latest={latest} total={rows.length}>
+    <AnnouncementPopup items={items} latestAt={latestAt} total={rows.length} emptyText={emptyText}>
       {canWrite && (
         <div className="mb-4">
           <NewAnnouncement />
@@ -110,7 +111,7 @@ export async function AnnouncementBoard({ user }: { user: { id: string; role: st
       )}
 
       {rows.length === 0 ? (
-        <p className="text-sm text-muted">{t("empty")}</p>
+        <p className="text-sm text-muted">{emptyText}</p>
       ) : (
         <ul className="space-y-3">
           {pinned.map(message)}

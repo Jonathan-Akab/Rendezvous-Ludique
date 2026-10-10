@@ -235,3 +235,26 @@ summary::-webkit-details-marker {
 .board-twinkle {
   animation: board-twinkle 1.8s ease-in-out infinite;
 }
+
+/* Message board, unread: brighter, with a small "read me" label circling the card's edge */
+.board-bright {
+  background-image: linear-gradient(100deg, color-mix(in oklab, var(--accent) 26%, transparent), color-mix(in oklab, var(--accent-2) 20%, transparent));
+  filter: brightness(1.14) saturate(1.2);
+}
+
+/* "Read me" label: in the empty end of the card it travels diagonally back and forth (2 s a way) and hops
+   four times on every way — four bounces one way, four bounces the other — without reaching the text */
+@keyframes board-travel {
+  from { translate: calc(-50% - 11px) calc(-50% - 4px); }
+  to { translate: calc(-50% + 11px) calc(-50% + 4px); }
+}
+@keyframes board-hop {
+  0%, 100% { transform: translateY(0); animation-timing-function: ease-out; }
+  50% { transform: translateY(-5px); animation-timing-function: ease-in; }
+}
+.board-bounce {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  animation: board-travel 2s ease-in-out infinite alternate, board-hop 0.5s infinite;
+}

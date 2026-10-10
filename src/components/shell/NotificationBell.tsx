@@ -25,6 +25,7 @@ const KNOWN = Object.keys(ICONS);
 /** The bell in the top bar: unread count, and a list of one-line notifications that lead to the right place. */
 export function NotificationBell() {
   const t = useTranslations("notifications");
+  const ts = useTranslations("suggestions.status");
   const format = useFormatter();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -87,7 +88,15 @@ export function NotificationBell() {
 
   const sentence = t as unknown as (key: string, values?: Record<string, string>) => string;
   const now = new Date(); // relative times are measured from now
-  const line = (n: Item) => sentence(KNOWN.includes(n.type) ? `items.${n.type}` : "items.other", n.params);
+  const line = (n: Item) => {
+    if (!KNOWN.includes(n.type)) return sentence("items.other");
+    // an update on a suggestion says what happened: a status change, a public reply, or a private message
+    if (n.type === "suggestionUpdate" && n.params.kind) {
+      const statusLabel = n.params.status && ["OPEN", "PLANNED", "DONE", "DECLINED"].includes(n.params.status) ? ts(n.params.status as never) : "";
+      return sentence(`items.suggestionUpdate_${n.params.kind}`, { ...n.params, statusLabel });
+    }
+    return sentence(`items.${n.type}`, n.params);
+  };
 
   return (
     <div ref={box} className="relative">

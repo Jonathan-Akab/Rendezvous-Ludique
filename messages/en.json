@@ -1218,7 +1218,7 @@
       "voters": "Votes",
       "titleLabel": "Suggestion",
       "status": "Status",
-      "note": "Reply to members (visible to everyone)",
+      "note": "Public reply (shown on the suggestion, everyone sees it)",
       "notePlaceholder": "E.g. Great idea, planned for this summer!",
       "save": "Save",
       "saved": "Saved.",
@@ -1227,7 +1227,14 @@
       "mergedInto": "Merged into “{title}”: the votes moved over.",
       "pickTarget": "Pick another suggestion.",
       "delete": "Delete",
-      "deleteConfirm": "Delete this suggestion and its votes?"
+      "deleteConfirm": "Delete this suggestion and its votes?",
+      "noteHint": "Use it with the status so everyone can see the idea is being worked on.",
+      "privateLabel": "Private message to {name} only",
+      "privatePlaceholder": "A question, a detail, a thank-you…",
+      "privateHint": "Only the person who posted it sees this, with a notification on their bell. Nobody else does.",
+      "sentPrivate": "Sent privately",
+      "notifyAuthor": "Notify {name} of the status change / public reply",
+      "noAuthor": "The member who posted this was deleted: nobody to notify."
     },
     "faq": {
       "title": "Rules FAQ",
@@ -1865,7 +1872,8 @@
     "close": "Close",
     "errors": {
       "title": "Describe your idea in a few words (at least 5 characters)."
-    }
+    },
+    "privateFromTeam": "Private message from the team — only you see it"
   },
   "email": {
     "verify": {
@@ -2217,7 +2225,9 @@
     "saved": "Message updated.",
     "newBadge": "New",
     "more": "+{count} more",
-    "close": "Close"
+    "close": "Close",
+    "readMe": "Read me!",
+    "emptyMember": "No messages yet."
   },
   "notifications": {
     "title": "Notifications",
@@ -2233,7 +2243,10 @@
       "kallaxInvite": "{name} invited you to share a Kallax",
       "bazaarMessage": "{name} wrote to you about “{listing}”",
       "suggestionUpdate": "The team answered your suggestion “{title}”",
-      "other": "New notification"
+      "other": "New notification",
+      "suggestionUpdate_reply": "The team replied to your suggestion “{title}”",
+      "suggestionUpdate_status": "Your suggestion “{title}” is now: {statusLabel}",
+      "suggestionUpdate_message": "Message from the team about “{title}”: {preview}"
     }
   }
 }

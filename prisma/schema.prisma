@@ -607,10 +607,24 @@ model Suggestion {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  author User?            @relation(fields: [authorId], references: [id], onDelete: SetNull)
-  votes  SuggestionVote[]
+  author   User?               @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  votes    SuggestionVote[]
+  messages SuggestionMessage[]
 
   @@index([status])
+}
+
+// A private message from the team to the member who posted a suggestion: only that member (and the admins) see it.
+model SuggestionMessage {
+  id           String   @id @default(cuid())
+  suggestionId String
+  body         String
+  createdById  String?
+  createdAt    DateTime @default(now())
+
+  suggestion Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+
+  @@index([suggestionId, createdAt])
 }
 
 model SuggestionVote {
