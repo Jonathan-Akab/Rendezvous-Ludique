@@ -25,7 +25,7 @@ export async function generateMetadata() {
   return { title: (await getTranslations("nav"))("ai") };
 }
 
-type Search = { chat?: string; game?: string; rulebook?: string };
+type Search = { chat?: string; game?: string; rulebook?: string; known?: string };
 
 export default async function AiPage({ searchParams }: { searchParams: Promise<Search> }) {
   const [user, mod, sp, t, tg, format, gamesMod] = await Promise.all([
@@ -75,7 +75,7 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<S
         include: { game: true, rulebook: true, messages: { orderBy: { createdAt: "asc" } } },
       })
     : null;
-  const game = chat?.game ?? (sp.game && myGames.some((g) => g.gameId === sp.game) ? await db.game.findUnique({ where: { id: sp.game } }) : null);
+  const game = chat?.game ?? (sp.game ? await db.game.findUnique({ where: { id: sp.game } }) : null);
   // Every PDF rulebook of the game is read for every question (same order as the chat API).
   // the game's rulebooks and its expansions' (same order as the chat API)
   const rulebooks = game ? await db.rulebook.findMany({ where: { game: { OR: [{ id: game.id }, { baseGameId: game.id }] } }, orderBy: { createdAt: "asc" }, take: 6 }) : [];
@@ -191,10 +191,11 @@ export default async function AiPage({ searchParams }: { searchParams: Promise<S
         {!game && !chat && (
           <div className="glass space-y-3 rounded-3xl p-5">
             <p className="font-semibold">{t("pickGame")}</p>
-            <AiGameSelect games={myGames} />
-            <p className="text-xs text-muted">{t("pickGameHint")}</p>
+            <AiGameSelect games={myGames} canUpload={canUpload} />
           </div>
         )}
+
+        {game && !chat && sp.known && <p className="glass rounded-2xl px-4 py-3 text-sm">{t("alreadyKnown", { name: game.name })}</p>}
 
         {faqOn && game && !chat && (
           <Link href={`/ai/faq/${game.id}`} className="card-hover flex items-center gap-3 rounded-2xl p-4">

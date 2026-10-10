@@ -1484,7 +1484,7 @@
     "generalKnowledge": "Connaissances générales",
     "generalHint": "Sans livret — réponses selon ce que l'IA sait du jeu.",
     "deleteConfirm": "Supprimer cette conversation?",
-    "pickGame": "Choisis un jeu de ta Kallax",
+    "pickGame": "Choisis un jeu",
     "continue": "Continuer",
     "pickSource": "Répondre à partir de quelle source?",
     "rulebookOption": "Livret ({lang}) — réponses avec citations des pages",
@@ -1621,6 +1621,18 @@
       "b4": "Les dons sont les bienvenus : ils paient les jetons de tout le monde!",
       "donate": "Faire un don",
       "ok": "Compris!"
+    },
+    "alreadyKnown": "« {name} » est déjà dans la Ludothèque avec un livret — inutile de le téléverser de nouveau.",
+    "source": {
+      "kallax": "Ma Kallax",
+      "ludo": "Chercher dans la Ludothèque",
+      "upload": "Téléverser un livret",
+      "kallaxHint": "Les jeux de ta Kallax.",
+      "ludoHint": "N’importe quel jeu de la Ludothèque, même si tu ne le possèdes pas.",
+      "gameName": "Nom du jeu",
+      "rulebookTitle": "Titre du livret (facultatif)",
+      "uploadHint": "Si le jeu est déjà dans la Ludothèque, on l’utilise (sans téléverser si un livret existe déjà); sinon il est créé pour toi.",
+      "uploadSubmit": "Téléverser et poser des questions"
     }
   },
   "facebook": {

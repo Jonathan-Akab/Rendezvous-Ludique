@@ -5,7 +5,6 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { getModule } from "@/lib/modules";
 import { buildMessages, getClient, SYSTEM_PROMPT, type Citation } from "@/modules/ai/service";
 import { getAiStatus, resolveProvider } from "@/modules/ai/policy";
-import { inMemberKallax } from "@/modules/games/service";
 import { claudeCostUsd, supportsEffort } from "@/modules/ai/pricing";
 import { FreeProviderError, rulebookPages, selectPages, streamFree, type FreeMessage } from "@/modules/ai/free";
 import { faqEnabled, findFaqMatch, recordFaq } from "@/modules/ai/faq";
@@ -58,9 +57,8 @@ export async function POST(req: Request) {
   let chat = parsed.data.chatId ? await db.aiChat.findFirst({ where: { id: parsed.data.chatId, userId: user.id }, include }) : null;
   let newGameId: string | undefined;
   if (!chat) {
-    // New conversations are about a game from the member's own Kallax.
-    const game =
-      parsed.data.gameId && (await inMemberKallax(user.id, parsed.data.gameId)) ? await db.game.findUnique({ where: { id: parsed.data.gameId } }) : null;
+    // New conversations are about any game of the Ludothèque.
+    const game = parsed.data.gameId ? await db.game.findUnique({ where: { id: parsed.data.gameId } }) : null;
     newGameId = game?.id;
   }
   const gameId = chat?.gameId ?? newGameId;

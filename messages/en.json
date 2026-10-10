@@ -1484,7 +1484,7 @@
     "generalKnowledge": "General knowledge",
     "generalHint": "No rulebook — answers from what the AI knows about the game.",
     "deleteConfirm": "Delete this conversation?",
-    "pickGame": "Pick a game from your Kallax",
+    "pickGame": "Pick a game",
     "continue": "Continue",
     "pickSource": "Answer from which source?",
     "rulebookOption": "Rulebook ({lang}) — answers with page citations",
@@ -1621,6 +1621,18 @@
       "b4": "Donations are welcome: they pay for everyone's tokens!",
       "donate": "Donate",
       "ok": "Got it!"
+    },
+    "alreadyKnown": "“{name}” is already in the Ludothèque with a rulebook — no need to upload it again.",
+    "source": {
+      "kallax": "My Kallax",
+      "ludo": "Search the Ludothèque",
+      "upload": "Upload a rulebook",
+      "kallaxHint": "Games from your Kallax.",
+      "ludoHint": "Any game of the Ludothèque, even if you don’t own it.",
+      "gameName": "Game name",
+      "rulebookTitle": "Rulebook title (optional)",
+      "uploadHint": "If the game is already in the Ludothèque we use it (and skip the upload if it already has a rulebook); otherwise it is created for you.",
+      "uploadSubmit": "Upload and start asking"
     }
   },
   "facebook": {
