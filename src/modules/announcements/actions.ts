@@ -28,6 +28,19 @@ export async function postAnnouncementAction(_prev: ActionState, fd: FormData): 
   return { ok: true, message: t("posted") };
 }
 
+export async function updateAnnouncementAction(id: string, _prev: ActionState, fd: FormData): Promise<ActionState> {
+  const user = await guard();
+  const t = await getTranslations("announcements");
+  const body = str(fd, "body").trim();
+  if (!body) return { error: t("errors.empty") };
+  if (body.length > 2000) return { error: t("errors.tooLong") };
+  const done = await db.announcement.updateMany({ where: { id }, data: { body } });
+  if (!done.count) return { error: t("errors.gone") };
+  await audit(user.id, "announcement.update", id);
+  revalidatePath("/home");
+  return { ok: true, message: t("saved") };
+}
+
 export async function toggleAnnouncementPinAction(id: string) {
   const user = await guard();
   const a = await db.announcement.findUnique({ where: { id } });

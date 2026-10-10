@@ -4,9 +4,10 @@ import { Megaphone, Pin, PinOff, Trash2 } from "lucide-react";
 import { db } from "@/lib/db";
 import { can } from "@/lib/auth/permissions";
 import { Meeple } from "@/components/Meeple";
-import { ActionForm } from "@/components/ActionForm";
 import { ConfirmButton } from "@/components/forms";
-import { deleteAnnouncementAction, postAnnouncementAction, toggleAnnouncementPinAction } from "../actions";
+import { deleteAnnouncementAction, toggleAnnouncementPinAction } from "../actions";
+import { NewAnnouncement } from "./NewAnnouncement";
+import { EditableAnnouncement } from "./EditAnnouncement";
 
 // "Babillard" on the home page: messages from the team. Pinned ones stay on top; the latest
 // others follow, older ones fold away.
@@ -72,29 +73,28 @@ export async function AnnouncementBoard({ user }: { user: { id: string; role: st
           </span>
         )}
       </div>
-      <p className="whitespace-pre-line text-sm leading-relaxed">
-        <Linkified text={a.body} />
-      </p>
+      {canWrite ? (
+        <EditableAnnouncement id={a.id} body={a.body}>
+          <p className="whitespace-pre-line text-sm leading-relaxed">
+            <Linkified text={a.body} />
+          </p>
+        </EditableAnnouncement>
+      ) : (
+        <p className="whitespace-pre-line text-sm leading-relaxed">
+          <Linkified text={a.body} />
+        </p>
+      )}
     </li>
   );
 
   return (
     <section className="card card-pad space-y-4">
-      <h2 className="section-title flex items-center gap-2">
-        <Megaphone className="size-5 text-accent" /> {t("title")}
-      </h2>
-
-      {canWrite && (
-        <details className="group rounded-2xl border border-dashed border-line">
-          <summary className="cursor-pointer list-none px-4 py-2.5 text-sm font-semibold text-accent">+ {t("new")}</summary>
-          <ActionForm action={postAnnouncementAction} submitLabel={t("publish")} submitClassName="btn btn-primary btn-sm" className="space-y-3 border-t border-line/70 p-4">
-            <textarea name="body" required maxLength={2000} rows={3} className="textarea" placeholder={t("placeholder")} />
-            <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="pinned" className="size-4 accent-[var(--accent)]" /> {t("pinOnTop")}
-            </label>
-          </ActionForm>
-        </details>
-      )}
+      <div className="flex items-center gap-2">
+        <h2 className="section-title flex items-center gap-2">
+          <Megaphone className="size-5 text-accent" /> {t("title")}
+        </h2>
+        {canWrite && <NewAnnouncement />}
+      </div>
 
       {rows.length === 0 ? (
         <p className="text-sm text-muted">{t("empty")}</p>

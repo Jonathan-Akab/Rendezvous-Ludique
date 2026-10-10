@@ -1221,7 +1221,7 @@
     },
     "permissions": {
       "title": "Accès à la console",
-      "lead": "Coche les sections que cette personne peut gérer. S'applique aux modérateurs et aux admins qui ne sont pas « complets ».",
+      "lead": "Coche ce que cette personne peut gérer. Les sections de la console s'appliquent aux modérateurs et aux admins qui ne sont pas « complets ». Le babillard peut aussi être donné à un simple membre (sans accès à la console).",
       "fullAdmin": "Admin complet : tous les accès, et peut donner des droits aux autres",
       "staffLocked": "C'est un compte de l'équipe : seul un admin complet peut le modifier.",
       "items": {
@@ -1287,7 +1287,7 @@
         },
         "announcements": {
           "title": "Babillard",
-          "text": "Publier, épingler et supprimer les messages du babillard de l'Accueil."
+          "text": "Publier, modifier, épingler et supprimer les messages du babillard de l'Accueil. Peut être donné à un simple membre."
         }
       }
     }
@@ -2119,7 +2119,12 @@
     "posted": "Publié.",
     "errors": {
       "empty": "Écris un message.",
-      "tooLong": "Le message est trop long (2000 caractères maximum)."
-    }
+      "tooLong": "Le message est trop long (2000 caractères maximum).",
+      "gone": "Ce message n'existe plus."
+    },
+    "edit": "Modifier",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saved": "Message modifié."
   }
 }

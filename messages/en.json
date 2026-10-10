@@ -1221,7 +1221,7 @@
     },
     "permissions": {
       "title": "Console access",
-      "lead": "Tick the sections this person can manage. Applies to moderators and to admins who aren't “full”.",
+      "lead": "Tick what this person can manage. Console sections apply to moderators and to admins who aren't “full”. The message board can also be given to a plain member (no console access).",
       "fullAdmin": "Full admin: every section, and can give rights to others",
       "staffLocked": "This is a team account: only a full admin can edit it.",
       "items": {
@@ -1287,7 +1287,7 @@
         },
         "announcements": {
           "title": "Message board",
-          "text": "Post, pin and delete messages on the home page board."
+          "text": "Post, edit, pin and delete messages on the home page board. Can be given to a plain member."
         }
       }
     }
@@ -2119,7 +2119,12 @@
     "posted": "Posted.",
     "errors": {
       "empty": "Write a message.",
-      "tooLong": "The message is too long (2000 characters max)."
-    }
+      "tooLong": "The message is too long (2000 characters max).",
+      "gone": "This message no longer exists."
+    },
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saved": "Message updated."
   }
 }
