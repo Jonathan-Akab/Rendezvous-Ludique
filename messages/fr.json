@@ -1628,7 +1628,16 @@
       "pickGame": "Trouver les questions d’un jeu — de ta Kallax ou de toute la Ludothèque",
       "ludoGames": "Jeux de la Ludothèque",
       "noKallaxGames": "Aucun jeu de ta Kallax ne correspond",
-      "noKallaxGamesHint": "Ajoute des jeux à ta Kallax, ou cherche dans la Ludothèque."
+      "noKallaxGamesHint": "Ajoute des jeux à ta Kallax, ou cherche dans la Ludothèque.",
+      "ludoMore": "Les {count} premiers jeux sont affichés — utilise la recherche pour trouver les autres.",
+      "saved": {
+        "added": "Ta question a été ajoutée à la FAQ de ce jeu.",
+        "addedHidden": "Ta question est enregistrée dans la FAQ de ce jeu; elle apparaîtra quand un admin l’aura approuvée.",
+        "grouped": "Une question semblable est déjà dans la FAQ de ce jeu — la tienne a été comptée avec elle.",
+        "skipped": "Non ajoutée à la FAQ : la question est trop courte ou trop générale pour être réutilisée.",
+        "photo": "Les questions avec une photo ne sont pas ajoutées à la FAQ.",
+        "failed": "La FAQ n’a pas pu être mise à jour cette fois."
+      }
     },
     "flow": "Chaque question passe d'abord par la FAQ, puis {who} répond{count, plural, =0 {.} one { en lisant le livret du jeu.} other { en lisant les # livrets du jeu.}}",
     "stage": {

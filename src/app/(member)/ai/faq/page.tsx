@@ -8,7 +8,8 @@ import { db } from "@/lib/db";
 import { normalizeText } from "@/lib/similarity";
 import { EmptyState } from "@/components/EmptyState";
 import { GameCover } from "@/modules/games/components/GameCover";
-import { coverUrl } from "@/modules/games/service";
+import { coverUrl, normalizeName } from "@/modules/games/service";
+import { ilike } from "@/lib/search";
 import { getMyKallaxGames } from "@/modules/kallax/service";
 import { faqCounts, faqEnabled } from "@/modules/ai/faq";
 import { AiGameSelect } from "@/modules/ai/components/AiGameSelect";
@@ -25,19 +26,24 @@ export default async function FaqIndexPage({ searchParams }: { searchParams: Pro
   if (!(await faqEnabled(mod))) notFound();
 
   const [counts, mine] = await Promise.all([faqCounts(mod), getMyKallaxGames(user.id)]);
-  const mineIds = new Set(mine.map((g) => g.gameId));
-  const others = await db.game.findMany({
-    where: { id: { in: [...counts.keys()].filter((id) => !mineIds.has(id)) } },
-    select: { id: true, name: true, coverFileId: true, imageUrl: true },
-    orderBy: { name: "asc" },
-  });
-
   // The tab chosen above decides which games are listed below.
   const src = sp.src === "ludo" ? "ludo" : "kallax";
   const q = normalizeText(sp.q ?? "");
+  // The Ludothèque tab lists the site's games (not only those with questions), like the Kallax tab lists yours.
+  const LUDO_LIMIT = 60;
+  const others =
+    src === "ludo"
+      ? await db.game.findMany({
+          where: q ? { OR: [{ name: ilike(sp.q ?? "") }, { normalizedName: ilike(normalizeName(sp.q ?? "")) }] } : {},
+          select: { id: true, name: true, coverFileId: true, imageUrl: true },
+          orderBy: { name: "asc" },
+          take: LUDO_LIMIT + 1,
+        })
+      : [];
   const keep = (c: Card) => !q || normalizeText(c.name).includes(q);
+  const ludoMore = others.length > LUDO_LIMIT;
   const myCards: Card[] = mine.map((g) => ({ id: g.gameId, name: g.name, cover: g.cover, count: counts.get(g.gameId) ?? 0 })).filter(keep);
-  const otherCards: Card[] = others.map((g) => ({ id: g.id, name: g.name, cover: coverUrl(g), count: counts.get(g.id) ?? 0 })).filter(keep);
+  const otherCards: Card[] = others.slice(0, LUDO_LIMIT).map((g) => ({ id: g.id, name: g.name, cover: coverUrl(g), count: counts.get(g.id) ?? 0 })).filter(keep);
 
   const grid = (cards: Card[]) => (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -83,6 +89,7 @@ export default async function FaqIndexPage({ searchParams }: { searchParams: Pro
         <section className="space-y-3">
           <h2 className="section-title">{t(src === "kallax" ? "myGames" : "ludoGames")}</h2>
           {grid(src === "kallax" ? myCards : otherCards)}
+          {src === "ludo" && ludoMore && <p className="text-sm text-muted">{t("ludoMore", { count: LUDO_LIMIT })}</p>}
         </section>
       )}
     </div>

@@ -253,10 +253,14 @@ export async function POST(req: Request) {
         await db.aiChat.update({ where: { id: conversation.id }, data: { updatedAt: new Date() } });
         // Feed the game's FAQ. Only a conversation's opening question stands on its own;
         // follow-ups ("and with 2 players?") depend on what came before.
-        if (useFaq && conversation.gameId && firstQuestion && !refused && answer) {
-          await recordFaq({ gameId: conversation.gameId, rulebookId: rulebooks.find((r) => r.fileId === citations[0]?.fileId)?.id ?? null, question, answer, citations, provider, countAsk: !retryAfterFaq }).catch((err) =>
+        if (useFaq && conversation.gameId && !refused && answer) {
+          const saved = await recordFaq({ gameId: conversation.gameId, rulebookId: rulebooks.find((r) => r.fileId === citations[0]?.fileId)?.id ?? null, question, answer, citations, provider, countAsk: !retryAfterFaq, isFirst: firstQuestion }).catch((err) =>
             console.error("[ai] FAQ update failed:", err),
           );
+          // Tell the member what became of their question (it is not always visible right away).
+          send({ type: "faqSaved", outcome: saved?.outcome ?? "failed", visible: Boolean(mod.settings.faqAutoPublish), first: firstQuestion });
+        } else if (images.length && conversation.gameId && !refused && answer && (await faqEnabled(mod))) {
+          send({ type: "faqSaved", outcome: "photo", visible: true, first: firstQuestion });
         }
         send({ type: "done" });
       } catch (error) {

@@ -1628,7 +1628,16 @@
       "pickGame": "Find a game’s questions — from your Kallax or the whole Ludothèque",
       "ludoGames": "Ludothèque games",
       "noKallaxGames": "No game in your Kallax matches",
-      "noKallaxGamesHint": "Add games to your Kallax, or search the Ludothèque."
+      "noKallaxGamesHint": "Add games to your Kallax, or search the Ludothèque.",
+      "ludoMore": "Showing the first {count} games — search to find others.",
+      "saved": {
+        "added": "Your question was added to this game’s FAQ.",
+        "addedHidden": "Your question was saved in this game’s FAQ; it shows once an admin approves it.",
+        "grouped": "A similar question is already in this game’s FAQ — yours was counted with it.",
+        "skipped": "Not added to the FAQ: the question is too short or general to be reused.",
+        "photo": "Questions with a photo are not added to the FAQ.",
+        "failed": "The FAQ could not be updated this time."
+      }
     },
     "flow": "Every question goes to the FAQ first, then {who} answers{count, plural, =0 {.} one { by reading the game's rulebook.} other { by reading the game's # rulebooks.}}",
     "stage": {

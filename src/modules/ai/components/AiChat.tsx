@@ -26,6 +26,8 @@ export type ChatMessage = {
   provider?: string | null;
   /** photos attached to a question (file ids) */
   images?: string[];
+  /** what became of the question in the game's FAQ (new, grouped with a similar one, not kept…) */
+  faqSaved?: { outcome: string; visible: boolean; first: boolean } | null;
   /** set when the answer comes from the game's FAQ */
   faq?: { question: string; verified: boolean } | null;
 };
@@ -154,6 +156,7 @@ export function AiChat({
           } else if (ev.type === "faq") update((m) => ({ ...m, faq: { question: ev.question, verified: Boolean(ev.verified) } }));
           else if (ev.type === "text") update((m) => ({ ...m, content: m.content + ev.text }));
           else if (ev.type === "citation") update((m) => ({ ...m, citations: [...m.citations, { page: ev.page, endPage: ev.endPage, text: ev.text }] }));
+          else if (ev.type === "faqSaved") update((m) => ({ ...m, faqSaved: { outcome: ev.outcome, visible: Boolean(ev.visible), first: Boolean(ev.first) } }));
           else if (ev.type === "error") setError(ev.code);
         }
       }
@@ -261,6 +264,12 @@ export function AiChat({
                     )}
                     <p className="whitespace-pre-line text-sm">{m.content}</p>
                   </>
+                )}
+                {m.role === "assistant" && m.faqSaved && (m.faqSaved.first || m.faqSaved.outcome !== "skipped") && (
+                  <p className="mt-2 flex items-start gap-1.5 text-[11px] text-muted">
+                    <MessageCircleQuestion className="mt-0.5 size-3 shrink-0 text-accent" />
+                    {t(`faq.saved.${m.faqSaved.outcome === "added" && !m.faqSaved.visible ? "addedHidden" : m.faqSaved.outcome}`)}
+                  </p>
                 )}
                 {m.role === "assistant" && m.provider === "faq" && m.content && (
                   <div className="mt-3 space-y-2 border-t border-line/50 pt-2">

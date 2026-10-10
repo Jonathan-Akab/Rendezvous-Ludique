@@ -81,9 +81,13 @@ export async function recordFaq(entry: {
   provider: string;
   /** false when the member already got this question from the FAQ and asked the AI anyway */
   countAsk?: boolean;
-}) {
+  /** the opening question of a conversation; later ones are kept only when they stand on their own */
+  isFirst?: boolean;
+}): Promise<{ outcome: "added" | "grouped" | "skipped" }> {
   const compare = await questionComparer(entry.gameId);
-  if (entry.answer.trim().length < 20 || compare.words(entry.question).length === 0) return;
+  const words = compare.words(entry.question).length;
+  // A follow-up ("and with 2 players?") depends on what came before: only keep it when it has enough words of its own.
+  if (entry.answer.trim().length < 20 || words === 0 || (entry.isFirst === false && words < 4)) return { outcome: "skipped" };
   const existing = await db.ruleFaq.findMany({ where: { gameId: entry.gameId }, select: { id: true, question: true, status: true, provider: true } });
   const same = existing
     .map((e) => ({ e, score: compare.similarity(entry.question, e.question) }))
@@ -98,9 +102,10 @@ export async function recordFaq(entry: {
   };
   if (!same) {
     await db.ruleFaq.create({ data: { gameId: entry.gameId, question: entry.question.slice(0, 500), ...content } });
-    return;
+    return { outcome: "added" };
   }
   // Keep admin-reviewed answers; otherwise a more reliable answer (Claude over the free AI) replaces it.
   const upgrade = same.status === "AUTO" && (PROVIDER_RANK[entry.provider] ?? 0) > (PROVIDER_RANK[same.provider ?? ""] ?? 0);
   await db.ruleFaq.update({ where: { id: same.id }, data: { ...(entry.countAsk === false ? {} : { askCount: { increment: 1 } }), ...(upgrade ? content : {}) } });
+  return { outcome: "grouped" };
 }
