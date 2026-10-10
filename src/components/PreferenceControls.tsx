@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { AnimatePresence, motion } from "motion/react";
 import { TapAway } from "@/components/TapAway";
-import { Languages, Palette } from "lucide-react";
+import { Palette } from "lucide-react";
 import { setLocaleAction, setThemeAction } from "@/modules/preferences/actions";
 import { THEMES, type ThemeKey } from "@/lib/constants";
 import { ThemePicture } from "./ThemePicture";
@@ -86,20 +86,41 @@ export function ThemePicker({
   );
 }
 
+/** FR | EN switch: the pill sits on the language the site is shown in; a tap moves it. */
 export function LocaleSwitch() {
   const locale = useLocale();
   const [pending, startTransition] = useTransition();
-  const next = locale === "fr" ? "en" : "fr";
+  // the pill moves right away; the page follows once the new language is loaded
+  const [shown, setShown] = useState(locale);
+  useEffect(() => setShown(locale), [locale]);
+  const next = shown === "fr" ? "en" : "fr";
+  const label = (l: string) => (l === "fr" ? "Français" : "English");
   return (
     <button
       type="button"
-      className="btn btn-ghost btn-sm uppercase"
+      role="switch"
+      aria-checked={shown === "en"}
+      aria-label={`${label(shown)} → ${label(next)}`}
+      title={label(next)}
       disabled={pending}
-      onClick={() => startTransition(() => setLocaleAction(next))}
-      title={next === "en" ? "English" : "Français"}
+      onClick={() => {
+        setShown(next);
+        startTransition(() => setLocaleAction(next));
+      }}
+      className="relative grid h-8 shrink-0 grid-cols-2 items-center rounded-full border border-line/70 bg-surface-2/70 p-0.5 text-[11px] font-bold disabled:opacity-80"
     >
-      <Languages className="size-4" aria-hidden />
-      {next}
+      <motion.span
+        aria-hidden
+        className="absolute inset-y-0.5 left-0.5 w-[calc(50%-2px)] rounded-full bg-accent shadow"
+        initial={false}
+        animate={{ x: shown === "fr" ? 0 : "100%" }}
+        transition={{ type: "spring", bounce: 0.25, duration: 0.35 }}
+      />
+      {(["fr", "en"] as const).map((l) => (
+        <span key={l} className={`relative z-10 w-8 text-center uppercase transition-colors ${shown === l ? "text-accent-ink" : "text-muted"}`}>
+          {l}
+        </span>
+      ))}
     </button>
   );
 }
