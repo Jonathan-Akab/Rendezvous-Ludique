@@ -11,6 +11,8 @@ import { ConfirmButton } from "@/components/forms";
 import { MeepleAvatar } from "@/components/Meeple";
 import { AdminHeader } from "@/modules/admin/components/AdminUi";
 import { deleteMemberAction, resetPasswordAction, revokeSessionsAction, updateMemberAction } from "@/modules/admin/actions";
+import { MemberAccessTools } from "@/modules/admin/components/MemberAccessTools";
+import { mailConfigured } from "@/lib/mail";
 
 export default async function AdminMemberPage({ params }: { params: Promise<{ id: string }> }) {
   const [{ id }, me, t, tp, format] = await Promise.all([
@@ -175,6 +177,13 @@ export default async function AdminMemberPage({ params }: { params: Promise<{ id
             <p>{t("libraries", { count: u._count.libraryMembers })}</p>
             <p>{u.lastSeenAt ? t("lastSeen", { date: format.dateTime(u.lastSeenAt, { dateStyle: "medium", timeStyle: "short" }) }) : t("neverSeen")}</p>
           </section>
+
+          {!locked && (
+            <section className="card card-pad space-y-3">
+              <h2 className="section-title text-base">{t("access.title")}</h2>
+              <MemberAccessTools userId={u.id} verified={Boolean(u.emailVerifiedAt)} pending={u.status === "PENDING"} suspended={u.status === "SUSPENDED"} mailOn={mailConfigured()} />
+            </section>
+          )}
 
           <section className="card card-pad space-y-3">
             <h2 className="section-title text-base">{t("resetPassword")}</h2>

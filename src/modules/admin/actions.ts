@@ -16,6 +16,7 @@ import { appUrl, emailLayout, mailConfigured, sendMail } from "@/lib/mail";
 import { bool, HEX_COLOR, oneOf, optFloat, optInt, optStr, str, type ActionState } from "@/lib/forms";
 import { LOCALES, ROLES, THEME_KEYS, USER_STATUSES, VISIBILITIES, type ThemeKey } from "@/lib/constants";
 import { getManifest, MODULES, type ModuleKey } from "@/modules/registry";
+import { sendPasswordResetEmail, sendVerificationEmail } from "@/modules/notifications/emails";
 import { readGameFields, storeCoverFromForm } from "@/modules/games/mutations";
 import { normalizeName } from "@/modules/games/service";
 import { deleteStored, saveUpload, UploadError } from "@/lib/storage";
@@ -114,6 +115,64 @@ export async function resetPasswordAction(userId: string, _prev: ActionState, fd
   await db.session.deleteMany({ where: { userId } });
   await audit(me.id, "admin.member.resetPassword", u.username);
   return { ok: true, message: t("passwordReset") };
+}
+
+/**
+ * Lets a member in by hand: their email address counts as confirmed and a pending account becomes active,
+ * so they can sign in without waiting for the confirmation email. (A suspended account stays suspended.)
+ */
+export async function verifyMemberAction(userId: string): Promise<ActionState> {
+  const me = await requirePermission("members");
+  const t = await getTranslations("admin.members.access");
+  const u = await manageableUser(me, userId);
+  if (!u) return { error: (await getTranslations("admin.errors"))("notAllowed") };
+  if (u.status === "SUSPENDED") return { error: t("suspendedFirst") };
+  await db.user.update({
+    where: { id: userId },
+    data: { emailVerifiedAt: u.emailVerifiedAt ?? new Date(), status: "ACTIVE" },
+  });
+  await audit(me.id, "admin.member.verify", u.username, { was: u.status, emailWasVerified: Boolean(u.emailVerifiedAt) });
+  revalidatePath("/admin", "layout");
+  return { ok: true, message: t("verifiedDone", { name: u.displayName }) };
+}
+
+/** Sends the "confirm your email address" email again. */
+export async function sendVerificationEmailAction(userId: string): Promise<ActionState> {
+  const me = await requirePermission("members");
+  const t = await getTranslations("admin.members.access");
+  const u = await manageableUser(me, userId);
+  if (!u) return { error: (await getTranslations("admin.errors"))("notAllowed") };
+  if (!mailConfigured()) return { error: t("mailOff") };
+  if (u.emailVerifiedAt) return { error: t("alreadyVerified") };
+  try {
+    await sendVerificationEmail(u);
+  } catch (e) {
+    return { error: t("sendFailed", { reason: (e as Error).message.slice(0, 160) }) };
+  }
+  await audit(me.id, "admin.member.resendVerification", u.username);
+  return { ok: true, message: t("confirmationSent", { email: u.email }) };
+}
+
+/** Emails the member a link to choose a new password. */
+export async function sendPasswordResetEmailAction(userId: string): Promise<ActionState> {
+  const me = await requirePermission("members");
+  const t = await getTranslations("admin.members.access");
+  const u = await manageableUser(me, userId);
+  if (!u) return { error: (await getTranslations("admin.errors"))("notAllowed") };
+  if (!mailConfigured()) return { error: t("mailOff") };
+  if (u.status === "SUSPENDED") return { error: t("suspendedFirst") };
+  try {
+    await sendPasswordResetEmail(u);
+  } catch (e) {
+    return { error: t("sendFailed", { reason: (e as Error).message.slice(0, 160) }) };
+  }
+  await audit(me.id, "admin.member.sendPasswordReset", u.username);
+  return { ok: true, message: t("resetSent", { email: u.email }) };
+}
+
+/** List shortcut for "Verify and let in" (no message needed: the row updates). */
+export async function verifyMemberQuickAction(userId: string) {
+  await verifyMemberAction(userId);
 }
 
 export async function revokeSessionsAction(userId: string) {

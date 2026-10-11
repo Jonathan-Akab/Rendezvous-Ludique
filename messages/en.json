@@ -911,7 +911,30 @@
       "dangerZone": "Danger zone",
       "deleteWarning": "Deletes the account, their games announced, plays logged and their place in shared kallax. This can't be undone.",
       "delete": "Delete member",
-      "deleteConfirm": "Delete {name} permanently?"
+      "deleteConfirm": "Delete {name} permanently?",
+      "access": {
+        "title": "Access to the site",
+        "emailVerified": "Email confirmed",
+        "emailNotVerified": "Email not confirmed",
+        "unverifiedChip": "not verified",
+        "active": "can sign in",
+        "waiting": "waiting for approval",
+        "suspended": "suspended",
+        "verify": "Verify and let them in",
+        "verifyShort": "Verify",
+        "verifyHint": "Mark the email as confirmed and activate the account so they can sign in",
+        "resendConfirmation": "Resend the confirmation email",
+        "sendReset": "Send a password-reset email",
+        "hint": "“Verify” lets them sign in right away, without the confirmation email. The reset email lets them choose a new password.",
+        "mailOff": "Email isn’t set up on this site (SMTP), so emails can’t be sent.",
+        "verifiedDone": "{name} is verified and can sign in.",
+        "suspendedFirst": "This account is suspended: reactivate it first.",
+        "alreadyVerified": "The email address is already confirmed.",
+        "confirmationSent": "Confirmation email sent to {email}.",
+        "resetSent": "Password-reset email sent to {email}.",
+        "sendFailed": "The email could not be sent: {reason}",
+        "failed": "Something went wrong. Try again."
+      }
     },
     "events": {
       "title": "Games & events",

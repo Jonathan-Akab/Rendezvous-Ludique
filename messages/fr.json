@@ -911,7 +911,30 @@
       "dangerZone": "Zone dangereuse",
       "deleteWarning": "Supprime le compte, ses parties annoncées et notées et sa place dans les Kallax partagées. Action irréversible.",
       "delete": "Supprimer le membre",
-      "deleteConfirm": "Supprimer {name} définitivement?"
+      "deleteConfirm": "Supprimer {name} définitivement?",
+      "access": {
+        "title": "Accès au site",
+        "emailVerified": "Courriel confirmé",
+        "emailNotVerified": "Courriel non confirmé",
+        "unverifiedChip": "non vérifié",
+        "active": "peut se connecter",
+        "waiting": "en attente d’approbation",
+        "suspended": "suspendu",
+        "verify": "Vérifier et laisser entrer",
+        "verifyShort": "Vérifier",
+        "verifyHint": "Marquer le courriel comme confirmé et activer le compte pour qu’il puisse se connecter",
+        "resendConfirmation": "Renvoyer le courriel de confirmation",
+        "sendReset": "Envoyer un courriel de réinitialisation du mot de passe",
+        "hint": "« Vérifier » leur permet de se connecter tout de suite, sans le courriel de confirmation. Le courriel de réinitialisation leur permet de choisir un nouveau mot de passe.",
+        "mailOff": "Le courriel n’est pas configuré sur ce site (SMTP) : impossible d’envoyer des courriels.",
+        "verifiedDone": "{name} est vérifié(e) et peut se connecter.",
+        "suspendedFirst": "Ce compte est suspendu : réactive-le d’abord.",
+        "alreadyVerified": "Le courriel est déjà confirmé.",
+        "confirmationSent": "Courriel de confirmation envoyé à {email}.",
+        "resetSent": "Courriel de réinitialisation envoyé à {email}.",
+        "sendFailed": "Le courriel n’a pas pu être envoyé : {reason}",
+        "failed": "Quelque chose n’a pas fonctionné. Réessaie."
+      }
     },
     "events": {
       "title": "Parties et événements",

@@ -7,7 +7,7 @@ import { isFullAdmin } from "@/lib/auth/permissions";
 import { ROLES, USER_STATUSES } from "@/lib/constants";
 import { MeepleAvatar } from "@/components/Meeple";
 import { AdminHeader, AdminTable, SearchBar, Td } from "@/modules/admin/components/AdminUi";
-import { quickSetRoleAction, setMemberStatusAction } from "@/modules/admin/actions";
+import { quickSetRoleAction, setMemberStatusAction, verifyMemberQuickAction } from "@/modules/admin/actions";
 import type { Prisma } from "@/generated/prisma/client";
 
 export async function generateMetadata() {
@@ -82,11 +82,17 @@ export default async function AdminMembersPage({ searchParams }: { searchParams:
             </Td>
             <Td>
               <span className={`chip ${u.status === "ACTIVE" ? "text-success" : u.status === "PENDING" ? "text-[#c78f1f]" : "text-danger"}`}>{t(`statuses.${u.status}`)}</span>
+              {!u.emailVerifiedAt && <span className="chip ml-1 text-[#c78f1f]" title={t("access.emailNotVerified")}>{t("access.unverifiedChip")}</span>}
             </Td>
             <Td className="text-xs text-muted">{t("activityCount", { events: u._count.hostedEvents, plays: u._count.playsCreated })}</Td>
             <Td className="whitespace-nowrap text-xs text-muted">{format.dateTime(u.createdAt, { dateStyle: "medium" })}</Td>
             <Td>
               <div className="flex justify-end gap-1">
+                {u.id !== me.id && (full || u.role === "MEMBER") && u.status !== "SUSPENDED" && (u.status === "PENDING" || !u.emailVerifiedAt) && (
+                  <form action={verifyMemberQuickAction.bind(null, u.id)}>
+                    <button className="btn btn-primary btn-sm" title={t("access.verifyHint")}>{t("access.verifyShort")}</button>
+                  </form>
+                )}
                 {u.id !== me.id && (full || u.role === "MEMBER") && (
                   <form action={setMemberStatusAction.bind(null, u.id, u.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE")}>
                     <button className="btn btn-ghost btn-sm">{u.status === "ACTIVE" ? t("suspend") : t("reactivate")}</button>
