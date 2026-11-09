@@ -87,8 +87,8 @@ export async function getEventForViewer(id: string, viewerId: string) {
 }
 
 export function seatsTaken(e: EventWithDetails) {
-  // the host takes a seat too
-  return 1 + e.attendees.filter((a) => a.status === "GOING" && a.userId !== e.hostId).length;
+  // the host takes a seat too, and so do the players the host already counted in
+  return 1 + (e.reservedSeats ?? 0) + e.attendees.filter((a) => a.status === "GOING" && a.userId !== e.hostId).length;
 }
 
 /** Game-night addresses (often someone's home) are only shown to the host and confirmed players. */

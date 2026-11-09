@@ -266,7 +266,8 @@
       "title": "Donnez un titre à votre partie (120 caractères max.).",
       "date": "Choisissez une date et une heure de début.",
       "endBeforeStart": "La fin doit être après le début.",
-      "maxPlayers": "Le nombre de places doit être entre 2 et {cap}."
+      "maxPlayers": "Le nombre de places doit être entre 2 et {cap}.",
+      "tooManyTaken": "Il y a plus de joueurs déjà autour de la table que de places ({max}). Augmente le nombre de joueurs ou retire quelqu'un."
     },
     "noLocation": "Lieu à confirmer",
     "addressHidden": "Adresse exacte partagée avec les joueurs confirmés",
@@ -302,6 +303,24 @@
       "next": "Mois suivant",
       "today": "Aujourd'hui",
       "nothing": "Rien de prévu cette journée."
+    },
+    "seatsForm": {
+      "title": "Les places",
+      "total": "Nombre de joueurs en tout (toi compris)",
+      "totalHint": "Laisse vide : pas de limite",
+      "already": "Déjà autour de la table",
+      "friendsHint": "Touche un ami pour l'ajouter : son nom sera affiché parmi les joueurs, et il en sera averti.",
+      "noFriends": "Ajoute des amis sur le site pour pouvoir les montrer ici.",
+      "reserved": "Autres places déjà prises",
+      "reservedHint": "Des joueurs qui ne sont pas sur le site, ou que tu préfères ne pas nommer. On affiche seulement « place prise ».",
+      "less": "Une place de moins",
+      "more": "Une place de plus",
+      "summary": "Toi{friends, plural, =0 {} one { + # ami} other { + # amis}}{reserved, plural, =0 {} one { + # place prise} other { + # places prises}}{joined, plural, =0 {} one { + # inscrit} other { + # inscrits}} →",
+      "free": "{n, plural, one {# place libre} other {# places libres}} sur {total}",
+      "full": "la table est complète",
+      "over": "{n, plural, one {# joueur de trop} other {# joueurs de trop}} : augmente le nombre de joueurs",
+      "open": "{n, plural, one {# joueur} other {# joueurs}} déjà, sans limite de places",
+      "reservedShown": "{count, plural, one {+ # place déjà prise} other {+ # places déjà prises}}"
     }
   },
   "kallax": {
@@ -775,7 +794,8 @@
         "eventCancelled": "Une partie où je vais est annulée",
         "kallaxInvite": "Une invitation à partager une Kallax",
         "bazaarMessage": "Un nouveau message au bazar",
-        "suggestionUpdate": "L'équipe répond à ma suggestion"
+        "suggestionUpdate": "L'équipe répond à ma suggestion",
+        "eventAddedByHost": "Un hôte m'ajoute à sa partie"
       }
     },
     "guide": {
@@ -1953,6 +1973,10 @@
       "suggestionUpdate": {
         "title": "Ta suggestion a une réponse",
         "body": "L'équipe a mis à jour ta suggestion « {title} »."
+      },
+      "eventAddedByHost": {
+        "title": "{name} t'a ajouté à « {event} »",
+        "body": "{name} t'a mis parmi les joueurs de « {event} ». Tu peux te retirer de la partie à tout moment."
       }
     }
   },
@@ -2273,7 +2297,8 @@
       "other": "Nouvelle notification",
       "suggestionUpdate_reply": "L’équipe a répondu à ta suggestion « {title} »",
       "suggestionUpdate_status": "Ta suggestion « {title} » est maintenant : {statusLabel}",
-      "suggestionUpdate_message": "Message de l’équipe au sujet de « {title} » : {preview}"
+      "suggestionUpdate_message": "Message de l’équipe au sujet de « {title} » : {preview}",
+      "eventAddedByHost": "{name} t'a ajouté à « {event} »"
     }
   },
   "demo": {

@@ -73,6 +73,8 @@ export function demoEvents(lang: Lang): EventWithDetails[] {
       longitude: null,
       visibility: "MEMBERS",
       maxPlayers: o.max,
+      // Marie's evening: 2 friends of hers who aren't on the site are already coming
+      reservedSeats: o.id === "demo-e1" ? 2 : 0,
       // home game nights: Marie accepts each player herself, Sam lets players in right away
       requiresApproval: o.id === "demo-e1" || o.kind === "TOURNAMENT",
       status: "SCHEDULED",

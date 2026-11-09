@@ -266,7 +266,8 @@
       "title": "Give your game a title (120 characters max).",
       "date": "Pick a start date and time.",
       "endBeforeStart": "The end must be after the start.",
-      "maxPlayers": "Seats must be between 2 and {cap}."
+      "maxPlayers": "Seats must be between 2 and {cap}.",
+      "tooManyTaken": "More players are already around the table than there are seats ({max}). Raise the number of players or remove someone."
     },
     "noLocation": "Location to be announced",
     "addressHidden": "Exact address shared with confirmed players",
@@ -302,6 +303,24 @@
       "next": "Next month",
       "today": "Today",
       "nothing": "Nothing planned this day."
+    },
+    "seatsForm": {
+      "title": "Seats",
+      "total": "Number of players in all (you included)",
+      "totalHint": "Leave empty: no limit",
+      "already": "Already around the table",
+      "friendsHint": "Tap a friend to add them: their name shows among the players, and they're told about it.",
+      "noFriends": "Add friends on the site to show them here.",
+      "reserved": "Other seats already taken",
+      "reservedHint": "Players who aren't on the site, or that you'd rather not name. Only “seat taken” is shown.",
+      "less": "One seat less",
+      "more": "One more seat",
+      "summary": "You{friends, plural, =0 {} one { + # friend} other { + # friends}}{reserved, plural, =0 {} one { + # taken seat} other { + # taken seats}}{joined, plural, =0 {} one { + # joined} other { + # joined}} →",
+      "free": "{n, plural, one {# free seat} other {# free seats}} out of {total}",
+      "full": "the table is full",
+      "over": "{n, plural, one {# player too many} other {# players too many}}: raise the number of players",
+      "open": "{n, plural, one {# player} other {# players}} so far, no seat limit",
+      "reservedShown": "{count, plural, one {+ # seat already taken} other {+ # seats already taken}}"
     }
   },
   "kallax": {
@@ -775,7 +794,8 @@
         "eventCancelled": "A game I'm going to is cancelled",
         "kallaxInvite": "An invitation to share a Kallax",
         "bazaarMessage": "A new bazar message",
-        "suggestionUpdate": "The team answers my suggestion"
+        "suggestionUpdate": "The team answers my suggestion",
+        "eventAddedByHost": "A host adds me to their game"
       }
     },
     "guide": {
@@ -1953,6 +1973,10 @@
       "suggestionUpdate": {
         "title": "Your suggestion has an answer",
         "body": "The team updated your suggestion “{title}”."
+      },
+      "eventAddedByHost": {
+        "title": "{name} added you to “{event}”",
+        "body": "{name} put you among the players of “{event}”. You can leave the game at any time."
       }
     }
   },
@@ -2273,7 +2297,8 @@
       "other": "New notification",
       "suggestionUpdate_reply": "The team replied to your suggestion “{title}”",
       "suggestionUpdate_status": "Your suggestion “{title}” is now: {statusLabel}",
-      "suggestionUpdate_message": "Message from the team about “{title}”: {preview}"
+      "suggestionUpdate_message": "Message from the team about “{title}”: {preview}",
+      "eventAddedByHost": "{name} added you to “{event}”"
     }
   },
   "demo": {

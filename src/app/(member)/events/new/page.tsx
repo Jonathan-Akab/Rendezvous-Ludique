@@ -5,6 +5,7 @@ import { FadeIn } from "@/components/Motion";
 import { EventForm } from "@/modules/events/components/EventForm";
 import { createEventAction } from "@/modules/events/actions";
 import { getMyKallaxGames } from "@/modules/kallax/service";
+import { getFriends } from "@/modules/friends/service";
 
 export async function generateMetadata() {
   return { title: (await getTranslations("events"))("announce") };
@@ -12,7 +13,7 @@ export async function generateMetadata() {
 
 export default async function NewEventPage() {
   const [user, mod, t] = await Promise.all([requireUser(), requireModule("events"), getTranslations("events")]);
-  const myGames = await getMyKallaxGames(user.id);
+  const [myGames, friends] = await Promise.all([getMyKallaxGames(user.id), getFriends(user.id)]);
   return (
     <FadeIn className="mx-auto max-w-3xl space-y-6">
       <div>
@@ -26,6 +27,7 @@ export default async function NewEventPage() {
           values={{ city: user.city, latitude: user.latitude, longitude: user.longitude }}
           submitLabel={t("publish")}
           myGames={myGames}
+          friends={friends}
         />
       </div>
     </FadeIn>

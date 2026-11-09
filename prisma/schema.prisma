@@ -254,6 +254,8 @@ model Event {
   longitude        Float?
   visibility       String    @default("MEMBERS") // PUBLIC | MEMBERS | FRIENDS
   maxPlayers       Int?
+  // seats the host already filled with people not shown on the site ("3 of us, looking for 1")
+  reservedSeats    Int       @default(0)
   requiresApproval Boolean   @default(false)
   status           String    @default("SCHEDULED") // SCHEDULED | CANCELLED
   createdAt        DateTime  @default(now())
@@ -273,6 +275,8 @@ model EventAttendee {
   eventId   String
   userId    String
   status    String   @default("GOING") // GOING | MAYBE | REQUESTED | DECLINED
+  // a friend the host put at the table when announcing (vs. a member who joined)
+  addedByHost Boolean @default(false)
   createdAt DateTime @default(now())
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)

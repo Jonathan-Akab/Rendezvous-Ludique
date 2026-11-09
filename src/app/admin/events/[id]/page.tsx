@@ -11,15 +11,16 @@ import { AdminHeader } from "@/modules/admin/components/AdminUi";
 import { EventForm } from "@/modules/events/components/EventForm";
 import { updateEventAction } from "@/modules/events/actions";
 import { getMyKallaxGames } from "@/modules/kallax/service";
+import { getFriends } from "@/modules/friends/service";
 
 export default async function AdminEditEventPage({ params }: { params: Promise<{ id: string }> }) {
   await requirePermission("events");
   const [{ id }, mod, { timeZone }, t] = await Promise.all([params, getModule("events"), getSiteSettings(), getTranslations("admin.events")]);
   const event = await db.event.findUnique({
     where: { id },
-    include: { games: { include: { game: true } }, host: { select: { displayName: true } } },
+    include: { games: { include: { game: true } }, host: { select: { displayName: true } }, attendees: true },
   });
-  const hostGames = event ? await getMyKallaxGames(event.hostId) : [];
+  const [hostGames, friends] = event ? await Promise.all([getMyKallaxGames(event.hostId), getFriends(event.hostId)]) : [[], []];
   if (!event) notFound();
 
   return (
@@ -38,11 +39,14 @@ export default async function AdminEditEventPage({ params }: { params: Promise<{
             ...event.games.map((g) => ({ gameId: g.gameId, name: g.game.name, cover: null })),
             ...hostGames.filter((g) => !event.games.some((e) => e.gameId === g.gameId)),
           ]}
+          friends={friends}
           values={{
             ...event,
             startsAt: toLocalInput(event.startsAt, timeZone),
             endsAt: event.endsAt ? toLocalInput(event.endsAt, timeZone) : "",
             gameIds: event.games.map((g) => g.gameId),
+            friendIds: event.attendees.filter((a) => a.addedByHost && a.status === "GOING").map((a) => a.userId),
+            joined: event.attendees.filter((a) => !a.addedByHost && a.status === "GOING" && a.userId !== event.hostId).length,
           }}
         />
       </div>

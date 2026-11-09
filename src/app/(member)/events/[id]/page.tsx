@@ -179,6 +179,16 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             ),
           )}
         </div>
+        {event.reservedSeats > 0 && (
+          <p className="flex flex-wrap items-center gap-2 text-sm text-muted">
+            <span className="flex -space-x-1.5" aria-hidden>
+              {Array.from({ length: Math.min(event.reservedSeats, 6) }, (_, i) => (
+                <MeepleAvatar key={i} color="#adb5bd" size={24} />
+              ))}
+            </span>
+            {t("seatsForm.reservedShown", { count: event.reservedSeats })}
+          </p>
+        )}
         {maybe.length > 0 && (
           <p className="text-sm text-muted">
             {t("maybeList")}: {maybe.map((a) => a.user.displayName).join(", ")}

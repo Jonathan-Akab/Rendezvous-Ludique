@@ -13,6 +13,7 @@ import { audit } from "@/lib/audit";
 import { bool, oneOf, optFloat, optInt, optStr, str, type ActionState } from "@/lib/forms";
 import { EVENT_KINDS, EVENT_VISIBILITIES, type AttendeeStatus } from "@/lib/constants";
 import { getMyKallaxGames } from "@/modules/kallax/service";
+import { getFriendIds } from "@/modules/friends/service";
 import { getEventForViewer, seatsTaken } from "./service";
 import { notify } from "@/modules/notifications/emails";
 
@@ -40,6 +41,10 @@ async function readEventForm(fd: FormData, mod: Awaited<ReturnType<typeof guard>
   const cap = Number(mod.settings.maxPlayersCap) || 100;
   const maxPlayers = optInt(fd, "maxPlayers");
   if (maxPlayers != null && (maxPlayers < 2 || maxPlayers > cap)) return { error: t("maxPlayers", { cap }) };
+  // already around the table: friends shown by name, and seats simply marked as taken
+  const reservedSeats = Math.max(0, Math.min(cap, optInt(fd, "reservedSeats") ?? 0));
+  const friendIds = [...new Set(fd.getAll("friendIds").map(String).filter(Boolean))].slice(0, cap);
+  if (maxPlayers != null && 1 + reservedSeats + friendIds.length > maxPlayers) return { error: t("tooManyTaken", { max: maxPlayers }) };
 
   return {
     data: {
@@ -55,9 +60,11 @@ async function readEventForm(fd: FormData, mod: Awaited<ReturnType<typeof guard>
       longitude: optFloat(fd, "longitude"),
       visibility,
       maxPlayers,
+      reservedSeats,
       requiresApproval: bool(fd, "requiresApproval"),
     },
     gameIds: fd.getAll("gameIds").map(String).filter(Boolean).slice(0, 12),
+    friendIds,
   };
 }
 
@@ -71,12 +78,31 @@ async function setEventGames(eventId: string, gameIds: string[], hostId: string)
   }
 }
 
+/**
+ * Friends the host put at the table: they come in as players (and hear about it); the ones the
+ * host takes off are removed. Members who joined by themselves are never touched here.
+ */
+async function setHostFriends(event: { id: string; title: string; hostId: string }, wanted: string[], hostName: string) {
+  const friends = new Set(await getFriendIds(event.hostId));
+  const keep = new Set(wanted.filter((id) => friends.has(id) && id !== event.hostId));
+  const current = await db.eventAttendee.findMany({ where: { eventId: event.id } });
+  await db.eventAttendee.deleteMany({ where: { eventId: event.id, addedByHost: true, userId: { notIn: [...keep] } } });
+  for (const userId of keep) {
+    const before = current.find((a) => a.userId === userId);
+    if (before?.addedByHost && before.status === "GOING") continue;
+    if (before) await db.eventAttendee.update({ where: { id: before.id }, data: { status: "GOING", addedByHost: true } });
+    else await db.eventAttendee.create({ data: { eventId: event.id, userId, status: "GOING", addedByHost: true } });
+    void notify(userId, "eventAddedByHost", { name: hostName, event: event.title }, `/events/${event.id}`);
+  }
+}
+
 export async function createEventAction(_prev: ActionState, fd: FormData): Promise<ActionState> {
   const { user, mod } = await guard();
   const parsed = await readEventForm(fd, mod);
   if ("error" in parsed) return { error: parsed.error };
   const event = await db.event.create({ data: { ...parsed.data, hostId: user.id } });
   await setEventGames(event.id, parsed.gameIds, user.id);
+  await setHostFriends(event, parsed.friendIds, user.displayName);
   revalidatePath("/events");
   redirect(`/events/${event.id}?created=1`);
 }
@@ -96,8 +122,18 @@ export async function updateEventAction(eventId: string, _prev: ActionState, fd:
   if (!ctx) return { error: "Forbidden" };
   const parsed = await readEventForm(fd, mod);
   if ("error" in parsed) return { error: parsed.error };
+  // the members who joined by themselves keep their seats: they count too
+  if (parsed.data.maxPlayers != null) {
+    const joined = await db.eventAttendee.count({ where: { eventId, status: "GOING", addedByHost: false, userId: { notIn: [ctx.event.hostId, ...parsed.friendIds] } } });
+    if (1 + parsed.data.reservedSeats + parsed.friendIds.length + joined > parsed.data.maxPlayers) {
+      const t = await getTranslations("events.errors");
+      return { error: t("tooManyTaken", { max: parsed.data.maxPlayers }) };
+    }
+  }
   await db.event.update({ where: { id: eventId }, data: parsed.data });
   await setEventGames(eventId, parsed.gameIds, ctx.event.hostId);
+  const host = await db.user.findUnique({ where: { id: ctx.event.hostId }, select: { displayName: true } });
+  await setHostFriends({ ...ctx.event, title: parsed.data.title }, parsed.friendIds, host?.displayName ?? "");
   if (ctx.viaAdmin) await audit(ctx.user.id, "event.update", eventId);
   revalidatePath(`/events/${eventId}`);
   revalidatePath("/admin/events");

@@ -13,6 +13,7 @@ export const NOTIFY_TYPES = [
   "playToConfirm",
   "eventJoinRequest",
   "eventJoinAccepted",
+  "eventAddedByHost",
   "eventCancelled",
   "kallaxInvite",
   "bazaarMessage",

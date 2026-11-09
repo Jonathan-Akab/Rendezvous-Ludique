@@ -12,7 +12,17 @@ export default async function DemoNewEvent() {
         <p className="text-muted">{t("announce.lead")}</p>
       </div>
       <div data-guide="demo-event-form" className="card card-pad">
-        <EventForm action={demoEventAction} allowPublic submitLabel={te("publish")} myGames={demoMyGames()} />
+        <EventForm
+          action={demoEventAction}
+          allowPublic
+          submitLabel={te("publish")}
+          myGames={demoMyGames()}
+          friends={[
+            { id: "demo-marie", displayName: "Marie", meepleColor: "#c92a2a" },
+            { id: "demo-sam", displayName: "Sam", meepleColor: "#1c5fbf" },
+            { id: "demo-julie", displayName: "Julie", meepleColor: "#f2b705" },
+          ]}
+        />
       </div>
     </div>
   );

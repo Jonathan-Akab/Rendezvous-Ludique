@@ -8,6 +8,7 @@ import { FormMessage, SubmitButton } from "@/components/forms";
 import { LocationFields } from "@/components/LocationFields";
 import type { ActionState } from "@/lib/forms";
 import { MyGameSelect, type MyGameOption } from "@/modules/kallax/components/MyGameSelect";
+import { SeatsFields, type SeatFriend } from "./SeatsFields";
 
 export type EventFormValues = {
   title?: string;
@@ -22,6 +23,11 @@ export type EventFormValues = {
   longitude?: number | null;
   visibility?: string;
   maxPlayers?: number | null;
+  reservedSeats?: number;
+  /** friends the host put at the table */
+  friendIds?: string[];
+  /** members who joined by themselves (editing) */
+  joined?: number;
   requiresApproval?: boolean;
   gameIds?: string[];
 };
@@ -40,6 +46,7 @@ export function EventForm({
   submitLabel,
   returnTo,
   myGames,
+  friends = [],
 }: {
   action: (prev: ActionState, fd: FormData) => Promise<ActionState>;
   values?: EventFormValues;
@@ -48,6 +55,8 @@ export function EventForm({
   returnTo?: "admin";
   /** games from the host's Kallax, to put on the menu */
   myGames: MyGameOption[];
+  /** the host's friends, to put at the table */
+  friends?: SeatFriend[];
 }) {
   const t = useTranslations("events");
   const [state, formAction] = useActionState(action, undefined);
@@ -151,13 +160,9 @@ export function EventForm({
             <option value="FRIENDS">{t("visibility.FRIENDS")}</option>
           </select>
         </div>
-        <div>
-          <label className="label" htmlFor="maxPlayers">
-            {t("form.maxPlayers")}
-          </label>
-          <input id="maxPlayers" name="maxPlayers" type="number" min={2} className="input" defaultValue={values.maxPlayers ?? ""} placeholder={t("form.maxPlayersHint")} />
-        </div>
       </div>
+
+      <SeatsFields friends={friends} maxPlayers={values.maxPlayers} reservedSeats={values.reservedSeats} friendIds={values.friendIds} joined={values.joined} />
 
       <label className="flex items-start gap-3 text-sm">
         <input type="checkbox" name="requiresApproval" defaultChecked={values.requiresApproval ?? kind === "GAME_NIGHT"} className="mt-1 size-4 accent-[var(--accent)]" />
