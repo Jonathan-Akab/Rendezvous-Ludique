@@ -29,6 +29,7 @@ export type EventFormValues = {
   /** members who joined by themselves (editing) */
   joined?: number;
   requiresApproval?: boolean;
+  chatEnabled?: boolean;
   gameIds?: string[];
 };
 
@@ -169,6 +170,14 @@ export function EventForm({
         <span>
           <span className="font-semibold">{t("form.requiresApproval")}</span>
           <span className="block text-muted">{t("form.requiresApprovalHint")}</span>
+        </span>
+      </label>
+
+      <label className="flex items-start gap-3 text-sm">
+        <input type="checkbox" name="chatEnabled" defaultChecked={values.chatEnabled ?? true} className="mt-1 size-4 accent-[var(--accent)]" />
+        <span>
+          <span className="font-semibold">{t("form.chatEnabled")}</span>
+          <span className="block text-muted">{t("form.chatEnabledHint")}</span>
         </span>
       </label>
 

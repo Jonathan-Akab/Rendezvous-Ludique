@@ -260,7 +260,9 @@
       "maxPlayers": "Places (vous inclus)",
       "maxPlayersHint": "Sans limite",
       "requiresApproval": "J'approuve chaque joueur",
-      "requiresApprovalHint": "Les joueurs demandent à se joindre et vous les acceptez."
+      "requiresApprovalHint": "Les joueurs demandent à se joindre et vous les acceptez.",
+      "chatEnabled": "Discussion pour les joueurs",
+      "chatEnabledHint": "Une discussion privée entre toi et les joueurs inscrits, ouverte jusqu'au lendemain de la partie."
     },
     "errors": {
       "title": "Donnez un titre à votre partie (120 caractères max.).",
@@ -321,6 +323,30 @@
       "over": "{n, plural, one {# joueur de trop} other {# joueurs de trop}} : augmente le nombre de joueurs",
       "open": "{n, plural, one {# joueur} other {# joueurs}} déjà, sans limite de places",
       "reservedShown": "{count, plural, one {+ # place déjà prise} other {+ # places déjà prises}}"
+    },
+    "follow": {
+      "button": "M'avertir des prochaines parties de {name}",
+      "title": "Suivre {name}",
+      "lead": "Tu ne peux pas venir cette fois-ci? Reçois un courriel quand cet hôte annonce une nouvelle partie.",
+      "similar": "Seulement les parties semblables",
+      "similarText": "Même genre de soirée, ou au moins un des mêmes jeux.",
+      "all": "Toutes ses parties",
+      "allText": "Chaque nouvelle partie de cet hôte.",
+      "emailNote": "Tu recevras une notification et un courriel. Tu peux arrêter en tout temps ici ou dans Paramètres.",
+      "cancel": "Annuler",
+      "followingSimilar": "Tu seras averti des parties semblables de {name}.",
+      "followingAll": "Tu seras averti de toutes les parties de {name}.",
+      "stop": "Ne plus suivre"
+    },
+    "chat": {
+      "title": "Discussion de la table",
+      "private": "Privée : seulement l'hôte et les joueurs inscrits. Ouverte jusqu'au {date}, puis effacée.",
+      "notifyOn": "Je suis averti des messages",
+      "notifyOff": "M'avertir des nouveaux messages",
+      "empty": "Aucun message pour l'instant. Dis bonjour à la table!",
+      "placeholder": "Écris un message… (Entrée pour envoyer)",
+      "send": "Envoyer",
+      "closed": "La discussion est fermée : elle s'arrête le lendemain de la partie et ses messages sont effacés."
     }
   },
   "kallax": {
@@ -795,13 +821,23 @@
         "kallaxInvite": "Une invitation à partager une Kallax",
         "bazaarMessage": "Un nouveau message au bazar",
         "suggestionUpdate": "L'équipe répond à ma suggestion",
-        "eventAddedByHost": "Un hôte m'ajoute à sa partie"
+        "eventAddedByHost": "Un hôte m'ajoute à sa partie",
+        "hostNewEvent": "Un hôte que je suis annonce une partie",
+        "eventChatMessage": "Nouveau message dans la discussion d'une partie (si je l'ai demandé)"
       }
     },
     "guide": {
       "title": "Guide du site",
       "lead": "Le petit tour du site présenté à ta première connexion.",
       "replay": "Revoir le guide"
+    },
+    "following": {
+      "title": "Hôtes que je suis",
+      "lead": "Tu reçois un courriel quand ces hôtes annoncent une partie.",
+      "empty": "Tu ne suis aucun hôte. Sur la page d'une partie, touche « M'avertir des prochaines parties ».",
+      "similar": "parties semblables",
+      "all": "toutes ses parties",
+      "unfollow": "Ne plus suivre"
     }
   },
   "home": {
@@ -1977,6 +2013,14 @@
       "eventAddedByHost": {
         "title": "{name} t'a ajouté à « {event} »",
         "body": "{name} t'a mis parmi les joueurs de « {event} ». Tu peux te retirer de la partie à tout moment."
+      },
+      "hostNewEvent": {
+        "title": "{name} annonce une nouvelle partie : « {event} »",
+        "body": "{name}, un hôte que tu suis, vient d'annoncer « {event} ». Il reste peut-être de la place!"
+      },
+      "eventChatMessage": {
+        "title": "Nouveau message dans « {event} »",
+        "body": "{name} a écrit dans la discussion de « {event} »."
       }
     }
   },
@@ -2298,7 +2342,9 @@
       "suggestionUpdate_reply": "L’équipe a répondu à ta suggestion « {title} »",
       "suggestionUpdate_status": "Ta suggestion « {title} » est maintenant : {statusLabel}",
       "suggestionUpdate_message": "Message de l’équipe au sujet de « {title} » : {preview}",
-      "eventAddedByHost": "{name} t'a ajouté à « {event} »"
+      "eventAddedByHost": "{name} t'a ajouté à « {event} »",
+      "hostNewEvent": "{name} annonce « {event} »",
+      "eventChatMessage": "{name} a écrit dans « {event} »"
     }
   },
   "demo": {

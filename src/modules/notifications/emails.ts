@@ -14,6 +14,8 @@ export const NOTIFY_TYPES = [
   "eventJoinRequest",
   "eventJoinAccepted",
   "eventAddedByHost",
+  "hostNewEvent",
+  "eventChatMessage",
   "eventCancelled",
   "kallaxInvite",
   "bazaarMessage",

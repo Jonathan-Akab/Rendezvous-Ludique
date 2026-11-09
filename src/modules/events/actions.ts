@@ -14,6 +14,7 @@ import { bool, oneOf, optFloat, optInt, optStr, str, type ActionState } from "@/
 import { EVENT_KINDS, EVENT_VISIBILITIES, type AttendeeStatus } from "@/lib/constants";
 import { getMyKallaxGames } from "@/modules/kallax/service";
 import { getFriendIds } from "@/modules/friends/service";
+import { notifyHostFollowers } from "./followers";
 import { getEventForViewer, seatsTaken } from "./service";
 import { notify } from "@/modules/notifications/emails";
 
@@ -61,6 +62,7 @@ async function readEventForm(fd: FormData, mod: Awaited<ReturnType<typeof guard>
       visibility,
       maxPlayers,
       reservedSeats,
+      chatEnabled: bool(fd, "chatEnabled"),
       requiresApproval: bool(fd, "requiresApproval"),
     },
     gameIds: fd.getAll("gameIds").map(String).filter(Boolean).slice(0, 12),
@@ -103,6 +105,8 @@ export async function createEventAction(_prev: ActionState, fd: FormData): Promi
   const event = await db.event.create({ data: { ...parsed.data, hostId: user.id } });
   await setEventGames(event.id, parsed.gameIds, user.id);
   await setHostFriends(event, parsed.friendIds, user.displayName);
+  // members who follow this host hear about it
+  await notifyHostFollowers(event, parsed.gameIds, user.displayName);
   revalidatePath("/events");
   redirect(`/events/${event.id}?created=1`);
 }

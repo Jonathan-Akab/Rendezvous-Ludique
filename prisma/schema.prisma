@@ -87,6 +87,10 @@ model User {
   suggestionVotes   SuggestionVote[]
   aiSetting         AiMemberSetting?
   playDraft         PlayDraft?
+  following         HostFollow[]      @relation("HostFollower")
+  followers         HostFollow[]      @relation("HostFollowed")
+  eventMessages     EventMessage[]
+  eventChats        EventChatMember[]
   aiUsage           AiUsage[]
   emailTokens       EmailToken[]
   bazaarListings    BazaarListing[]
@@ -256,6 +260,8 @@ model Event {
   maxPlayers       Int?
   // seats the host already filled with people not shown on the site ("3 of us, looking for 1")
   reservedSeats    Int       @default(0)
+  // the host decides whether the players get a private chat
+  chatEnabled      Boolean   @default(true)
   requiresApproval Boolean   @default(false)
   status           String    @default("SCHEDULED") // SCHEDULED | CANCELLED
   createdAt        DateTime  @default(now())
@@ -264,6 +270,8 @@ model Event {
   host      User            @relation("EventHost", fields: [hostId], references: [id], onDelete: Cascade)
   attendees EventAttendee[]
   games     EventGame[]
+  messages  EventMessage[]
+  chatMembers EventChatMember[]
   plays     Play[]
 
   @@index([startsAt])
@@ -283,6 +291,52 @@ model EventAttendee {
   user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([eventId, userId])
+}
+
+// "Tell me when this host announces a game": all their games, or only similar ones
+// (same kind, or one of the same games as the event the member followed from).
+model HostFollow {
+  id        String   @id @default(cuid())
+  userId    String
+  hostId    String
+  similar   Boolean  @default(true)
+  kind      String? // kind of the event they followed from
+  gameIds   String? // JSON: games of that event
+  createdAt DateTime @default(now())
+
+  user User @relation("HostFollower", fields: [userId], references: [id], onDelete: Cascade)
+  host User @relation("HostFollowed", fields: [hostId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, hostId])
+  @@index([hostId])
+}
+
+// The table's private chat: host and confirmed players, until the day after the game.
+model EventMessage {
+  id        String   @id @default(cuid())
+  eventId   String
+  userId    String
+  body      String
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, createdAt])
+}
+
+// Who wants a notification for new chat messages (and when they last read the chat).
+model EventChatMember {
+  eventId  String
+  userId   String
+  notify   Boolean   @default(false)
+  readAt   DateTime?
+  notified Boolean   @default(false) // a notification is waiting to be read: no more until then
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([eventId, userId])
 }
 
 model EventGame {

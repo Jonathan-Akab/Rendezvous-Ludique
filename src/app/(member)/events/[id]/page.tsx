@@ -8,6 +8,10 @@ import { FadeIn } from "@/components/Motion";
 import { MeepleAvatar } from "@/components/Meeple";
 import { canSeeAddress, getEventForViewer, seatsTaken } from "@/modules/events/service";
 import { KIND_COLORS } from "@/modules/events/components/EventCard";
+import { EventChat } from "@/modules/events/components/EventChat";
+import { FollowHost } from "@/modules/events/components/FollowHost";
+import { loadChatAction } from "@/modules/events/chat";
+import { db } from "@/lib/db";
 import {
   deleteEventAction,
   respondJoinRequestAction,
@@ -30,6 +34,11 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
   const showAddress = canSeeAddress(event, user.id);
   const color = KIND_COLORS[event.kind];
   const scheduled = event.status === "SCHEDULED";
+  // the table's private chat (host and players going), and "tell me about this host's next games"
+  const [chat, follow] = await Promise.all([
+    isHost || me?.status === "GOING" ? loadChatAction(event.id) : null,
+    isHost ? null : db.hostFollow.findUnique({ where: { userId_hostId: { userId: user.id, hostId: event.hostId } }, select: { similar: true } }),
+  ]);
 
   return (
     <FadeIn className="mx-auto max-w-4xl space-y-6">
@@ -119,6 +128,13 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
             </div>
           )}
 
+          {/* can't come this time? hear about this host's next games */}
+          {!isHost && (
+            <div className={scheduled ? "" : "border-t border-line pt-4"}>
+              <FollowHost eventId={event.id} hostId={event.hostId} hostName={event.host.displayName} following={follow ? (follow.similar ? "similar" : "all") : null} />
+            </div>
+          )}
+
           {/* Host tools */}
           {isHost && (
             <div className="flex flex-wrap gap-2 border-t border-line pt-4">
@@ -195,6 +211,8 @@ export default async function EventPage({ params }: { params: Promise<{ id: stri
           </p>
         )}
       </section>
+
+      {chat && <EventChat eventId={event.id} initial={chat} />}
     </FadeIn>
   );
 }

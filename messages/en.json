@@ -260,7 +260,9 @@
       "maxPlayers": "Seats (including you)",
       "maxPlayersHint": "No limit",
       "requiresApproval": "I approve each player",
-      "requiresApprovalHint": "Players ask to join and you accept them."
+      "requiresApprovalHint": "Players ask to join and you accept them.",
+      "chatEnabled": "Chat for the players",
+      "chatEnabledHint": "A private chat between you and the players going, open until the day after the game."
     },
     "errors": {
       "title": "Give your game a title (120 characters max).",
@@ -321,6 +323,30 @@
       "over": "{n, plural, one {# player too many} other {# players too many}}: raise the number of players",
       "open": "{n, plural, one {# player} other {# players}} so far, no seat limit",
       "reservedShown": "{count, plural, one {+ # seat already taken} other {+ # seats already taken}}"
+    },
+    "follow": {
+      "button": "Tell me about {name}'s next games",
+      "title": "Follow {name}",
+      "lead": "Can't come this time? Get an email when this host announces a new game.",
+      "similar": "Only similar games",
+      "similarText": "Same kind of event, or at least one of the same games.",
+      "all": "All their games",
+      "allText": "Every new game from this host.",
+      "emailNote": "You'll get a notification and an email. Stop any time here or in Settings.",
+      "cancel": "Cancel",
+      "followingSimilar": "You'll hear about {name}'s similar games.",
+      "followingAll": "You'll hear about all of {name}'s games.",
+      "stop": "Stop following"
+    },
+    "chat": {
+      "title": "Table chat",
+      "private": "Private: only the host and the players going. Open until {date}, then deleted.",
+      "notifyOn": "I get message alerts",
+      "notifyOff": "Alert me about new messages",
+      "empty": "No messages yet. Say hi to the table!",
+      "placeholder": "Write a message… (Enter to send)",
+      "send": "Send",
+      "closed": "The chat is closed: it ends the day after the game and its messages are deleted."
     }
   },
   "kallax": {
@@ -795,13 +821,23 @@
         "kallaxInvite": "An invitation to share a Kallax",
         "bazaarMessage": "A new bazar message",
         "suggestionUpdate": "The team answers my suggestion",
-        "eventAddedByHost": "A host adds me to their game"
+        "eventAddedByHost": "A host adds me to their game",
+        "hostNewEvent": "A host I follow announces a game",
+        "eventChatMessage": "New message in a game's chat (when I asked for it)"
       }
     },
     "guide": {
       "title": "Site guide",
       "lead": "The quick tour shown at your first sign-in.",
       "replay": "See the guide again"
+    },
+    "following": {
+      "title": "Hosts I follow",
+      "lead": "You get an email when these hosts announce a game.",
+      "empty": "You follow no host. On a game's page, tap “Tell me about their next games”.",
+      "similar": "similar games",
+      "all": "all their games",
+      "unfollow": "Stop following"
     }
   },
   "home": {
@@ -1977,6 +2013,14 @@
       "eventAddedByHost": {
         "title": "{name} added you to “{event}”",
         "body": "{name} put you among the players of “{event}”. You can leave the game at any time."
+      },
+      "hostNewEvent": {
+        "title": "{name} announces a new game: “{event}”",
+        "body": "{name}, a host you follow, just announced “{event}”. There may be room left!"
+      },
+      "eventChatMessage": {
+        "title": "New message in “{event}”",
+        "body": "{name} wrote in the chat of “{event}”."
       }
     }
   },
@@ -2298,7 +2342,9 @@
       "suggestionUpdate_reply": "The team replied to your suggestion “{title}”",
       "suggestionUpdate_status": "Your suggestion “{title}” is now: {statusLabel}",
       "suggestionUpdate_message": "Message from the team about “{title}”: {preview}",
-      "eventAddedByHost": "{name} added you to “{event}”"
+      "eventAddedByHost": "{name} added you to “{event}”",
+      "hostNewEvent": "{name} announces “{event}”",
+      "eventChatMessage": "{name} wrote in “{event}”"
     }
   },
   "demo": {

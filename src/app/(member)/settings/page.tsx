@@ -16,6 +16,8 @@ import { mailConfigured } from "@/lib/mail";
 import { NOTIFY_TYPES, parseNotifyPrefs } from "@/modules/notifications/emails";
 import { NotifyPrefsForm } from "@/modules/notifications/components/NotifyPrefsForm";
 import { ReplayGuideButton } from "@/modules/guide/components/SiteGuide";
+import { MeepleAvatar } from "@/components/Meeple";
+import { unfollowHostAction } from "@/modules/events/follow";
 
 export async function generateMetadata() {
   return { title: (await getTranslations("nav"))("settings") };
@@ -28,6 +30,7 @@ export default async function SettingsPage() {
   const ownAllowed = ownKeysAllowed(aiMod);
   const own = ownAllowed ? await db.aiMemberSetting.findUnique({ where: { userId: user.id }, select: { ownKeyHint: true, ownModel: true } }) : null;
   const ownSpend = own?.ownKeyHint ? await ownSpendSince(user.id, await monthStart()) : null;
+  const following = await db.hostFollow.findMany({ where: { userId: user.id }, include: { host: { select: { displayName: true, meepleColor: true } } }, orderBy: { createdAt: "desc" } });
   return (
     <FadeIn className="mx-auto max-w-3xl space-y-6">
       <div>
@@ -60,6 +63,30 @@ export default async function SettingsPage() {
           </p>
         </div>
         {mailConfigured() && <NotifyPrefsForm types={NOTIFY_TYPES} enabled={[...parseNotifyPrefs(user.notifyPrefs)]} />}
+        {/* hosts followed from a game's page ("M'avertir des prochaines parties") */}
+        <div className="space-y-2 border-t border-line/70 pt-4">
+          <h3 className="font-semibold">{t("following.title")}</h3>
+          <p className="text-xs text-muted">{t("following.lead")}</p>
+          {following.length === 0 ? (
+            <p className="text-sm text-muted">{t("following.empty")}</p>
+          ) : (
+            <ul className="space-y-1.5">
+              {following.map((f) => (
+                <li key={f.hostId} className="flex items-center gap-2 rounded-xl bg-surface-2/50 px-3 py-2 text-sm">
+                  <MeepleAvatar color={f.host.meepleColor} size={22} />
+                  <span className="flex-1">
+                    <b>{f.host.displayName}</b> · <span className="text-muted">{f.similar ? t("following.similar") : t("following.all")}</span>
+                  </span>
+                  <form action={unfollowHostAction.bind(null, f.hostId)}>
+                    <button type="submit" className="text-xs font-semibold text-muted underline hover:text-danger">
+                      {t("following.unfollow")}
+                    </button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
       {ownAllowed && (
         <div id="own-key" className="card card-pad scroll-mt-24 space-y-4">
