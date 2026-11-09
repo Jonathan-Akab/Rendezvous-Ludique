@@ -11,7 +11,13 @@
     "f4Title": "Friends",
     "f4Text": "Build your group of regular players.",
     "welcomeBack": "Back to the table",
-    "signInLead": "Sign in to see what's on the table this week."
+    "signInLead": "Sign in to see what's on the table this week.",
+    "demoInvite": {
+      "badge": "Guided tour",
+      "title": "Not sure? Take a tour first!",
+      "text": "Explore the site with examples, no account needed. A pawn guides you.",
+      "cta": "Start the tour"
+    }
   },
   "auth": {
     "identifier": "Email or username",
@@ -47,24 +53,21 @@
         "meepleColor": "Pick a meeple colour.",
         "locale": "Pick a language.",
         "form": "Check the form and try again.",
-        "signupNote": "Tell us in a few words how you heard about the group (at least 10 characters).",
-        "birthDate": "Enter a valid date of birth."
+        "signupNote": "Tell us in a few words how you heard about the group (at least 10 characters)."
       },
       "pending": "Your sign-up is still waiting for the team's approval.",
       "bot": "Your sign-up couldn't be sent. Take your time filling in the form and try again.",
       "tooMany": "Too many sign-ups from this connection. Try again in an hour.",
       "unverified": "First confirm your email address with the link you got when signing up.",
-      "tooYoung": "You must be {age} or older to sign up.",
       "linkInvalid": "This link is no longer valid (expired or already used).",
-      "mailOff": "Email isn't set up on this site. Ask an admin to reset your password."
+      "mailOff": "Email isn't set up on this site. Ask an admin to reset your password.",
+      "consent": "Tick the box to confirm you are {age} or older and accept the site's terms."
     },
     "becomeMember": "Become a member",
     "signupNote": "How did you hear about the group?",
     "signupNotePlaceholder": "E.g. I play at the Thursday game café with Marie.",
     "approvalHint": "A team member approves each sign-up (against fake accounts). You can sign in as soon as it's done.",
     "pendingSignup": "Thanks! Your sign-up was received. You can sign in as soon as a team member approves it.",
-    "birthDate": "Date of birth",
-    "ageHint": "You must be {age} or older to sign up. Your date of birth is only used to check this: it isn't stored.",
     "forgot": "Forgot your password?",
     "forgotTitle": "Forgot your password",
     "forgotLead": "Enter your email or username: we'll send you a link to choose a new password.",
@@ -89,7 +92,8 @@
       "already": "Your email address is already confirmed. You can sign in.",
       "invalid": "This link is no longer valid (expired or replaced by a newer one). Sign in: you'll be able to ask for a new confirmation email.",
       "signIn": "Go to sign in"
-    }
+    },
+    "consent": "I confirm I am {age} or older. I understand Rendezvous Ludique is a community site and that I am responsible for every game I host or attend."
   },
   "meeple": {
     "yours": "Your meeple",
@@ -2270,6 +2274,242 @@
       "suggestionUpdate_reply": "The team replied to your suggestion “{title}”",
       "suggestionUpdate_status": "Your suggestion “{title}” is now: {statusLabel}",
       "suggestionUpdate_message": "Message from the team about “{title}”: {preview}"
+    }
+  },
+  "demo": {
+    "metaTitle": "Demo",
+    "banner": {
+      "title": "Demo",
+      "text": "nothing here is real: the members, games and events are made up, and nothing is saved.",
+      "tour": "Replay the tour",
+      "signIn": "Sign in",
+      "signUp": "Create my account"
+    },
+    "blocked": {
+      "title": "This link leads to a members' page",
+      "text": "The demo sticks to examples. Create your free account to use everything for real!"
+    },
+    "nav": {
+      "home": "Home",
+      "events": "Games",
+      "kallax": "My Kallax",
+      "plays": "Logged plays",
+      "picker": "Roll the dice",
+      "ai": "Rules AI",
+      "facebook": "Facebook groups",
+      "games": "Ludothèque"
+    },
+    "quick": {
+      "announce": "Announce a game",
+      "log": "Log a play",
+      "kallax": "My Kallax",
+      "ai": "Ask the AI"
+    },
+    "home": {
+      "kicker": "Welcome back",
+      "hello": "Hi {name}!",
+      "lead": "This is what your home page looks like as a member.",
+      "board": "Message board",
+      "pinned": "Pinned",
+      "hoursAgo": "{n} h ago",
+      "table": "My table"
+    },
+    "events": {
+      "title": "Games",
+      "lead": "Game nights and events announced near you.",
+      "near": "Near Montréal · 50 km"
+    },
+    "announce": {
+      "lead": "Try the real form: nothing will be published, it's a demo."
+    },
+    "event": {
+      "needTitle": "Give your game a title.",
+      "done": "Demo: “{title}” would now be announced! With an account, players could join it."
+    },
+    "kallax": {
+      "lead": "Your own game library: your games, your expansions and how often you played them."
+    },
+    "plays": {
+      "lead": "Every logged play: who played, the scores, the winner and the expansions.",
+      "clockTitle": "Try the game clock"
+    },
+    "ai": {
+      "lead": "A rules question mid-game? The AI reads the rulebook and answers.",
+      "page": "Page {n}",
+      "note": "Sample conversations. With an account, the AI reads your games’ rulebooks, cites the pages, and the FAQ grows with every member’s questions.",
+      "locked": "You can’t ask in the demo: create your account to ask the AI about your games.",
+      "placeholder": "Ask your rules question…",
+      "hoursAgo": "{n} h ago",
+      "daysAgo": "{n} d ago"
+    },
+    "ask": {
+      "button": "A question?",
+      "title": "Ask me a question",
+      "lead": "I answer questions about how the site works.",
+      "placeholder": "E.g. Is my address visible?",
+      "send": "Send",
+      "close": "Close",
+      "thinking": "Looking for the answer…",
+      "ex1": "How do I announce a game at home?",
+      "ex2": "Is it free?",
+      "ex3": "What is My Kallax for?",
+      "scope": "Questions about the site only (not game rules). AI-generated answers: they may contain mistakes.",
+      "errors": {
+        "limit": "That's a lot of questions! Try again in an hour, or create your account to see everything.",
+        "unavailable": "I can't answer right now. The guided tour (“Replay the tour”) covers the essentials!",
+        "empty": "Write your question."
+      }
+    },
+    "tour": {
+      "progress": "Step {n} of {total}",
+      "skip": "Leave the tour",
+      "next": "Next",
+      "previous": "Back",
+      "finish": "Finish",
+      "signUp": "Create my free account",
+      "steps": {
+        "welcome": {
+          "title": "Welcome to the demo!",
+          "b1": "A quick tour of Rendezvous Ludique, no account needed.",
+          "b2": "Follow the pawn: it opens each section for you.",
+          "b3": "You can leave the tour at any time (✕)."
+        },
+        "banner": {
+          "title": "Nothing here is real",
+          "b1": "Members, games and events are made-up examples.",
+          "b2": "Try everything: nothing is saved."
+        },
+        "menu": {
+          "title": "The menu",
+          "b1": "Every section of the site is here.",
+          "b2": "On a phone, it scrolls at the top.",
+          "b3": "As a member, you can reorder it."
+        },
+        "board": {
+          "title": "The message board",
+          "b1": "News from the team, on your home page.",
+          "b2": "Important messages stay pinned on top.",
+          "b3": "Every member sees it."
+        },
+        "table": {
+          "title": "My table",
+          "b1": "The games you host or join.",
+          "b2": "And the ones near you.",
+          "b3": "One click for the details or to join."
+        },
+        "events": {
+          "title": "Find a game",
+          "b1": "Home game nights, events, tournaments, conventions.",
+          "b2": "By distance, city, date or kind of event.",
+          "b3": "Travelling? Find a table where you are.",
+          "b4": "The address of a game night at someone's home stays private."
+        },
+        "address": {
+          "title": "The address stays private",
+          "b1": "For a game night at someone's home, the address is hidden from everyone.",
+          "b2": "It only shows once your seat is approved.",
+          "b3": "The host chooses: accept each player (manual) or let them in right away (automatic).",
+          "b4": "Try “Ask to join” here, then Sam's game night (automatic)!"
+        },
+        "announce": {
+          "title": "Announce your game night",
+          "b1": "The real form: try it!",
+          "b2": "Pick the date, the games you bring and the seats.",
+          "b3": "Choose who sees it and whether you approve each player.",
+          "b4": "Your address is only shown to accepted players."
+        },
+        "kallax": {
+          "title": "My Kallax",
+          "b1": "Your games, like on your shelf.",
+          "b2": "Add by hand, from a photo or a list: the AI fills in the details.",
+          "b3": "Expansions are stored with their game.",
+          "b4": "The counter shows how often each game was played."
+        },
+        "ludo": {
+          "title": "The Ludothèque",
+          "b1": "Every member's games, in one place.",
+          "b2": "The meeple rating and how many Kallax have it.",
+          "b3": "One click to see the game and add it to your Kallax."
+        },
+        "clock": {
+          "title": "The game clock",
+          "b1": "“Start the game” starts the clock.",
+          "b2": "Pause, resume: you can even close the page.",
+          "b3": "At the end, enter the scores and log the play."
+        },
+        "plays": {
+          "title": "Logged plays",
+          "b1": "Who played, the scores, the winner and the expansions.",
+          "b2": "Your friends confirm the play on their side.",
+          "b3": "Your stats fill in by themselves."
+        },
+        "picker": {
+          "title": "Roll the dice",
+          "b1": "No idea? The die picks a game from your Kallax.",
+          "b2": "Filters: players, length, level, party game, kind of game…",
+          "b3": "Random draws and the first player too.",
+          "b4": "Try it: roll the die!"
+        },
+        "ai": {
+          "title": "The rules AI",
+          "b1": "A question mid-game? Ask it.",
+          "b2": "It reads the PDF rulebook and cites the pages.",
+          "b3": "The FAQ answers first, for free.",
+          "b4": "A real time-saver at the table!"
+        },
+        "facebook": {
+          "title": "The community",
+          "b1": "The local Facebook groups and pages.",
+          "b2": "A page opens right inside the site.",
+          "b3": "Pin your favourite groups on top."
+        },
+        "ask": {
+          "title": "A question?",
+          "b1": "This button answers your questions about the site.",
+          "b2": "It stays there during the whole demo."
+        },
+        "end": {
+          "title": "Ready to play?",
+          "b1": "The site is free, ad-free, made in Quebec by a board game fan.",
+          "b2": "Create your account and announce your first game night!",
+          "b3": "The more of us, the bigger the community."
+        }
+      },
+      "choose": {
+        "title": "Welcome to the demo!",
+        "text": "Everything here is made up and nothing is saved. How would you like to discover the site?",
+        "tour": "Guided tour",
+        "tourText": "A pawn shows you each section in 2 minutes.",
+        "explore": "Explore on my own",
+        "exploreText": "Wander at your own pace. The tour stays in the banner.",
+        "help": "A question about the site along the way? The “A question?” button, at the bottom right of every page, answers you any time."
+      }
+    },
+    "join": {
+      "addressHidden": "Address hidden until your seat is approved",
+      "addressShown": "Your seat is confirmed: here is the address",
+      "manual": "Manual approval: the host accepts each player personally, then the address is revealed to you.",
+      "auto": "Automatic approval: your seat is confirmed right away and the address appears.",
+      "pending": "Request sent — the host has to accept it. The address stays hidden until then.",
+      "confirmed": "Seat confirmed! The address is now visible to you.",
+      "demoNote": "This is a demo: nothing was sent.",
+      "signUp": "Create my account"
+    },
+    "game": {
+      "notMine": "Not in your Kallax",
+      "close": "Close",
+      "askAi": "Ask the AI",
+      "rulebookText": "With an account, the PDF rulebook opens right here in the site, page by page. The rules AI also uses it to answer your questions and cite the pages.",
+      "added": "Demo: “{name}” would now be in your Kallax!"
+    },
+    "nudge": {
+      "title": "Like what you see?",
+      "text": "Got a question about the site, or ready to join the community? It's free!",
+      "ask": "Ask a question",
+      "keepGoing": "Keep exploring"
+    },
+    "ludo": {
+      "lead": "Every game from the members' Kallax, with its rating. Find a game's info and add it to your Kallax in one click."
     }
   }
 }

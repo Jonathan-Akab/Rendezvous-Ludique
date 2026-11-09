@@ -106,21 +106,12 @@ export function RegisterForm({ approval, minimumAge }: { approval: boolean; mini
           <p className="mt-1 text-xs text-muted">{t("usernameHint")}</p>
         </div>
       </div>
-      <div className="grid gap-4 sm:grid-cols-[1fr_190px]">
-        <div>
-          <label className="label" htmlFor="email">
-            {t("email")}
-          </label>
-          <input id="email" name="email" type="email" className="input" required autoComplete="email" />
-        </div>
-        <div>
-          <label className="label" htmlFor="birthDate">
-            {t("birthDate")}
-          </label>
-          <input id="birthDate" name="birthDate" type="date" className="input" required max={latestBirthDate(minimumAge)} min="1900-01-01" autoComplete="bday" />
-        </div>
+      <div>
+        <label className="label" htmlFor="email">
+          {t("email")}
+        </label>
+        <input id="email" name="email" type="email" className="input" required autoComplete="email" />
       </div>
-      <p className="-mt-2 text-xs text-muted">{t("ageHint", { age: minimumAge })}</p>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label className="label" htmlFor="password">
@@ -145,6 +136,10 @@ export function RegisterForm({ approval, minimumAge }: { approval: boolean; mini
           <p className="mt-1 text-xs text-muted">{t("approvalHint")}</p>
         </div>
       )}
+      <label className="flex items-start gap-3 rounded-2xl border border-line/70 bg-surface-2/50 p-3 text-sm">
+        <input type="checkbox" name="consent" required className="mt-0.5 size-5 shrink-0 accent-[var(--accent)]" />
+        <span>{t("consent", { age: minimumAge })}</span>
+      </label>
       <FormMessage state={state} />
       <SubmitButton className="btn btn-primary w-full py-3 text-base" pendingLabel={t("creating")}>
         {t("createAccount")}
@@ -157,13 +152,6 @@ export function RegisterForm({ approval, minimumAge }: { approval: boolean; mini
       </p>
     </form>
   );
-}
-
-/** The latest birth date allowed for this minimum age (yyyy-mm-dd). */
-function latestBirthDate(age: number) {
-  const d = new Date();
-  d.setFullYear(d.getFullYear() - age);
-  return d.toISOString().slice(0, 10);
 }
 
 /** "Forgot my password": asks for the email or username and sends a link. */

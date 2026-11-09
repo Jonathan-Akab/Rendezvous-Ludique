@@ -21,13 +21,6 @@ async function confirmationRequired() {
   return mailConfigured() && (await getSiteSettings()).requireEmailConfirmation;
 }
 
-/** Full years between a birth date and today. */
-function ageOn(birth: Date, today = new Date()) {
-  let age = today.getFullYear() - birth.getFullYear();
-  const m = today.getMonth() - birth.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
-  return age;
-}
 
 const YEAR = 60 * 60 * 24 * 365;
 
@@ -110,10 +103,8 @@ export async function registerAction(_prev: ActionState, fd: FormData): Promise<
   }
   const data = parsed.data;
   if (str(fd, "password") !== str(fd, "confirm")) return { error: t("passwordMismatch") };
-  // Minimum age (Québec: age of majority). The birth date is only checked, never stored.
-  const birth = new Date(`${str(fd, "birthDate")}T12:00:00`);
-  if (Number.isNaN(birth.getTime()) || birth > new Date() || birth.getFullYear() < 1900) return { error: t("field.birthDate") };
-  if (ageOn(birth) < settings.minimumAge) return { error: t("tooYoung", { age: settings.minimumAge }) };
+  // Of age (Québec: 18) and responsible for the games they host or attend: the person ticks it.
+  if (fd.get("consent") !== "on") return { error: t("consent", { age: settings.minimumAge }) };
   const signupNote = str(fd, "signupNote").slice(0, 500);
   if (settings.registrationApproval && signupNote.length < 10) return { error: t("field.signupNote") };
 
@@ -140,6 +131,7 @@ export async function registerAction(_prev: ActionState, fd: FormData): Promise<
       status: pending ? "PENDING" : "ACTIVE",
       signupNote: signupNote || null,
       emailVerifiedAt: mustConfirm ? null : new Date(),
+      consentedAt: new Date(),
     },
   });
   recentSignups.set(ip, [...recent, Date.now()]);

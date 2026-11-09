@@ -76,7 +76,7 @@ function Toggle({ checked, onChange, children }: { checked: boolean; onChange: (
   );
 }
 
-export function GamePick({ games, playsEnabled, now, presets: initialPresets }: { games: PickerGame[]; playsEnabled: boolean; now: number; presets: PickerPreset[] }) {
+export function GamePick({ games, playsEnabled, now, presets: initialPresets, demo = false }: { games: PickerGame[]; playsEnabled: boolean; now: number; presets: PickerPreset[]; demo?: boolean }) {
   const t = useTranslations("picker.game");
   const tt = useTranslations("picker.types");
   const tp = useTranslations("picker.presets");
@@ -135,7 +135,7 @@ export function GamePick({ games, playsEnabled, now, presets: initialPresets }: 
   };
   const savePresets = (next: PickerPreset[]) => {
     setPresets(next);
-    void savePickerPresetsAction(next);
+    if (!demo) void savePickerPresetsAction(next);
   };
   const saveCurrent = () => {
     const name = presetName.trim();

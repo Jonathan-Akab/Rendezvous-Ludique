@@ -11,7 +11,13 @@
     "f4Title": "Amis",
     "f4Text": "Formez votre groupe de joueurs réguliers.",
     "welcomeBack": "De retour à la table",
-    "signInLead": "Connectez-vous pour voir ce qui se joue cette semaine."
+    "signInLead": "Connectez-vous pour voir ce qui se joue cette semaine.",
+    "demoInvite": {
+      "badge": "Visite guidée",
+      "title": "Pas certain? Fais d'abord le tour!",
+      "text": "Explore le site avec des exemples, sans créer de compte. Un pion te guide.",
+      "cta": "Commencer la visite"
+    }
   },
   "auth": {
     "identifier": "Courriel ou nom d'utilisateur",
@@ -47,24 +53,21 @@
         "meepleColor": "Choisissez une couleur de meeple.",
         "locale": "Choisissez une langue.",
         "form": "Vérifiez le formulaire et réessayez.",
-        "signupNote": "Dis-nous en quelques mots comment tu as connu le groupe (10 caractères minimum).",
-        "birthDate": "Entre une date de naissance valide."
+        "signupNote": "Dis-nous en quelques mots comment tu as connu le groupe (10 caractères minimum)."
       },
       "pending": "Ton inscription attend encore la validation de l'équipe.",
       "bot": "Ton inscription n'a pas pu être envoyée. Prends le temps de remplir le formulaire et réessaie.",
       "tooMany": "Trop d'inscriptions depuis cette connexion. Réessaie dans une heure.",
       "unverified": "Confirme d'abord ton adresse courriel avec le lien reçu à l'inscription.",
-      "tooYoung": "Il faut avoir {age} ans ou plus pour s'inscrire.",
       "linkInvalid": "Ce lien n'est plus valide (expiré ou déjà utilisé).",
-      "mailOff": "L'envoi de courriels n'est pas configuré sur ce site. Demande à un admin de réinitialiser ton mot de passe."
+      "mailOff": "L'envoi de courriels n'est pas configuré sur ce site. Demande à un admin de réinitialiser ton mot de passe.",
+      "consent": "Coche la case pour confirmer que tu as {age} ans ou plus et que tu acceptes les conditions du site."
     },
     "becomeMember": "Devenir membre",
     "signupNote": "Comment as-tu connu le groupe?",
     "signupNotePlaceholder": "Ex. : Je joue au café ludique du jeudi avec Marie.",
     "approvalHint": "Un membre de l'équipe valide chaque inscription (contre les faux comptes). Tu pourras te connecter dès que c'est fait.",
     "pendingSignup": "Merci! Ton inscription est reçue. Tu pourras te connecter dès qu'un membre de l'équipe l'aura validée.",
-    "birthDate": "Date de naissance",
-    "ageHint": "Il faut avoir {age} ans ou plus pour s'inscrire. Ta date de naissance sert seulement à le vérifier : elle n'est pas conservée.",
     "forgot": "Mot de passe oublié?",
     "forgotTitle": "Mot de passe oublié",
     "forgotLead": "Entre ton courriel ou ton nom d'utilisateur : on t'envoie un lien pour choisir un nouveau mot de passe.",
@@ -89,7 +92,8 @@
       "already": "Ton adresse courriel est déjà confirmée. Tu peux te connecter.",
       "invalid": "Ce lien n'est plus valide (expiré ou remplacé par un plus récent). Connecte-toi : tu pourras demander un nouveau courriel de confirmation.",
       "signIn": "Aller à la connexion"
-    }
+    },
+    "consent": "Je confirme avoir {age} ans ou plus. Je comprends que Rendezvous Ludique est un site communautaire et que je suis responsable de toutes les parties que j'organise ou auxquelles je participe."
   },
   "meeple": {
     "yours": "Votre meeple",
@@ -2270,6 +2274,242 @@
       "suggestionUpdate_reply": "L’équipe a répondu à ta suggestion « {title} »",
       "suggestionUpdate_status": "Ta suggestion « {title} » est maintenant : {statusLabel}",
       "suggestionUpdate_message": "Message de l’équipe au sujet de « {title} » : {preview}"
+    }
+  },
+  "demo": {
+    "metaTitle": "Démo",
+    "banner": {
+      "title": "Démo",
+      "text": "rien n'est réel : les membres, les parties et les jeux sont inventés, et rien n'est enregistré.",
+      "tour": "Revoir la visite",
+      "signIn": "Connexion",
+      "signUp": "Créer mon compte"
+    },
+    "blocked": {
+      "title": "Ce lien mène à une page de membre",
+      "text": "Dans la démo, on reste sur les exemples. Crée ton compte gratuit pour tout utiliser pour vrai!"
+    },
+    "nav": {
+      "home": "Accueil",
+      "events": "Parties",
+      "kallax": "Ma Kallax",
+      "plays": "Parties jouées",
+      "picker": "Coup de dé",
+      "ai": "IA des règles",
+      "facebook": "Groupes Facebook",
+      "games": "Ludothèque"
+    },
+    "quick": {
+      "announce": "Annoncer une partie",
+      "log": "Noter une partie",
+      "kallax": "Ma Kallax",
+      "ai": "Demander à l'IA"
+    },
+    "home": {
+      "kicker": "Bon retour",
+      "hello": "Salut {name}!",
+      "lead": "Voici à quoi ressemble ton accueil une fois membre.",
+      "board": "Babillard",
+      "pinned": "Épinglé",
+      "hoursAgo": "il y a {n} h",
+      "table": "Ma table"
+    },
+    "events": {
+      "title": "Parties",
+      "lead": "Les soirées et événements annoncés près de chez toi.",
+      "near": "Près de Montréal · 50 km"
+    },
+    "announce": {
+      "lead": "Essaie le vrai formulaire : rien ne sera publié, c'est une démo."
+    },
+    "event": {
+      "needTitle": "Donne un titre à ta partie.",
+      "done": "Démo : « {title} » serait maintenant annoncée! Avec un compte, les joueurs pourraient s'y inscrire."
+    },
+    "kallax": {
+      "lead": "Ta ludothèque à toi : tes jeux, tes extensions et combien de fois tu les as joués."
+    },
+    "plays": {
+      "lead": "Chaque partie notée : qui a joué, les points, le gagnant et les extensions.",
+      "clockTitle": "Essaie le chrono de partie"
+    },
+    "ai": {
+      "lead": "Une question de règles en pleine partie? L'IA lit le livret et répond.",
+      "page": "Page {n}",
+      "note": "Conversations d’exemple. Avec un compte, l’IA lit les livrets de tes jeux, cite les pages, et la FAQ grandit avec les questions de tous les membres.",
+      "locked": "Dans la démo, on ne pose pas de questions : crée ton compte pour demander à l’IA sur tes jeux.",
+      "placeholder": "Pose ta question sur les règles…",
+      "hoursAgo": "il y a {n} h",
+      "daysAgo": "il y a {n} j"
+    },
+    "ask": {
+      "button": "Une question?",
+      "title": "Pose-moi une question",
+      "lead": "Je réponds aux questions sur le fonctionnement du site.",
+      "placeholder": "Ex. : Mon adresse est-elle visible?",
+      "send": "Envoyer",
+      "close": "Fermer",
+      "thinking": "Je cherche la réponse…",
+      "ex1": "Comment annoncer une partie chez moi?",
+      "ex2": "Est-ce que c'est gratuit?",
+      "ex3": "À quoi sert Ma Kallax?",
+      "scope": "Seulement les questions sur le site (pas les règles de jeux). Réponses générées par une IA : elles peuvent contenir des erreurs.",
+      "errors": {
+        "limit": "Tu as posé beaucoup de questions! Réessaie dans une heure, ou crée ton compte pour tout voir.",
+        "unavailable": "Je ne peux pas répondre pour le moment. La visite guidée (bouton « Revoir la visite ») explique l'essentiel!",
+        "empty": "Écris ta question."
+      }
+    },
+    "tour": {
+      "progress": "Étape {n} sur {total}",
+      "skip": "Quitter la visite",
+      "next": "Suivant",
+      "previous": "Précédent",
+      "finish": "Terminer",
+      "signUp": "Créer mon compte gratuit",
+      "steps": {
+        "welcome": {
+          "title": "Bienvenue dans la démo!",
+          "b1": "Un tour rapide de Rendezvous Ludique, sans créer de compte.",
+          "b2": "Suis le pion : il ouvre chaque section pour toi.",
+          "b3": "Tu peux quitter la visite à tout moment (✕)."
+        },
+        "banner": {
+          "title": "Ici, rien n'est réel",
+          "b1": "Les membres, les parties et les jeux sont des exemples inventés.",
+          "b2": "Essaie tout : rien n'est enregistré."
+        },
+        "menu": {
+          "title": "Le menu",
+          "b1": "Toutes les sections du site sont ici.",
+          "b2": "Sur téléphone, il défile en haut.",
+          "b3": "Une fois membre, tu peux le réorganiser."
+        },
+        "board": {
+          "title": "Le babillard",
+          "b1": "Les nouvelles de l'équipe, sur ton accueil.",
+          "b2": "Les messages importants restent épinglés en haut.",
+          "b3": "Tous les membres le voient."
+        },
+        "table": {
+          "title": "Ma table",
+          "b1": "Les parties que tu organises ou auxquelles tu participes.",
+          "b2": "Et celles près de chez toi.",
+          "b3": "Un clic pour voir les détails ou t'inscrire."
+        },
+        "events": {
+          "title": "Trouver une partie",
+          "b1": "Soirées à la maison, événements, tournois, conventions.",
+          "b2": "Par distance, ville, date ou genre de soirée.",
+          "b3": "En voyage? Trouve une table où tu es.",
+          "b4": "L'adresse d'une soirée chez quelqu'un reste privée."
+        },
+        "address": {
+          "title": "L'adresse reste privée",
+          "b1": "Pour une soirée chez quelqu'un, l'adresse est cachée à tous.",
+          "b2": "Elle n'apparaît qu'une fois ta place approuvée.",
+          "b3": "L'hôte choisit : il accepte chaque joueur (manuel) ou laisse entrer tout de suite (automatique).",
+          "b4": "Essaie « Demander à me joindre » ici, puis la soirée de Sam (automatique)!"
+        },
+        "announce": {
+          "title": "Annoncer ta soirée",
+          "b1": "Le vrai formulaire : essaie-le!",
+          "b2": "Choisis la date, les jeux que tu sors et le nombre de places.",
+          "b3": "Décide qui la voit et si tu acceptes chaque joueur.",
+          "b4": "Ton adresse n'est montrée qu'aux joueurs acceptés."
+        },
+        "kallax": {
+          "title": "Ma Kallax",
+          "b1": "Tes jeux, comme sur ton étagère.",
+          "b2": "Ajout à la main, par photo ou par liste : l'IA complète les infos.",
+          "b3": "Les extensions sont rangées avec leur jeu.",
+          "b4": "Le compteur montre combien de fois chaque jeu a été joué."
+        },
+        "ludo": {
+          "title": "La Ludothèque",
+          "b1": "Tous les jeux des membres, au même endroit.",
+          "b2": "La note meeple et le nombre de Kallax qui l'ont.",
+          "b3": "Un clic pour voir la fiche et l'ajouter à ta Kallax."
+        },
+        "clock": {
+          "title": "Le chrono de partie",
+          "b1": "« Commencer la partie » lance le chrono.",
+          "b2": "Pause, reprise : tu peux même fermer la page.",
+          "b3": "À la fin, entre les points et note la partie."
+        },
+        "plays": {
+          "title": "Parties jouées",
+          "b1": "Qui a joué, les points, le gagnant et les extensions.",
+          "b2": "Tes amis confirment la partie de leur côté.",
+          "b3": "Tes statistiques se remplissent toutes seules."
+        },
+        "picker": {
+          "title": "Le Coup de dé",
+          "b1": "Pas d'idée? Le dé pige un jeu dans ta Kallax.",
+          "b2": "Filtres : joueurs, durée, niveau, party game, type de jeu…",
+          "b3": "Tirage au sort et premier joueur aussi.",
+          "b4": "Essaie : lance le dé!"
+        },
+        "ai": {
+          "title": "L'IA des règles",
+          "b1": "Une question en pleine partie? Pose-la.",
+          "b2": "Elle lit le livret PDF et cite les pages.",
+          "b3": "La FAQ répond d'abord, gratuitement.",
+          "b4": "Un vrai gain de temps à la table!"
+        },
+        "facebook": {
+          "title": "La communauté",
+          "b1": "Les groupes et pages Facebook de la région.",
+          "b2": "Une page s'ouvre directement dans le site.",
+          "b3": "Épingle tes groupes préférés en haut."
+        },
+        "ask": {
+          "title": "Une question?",
+          "b1": "Ce bouton répond à tes questions sur le site.",
+          "b2": "Il est là pendant toute la démo."
+        },
+        "end": {
+          "title": "Prêt à jouer?",
+          "b1": "Le site est gratuit, sans pub, fait au Québec par un passionné.",
+          "b2": "Crée ton compte et annonce ta première soirée!",
+          "b3": "Plus on est nombreux, plus la communauté grandit."
+        }
+      },
+      "choose": {
+        "title": "Bienvenue dans la démo!",
+        "text": "Ici, tout est inventé et rien n'est enregistré. Comment veux-tu découvrir le site?",
+        "tour": "Visite guidée",
+        "tourText": "Un pion te montre chaque section en 2 minutes.",
+        "explore": "Explorer librement",
+        "exploreText": "Promène-toi à ton rythme. La visite reste dans la bannière.",
+        "help": "Une question sur le site en cours de route? Le bouton « Une question? », en bas à droite de chaque page, te répond en tout temps."
+      }
+    },
+    "join": {
+      "addressHidden": "Adresse cachée jusqu'à ce que ta place soit approuvée",
+      "addressShown": "Ta place est confirmée : voici l'adresse",
+      "manual": "Approbation manuelle : l'hôte accepte chaque joueur lui-même, puis l'adresse t'est dévoilée.",
+      "auto": "Approbation automatique : ta place est confirmée tout de suite et l'adresse s'affiche.",
+      "pending": "Demande envoyée — l'hôte doit l'accepter. L'adresse restera cachée d'ici là.",
+      "confirmed": "Place confirmée! L'adresse est maintenant visible pour toi.",
+      "demoNote": "Ceci est une démo : rien n'a été envoyé.",
+      "signUp": "Créer mon compte"
+    },
+    "game": {
+      "notMine": "Pas dans ta Kallax",
+      "close": "Fermer",
+      "askAi": "Demander à l’IA",
+      "rulebookText": "Avec un compte, le livret PDF s’ouvre ici même, dans le site, page par page. L’IA des règles s’en sert aussi pour répondre à tes questions en citant les pages.",
+      "added": "Démo : « {name} » serait maintenant dans ta Kallax!"
+    },
+    "nudge": {
+      "title": "Tu aimes ce que tu vois?",
+      "text": "Tu as une question sur le site, ou tu es prêt à rejoindre la communauté? C'est gratuit!",
+      "ask": "Poser une question",
+      "keepGoing": "Continuer à explorer"
+    },
+    "ludo": {
+      "lead": "Tous les jeux des Kallax des membres, avec leur note. Trouve l'info d'un jeu et ajoute-le à ta Kallax en un clic."
     }
   }
 }

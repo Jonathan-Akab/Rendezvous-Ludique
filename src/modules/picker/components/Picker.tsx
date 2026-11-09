@@ -20,6 +20,7 @@ export function Picker({
   now,
   initialTab,
   presets,
+  demo = false,
 }: {
   games: PickerGame[];
   friends: Friend[];
@@ -28,6 +29,8 @@ export function Picker({
   now: number;
   initialTab: Tab;
   presets: PickerPreset[];
+  /** the public demo: saved filters stay in the page */
+  demo?: boolean;
 }) {
   const t = useTranslations("picker");
   const [tab, setTab] = useState<Tab>(initialTab);
@@ -53,7 +56,7 @@ export function Picker({
           </button>
         ))}
       </div>
-      {tab === "game" && <GamePick games={games} playsEnabled={playsEnabled} now={now} presets={presets} />}
+      {tab === "game" && <GamePick games={games} playsEnabled={playsEnabled} now={now} presets={presets} demo={demo} />}
       {tab === "list" && <ListPick games={games} />}
       {tab === "first" && <FirstPlayer friends={friends} me={me} />}
     </div>

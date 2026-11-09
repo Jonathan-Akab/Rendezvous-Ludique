@@ -5,6 +5,7 @@ import { FadeIn } from "@/components/Motion";
 import { Meeple } from "@/components/Meeple";
 import { LoginForm } from "@/modules/auth/components/AuthForms";
 import { mailConfigured } from "@/lib/mail";
+import { DemoInvite } from "@/modules/demo/components/DemoInvite";
 
 export default async function LandingPage({ searchParams }: { searchParams: Promise<{ next?: string; pending?: string; verify?: string; verified?: string; reset?: string }> }) {
   const [{ next, pending, verify, verified, reset }, settings, t, ta] = await Promise.all([searchParams, getSiteSettings(), getTranslations("landing"), getTranslations("auth")]);
@@ -43,24 +44,30 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
         </ul>
       </FadeIn>
 
-      <FadeIn delay={0.15} className="card card-pad relative mx-auto w-full max-w-md backdrop-blur">
-        <div className="absolute -top-5 left-6 flex gap-1" aria-hidden>
-          {["#c92a2a", "#1c5fbf", "#f2b705", "#2b8a3e"].map((c) => (
-            <Meeple key={c} color={c} size={28} />
-          ))}
-        </div>
-        <h2 className="section-title mb-1 mt-2">{t("welcomeBack")}</h2>
-        <p className="mb-5 text-sm text-muted">{t("signInLead")}</p>
-        {verify === "invalid" ? (
-          <p className="mb-4 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">{ta("errors.linkInvalid")}</p>
-        ) : verify ? (
-          <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("checkEmail")}</p>
-        ) : null}
-        {verified && <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("emailConfirmed")}</p>}
-        {reset && <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("passwordChanged")}</p>}
-        {pending && <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("pendingSignup")}</p>}
-        <LoginForm next={next} registrationOpen={settings.registrationOpen} mailOn={mailConfigured()} />
-      </FadeIn>
+      <div className="mx-auto w-full max-w-md space-y-10">
+        {/* not sure yet? the demo, right above the sign-in card */}
+        <FadeIn delay={0.1}>
+          <DemoInvite />
+        </FadeIn>
+        <FadeIn delay={0.2} className="card card-pad relative w-full backdrop-blur">
+          <div className="absolute -top-5 left-6 flex gap-1" aria-hidden>
+            {["#c92a2a", "#1c5fbf", "#f2b705", "#2b8a3e"].map((c) => (
+              <Meeple key={c} color={c} size={28} />
+            ))}
+          </div>
+          <h2 className="section-title mb-1 mt-2">{t("welcomeBack")}</h2>
+          <p className="mb-5 text-sm text-muted">{t("signInLead")}</p>
+          {verify === "invalid" ? (
+            <p className="mb-4 rounded-xl bg-danger/10 px-3 py-2 text-sm text-danger">{ta("errors.linkInvalid")}</p>
+          ) : verify ? (
+            <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("checkEmail")}</p>
+          ) : null}
+          {verified && <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("emailConfirmed")}</p>}
+          {reset && <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("passwordChanged")}</p>}
+          {pending && <p className="mb-4 rounded-xl bg-success/10 px-3 py-2 text-sm text-success">{ta("pendingSignup")}</p>}
+          <LoginForm next={next} registrationOpen={settings.registrationOpen} mailOn={mailConfigured()} />
+        </FadeIn>
+      </div>
     </div>
   );
 }

@@ -41,6 +41,8 @@ model User {
   pickerPresets   String?
   // "Groupes Facebook": the tiles the member pinned on top (JSON list: "featured" or a group id)
   facebookPins    String?
+  // sign-up: ticked "I am of age and responsible for the games I host or attend"
+  consentedAt     DateTime?
 
   // Personalisation
   meepleColor String @default("#d9480f")
